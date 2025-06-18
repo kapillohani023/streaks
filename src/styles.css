@@ -1,1 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
+
+
+html, body { 
+  height: 100%; 
+}
+
+body { 
+  margin: 0; 
+  font-family: "Tomorrow", Roboto, "Helvetica Neue", sans-serif; 
+}
+
+/* Ensure Tomorrow font is used throughout the entire application */
+*, *::before, *::after {
+  font-family: inherit;
+}
+
+* {
+  font-family: "Tomorrow", Roboto, "Helvetica Neue", sans-serif !important;
+}
+
+
+.full-width {
+  width: 100%;
+}
