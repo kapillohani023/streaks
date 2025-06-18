@@ -1,0 +1,25 @@
+<div class="form-container">
+  <h2 class="form-title">{{ config.title }}</h2>
+  
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="dynamic-form">
+    <div *ngFor="let field of config.fields" class="form-field">
+      <app-input
+        [id]="field.key"
+        [type]="field.type"
+        [label]="field.label"
+        [placeholder]="field.placeholder"
+        [required]="field.required || false"
+        [error]="getFieldError(field.key)"
+        [formControlName]="field.key"
+      ></app-input>
+    </div>
+    
+    <div *ngFor="let action of config.actions" class="form-action">
+      <app-button
+        [label]="action.label"
+        [type]="action.type"
+        (onClick)="action.onClick?.()"
+      ></app-button>
+    </div>
+  </form>
+</div>

@@ -7,7 +7,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   styleUrl: './button.component.css'
 })
 export class ButtonComponent {
-  @Input() text: string = 'Button';
+  @Input() label: string = 'Button';
   @Input() disabled: boolean = false;
   @Input() type: 'button' | 'submit'= 'button';
   
