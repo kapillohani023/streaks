@@ -1,0 +1,17 @@
+<mat-form-field [appearance]="appearance" class="full-width">
+  <mat-label>{{ label }}</mat-label>
+  
+  <input 
+    matInput
+    [id]="id"
+    [type]="type"
+    [placeholder]="placeholder"
+    [required]="required"
+    [value]="value"
+    [disabled]="disabled"
+    (input)="onInput($event)"
+    (blur)="onBlur()"
+  />
+
+  <mat-error *ngIf="hasError()">{{ error }}</mat-error>
+</mat-form-field>
