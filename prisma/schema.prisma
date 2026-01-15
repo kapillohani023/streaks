@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Streak {
+  id          String        @id @default(cuid())
+  name        String
+  description String
+  startDate   DateTime      @map("start_date")
+  entries     StreakEntry[]
+
+  @@map("streaks")
+}
+
+model StreakEntry {
+  id        String   @id @default(cuid())
+  streakId  String   @map("streak_id")
+  date      DateTime
+  completed Boolean  @default(false)
+  note      String?
+  streak    Streak   @relation(fields: [streakId], references: [id], onDelete: Cascade)
+
+  @@index([streakId, date])
+  @@map("streak_entries")
+}

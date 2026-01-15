@@ -4,84 +4,89 @@ import { useState, useEffect } from 'react';
 import { Check } from 'lucide-react';
 import { StreakCard } from '../components/StreakCard';
 import { Streak } from '../lib/Streak';
-import { StreakEntry } from '../lib/StreakEntry';
 import { CreateStreakDialog } from '../components/CreateStreakDialog';
 import { NotesDialog } from '../components/NotesDialog';
 import { Sidebar } from '../components/Sidebar';
 import { HomeDashboard } from '../components/HomeDashboard';
 import { isCompletedToday } from '../utils/streak';
+import {
+  fetchStreaks,
+  createStreak,
+  deleteStreak,
+  createStreakEntry,
+} from '../lib/api';
 
 export default function App() {
   const [streaks, setStreaks] = useState<Streak[]>([]);
   const [selectedStreakId, setSelectedStreakId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [notesDialog, setNotesDialog] = useState<{ isOpen: boolean; streakId: string | null }>({
     isOpen: false,
     streakId: null,
   });
 
-  // Load streaks from localStorage
+  // Load streaks from API
   useEffect(() => {
-    const saved = localStorage.getItem('streaks');
-    if (saved) {
+    const loadStreaks = async () => {
       try {
-        const loadedStreaks = JSON.parse(saved);
-        loadedStreaks.forEach((streak: Streak) => {
-          streak.entries.forEach((entry: StreakEntry) => {
-            entry.date = new Date(entry.date);
-          });
-        });
+        const loadedStreaks = await fetchStreaks();
         setStreaks(loadedStreaks);
-        // Don't auto-select any streak - show home dashboard by default
       } catch (e) {
         console.error('Failed to load streaks:', e);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
+    loadStreaks();
   }, []);
 
-  // Save streaks to localStorage
-  useEffect(() => {
-    if (streaks.length > 0) {
-      localStorage.setItem('streaks', JSON.stringify(streaks));
-    } else {
-      localStorage.removeItem('streaks');
-    }
-  }, [streaks]);
-
-  const handleCreateStreak = (name: string, description: string) => {
-    const newStreak: Streak = {
-      id: Date.now().toString(),
-      name,
-      description,
-      entries: [],
-      startDate: new Date(),
-    };
-    setStreaks([...streaks, newStreak]);
-    setSelectedStreakId(newStreak.id);
-  };
-
-  const handleDeleteStreak = (id: string) => {
-    const newStreaks = streaks.filter(s => s.id !== id);
-    setStreaks(newStreaks);
-
-    // Go back to home if deleted streak was selected
-    if (selectedStreakId === id) {
-      setSelectedStreakId(null);
+  const handleCreateStreak = async (name: string, description: string) => {
+    try {
+      const newStreak = await createStreak(name, description);
+      setStreaks([...streaks, newStreak]);
+      setSelectedStreakId(newStreak.id);
+    } catch (e) {
+      console.error('Failed to create streak:', e);
     }
   };
 
-  const handleSaveNote = (streakId: string, note: string) => {
-    const streak = streaks.find(s => s.id === streakId);
-    if (streak) {
-      const streakEntry: StreakEntry = {
-        id: Date.now().toString(),
-        date: new Date(),
-        note,
-        completed: true,
+  const handleDeleteStreak = async (id: string) => {
+    try {
+      await deleteStreak(id);
+      const newStreaks = streaks.filter(s => s.id !== id);
+      setStreaks(newStreaks);
+
+      // Go back to home if deleted streak was selected
+      if (selectedStreakId === id) {
+        setSelectedStreakId(null);
       }
-      streak.entries.push(streakEntry);
-      setStreaks([...streaks]);
+    } catch (e) {
+      console.error('Failed to delete streak:', e);
+    }
+  };
+
+  const handleSaveNote = async (streakId: string, note: string) => {
+    try {
+      const newEntry = await createStreakEntry(streakId, {
+        date: new Date(),
+        completed: true,
+        note,
+      });
+
+      // Update local state with the new entry
+      setStreaks(streaks.map(streak => {
+        if (streak.id === streakId) {
+          return {
+            ...streak,
+            entries: [...streak.entries, newEntry],
+          };
+        }
+        return streak;
+      }));
       setNotesDialog({ isOpen: false, streakId: null });
+    } catch (e) {
+      console.error('Failed to save note:', e);
     }
   };
 
