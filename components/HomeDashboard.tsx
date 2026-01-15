@@ -28,7 +28,7 @@ export function HomeDashboard({ streaks }: HomeDashboardProps) {
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
       streaks.forEach(streak => {
-        const streakCompletedToday = streak.entries.find(entry => new Date(entry.date).toDateString() === dateStr);
+        const streakCompletedToday = streak.entries.find(entry => entry.date.toDateString() === dateStr);
         if (streakCompletedToday) {
           totalCompleted++;
         }

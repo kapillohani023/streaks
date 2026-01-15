@@ -11,16 +11,13 @@ interface StreakCardProps {
 }
 
 export function StreakCard({ streak, onDelete, onToggleToday }: StreakCardProps) {
-  // Convert timestamps to date strings (normalized to midnight) for comparison
-  const completedDatesSet = new Set(
-    streak.entries
-      .filter((entry) => entry.completed)
-      .map((entry) => {
-        const d = new Date(entry.date);
-        d.setHours(0, 0, 0, 0);
-        return d.getTime();
-      })
-  );
+  // Get completed entries' dates (already normalized to midnight)
+  const completedDates = streak.entries
+    .filter((entry) => entry.completed)
+    .map((entry) => entry.date);
+
+  // Create a set of timestamps for fast lookup
+  const completedDatesSet = new Set(completedDates.map(d => d.getTime()));
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -46,9 +43,8 @@ export function StreakCard({ streak, onDelete, onToggleToday }: StreakCardProps)
     let currentStreak = 1;
     const sortedDates = [...completedDatesSet].sort();
     for (let i = 1; i < sortedDates.length; i++) {
-      const prevDate = new Date(sortedDates[i - 1]);
-      const currDate = new Date(sortedDates[i]);
-      const diffTime = currDate.getTime() - prevDate.getTime();
+      // sortedDates contains timestamps, so we calculate diff directly
+      const diffTime = sortedDates[i] - sortedDates[i - 1];
       const diffDays = diffTime / (1000 * 60 * 60 * 24);
       if (diffDays === 1) {
         currentStreak++;
@@ -103,15 +99,15 @@ export function StreakCard({ streak, onDelete, onToggleToday }: StreakCardProps)
 
       {/* Calendar */}
       <div className="mb-6">
-        <StreakCalendar completedDates={Array.from(completedDatesSet).map(t => new Date(t))} />
+        <StreakCalendar completedDates={completedDates} />
       </div>
 
       {/* Today button */}
       <button
         onClick={() => onToggleToday(streak.id)}
         className={`w-full py-3 rounded border-2 transition-colors ${isCompletedToday(streak)
-            ? 'border-black bg-black text-white hover:bg-zinc-800'
-            : 'border-black bg-white text-black hover:bg-zinc-100'
+          ? 'border-black bg-black text-white hover:bg-zinc-800'
+          : 'border-black bg-white text-black hover:bg-zinc-100'
           }`}
       >
         <span className="flex items-center justify-center gap-2">

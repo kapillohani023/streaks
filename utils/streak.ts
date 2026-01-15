@@ -1,6 +1,12 @@
 import { Streak } from "../lib/Streak";
 
 export const isCompletedToday = (streak: Streak) => {
-    const today = new Date().toDateString().split('T')[0];
-    return streak.entries.some(entry => new Date(entry.date).toDateString().split('T')[0] === today);
+    const today = new Date().toDateString();
+    return streak.entries.some(entry => entry.date.toDateString() === today);
 }
+
+export const normalizeToMidnight = (date: Date): Date => {
+    const normalized = new Date(date);
+    normalized.setHours(0, 0, 0, 0);
+    return normalized;
+};

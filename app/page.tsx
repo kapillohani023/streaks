@@ -26,6 +26,11 @@ export default function App() {
     if (saved) {
       try {
         const loadedStreaks = JSON.parse(saved);
+        loadedStreaks.forEach((streak: Streak) => {
+          streak.entries.forEach((entry: StreakEntry) => {
+            entry.date = new Date(entry.date);
+          });
+        });
         setStreaks(loadedStreaks);
         // Don't auto-select any streak - show home dashboard by default
       } catch (e) {
@@ -49,7 +54,7 @@ export default function App() {
       name,
       description,
       entries: [],
-      startDate: Date.now(),
+      startDate: new Date(),
     };
     setStreaks([...streaks, newStreak]);
     setSelectedStreakId(newStreak.id);
@@ -70,7 +75,7 @@ export default function App() {
     if (streak) {
       const streakEntry: StreakEntry = {
         id: Date.now().toString(),
-        date: Date.now(),
+        date: new Date(),
         note,
         completed: true,
       }
@@ -99,7 +104,7 @@ export default function App() {
   const selectedStreak = streaks.find(s => s.id === selectedStreakId);
   const today = new Date().toDateString();
   const currentNote = notesDialog.streakId
-    ? streaks.find(s => s.id === notesDialog.streakId)?.entries.find(e => new Date(e.date).toDateString() === today)?.note || ''
+    ? streaks.find(s => s.id === notesDialog.streakId)?.entries.find(e => e.date.toDateString() === today)?.note || ''
     : '';
   const notesStreakName = notesDialog.streakId
     ? streaks.find(s => s.id === notesDialog.streakId)?.name || ''
@@ -130,8 +135,8 @@ export default function App() {
                       key={streak.id}
                       onClick={() => handleDailyCheck(streak.id)}
                       className={`flex items-center gap-2 px-4 py-2 rounded border-2 transition-colors whitespace-nowrap ${isCompleted
-                          ? 'border-black bg-black text-white'
-                          : 'border-black hover:bg-zinc-100'
+                        ? 'border-black bg-black text-white'
+                        : 'border-black hover:bg-zinc-100'
                         }`}
                     >
                       {isCompleted && <Check size={16} />}
