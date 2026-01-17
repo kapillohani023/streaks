@@ -1,5 +1,5 @@
-import { Streak } from "./Streak";
-import { StreakEntry } from "./StreakEntry";
+import { Streak } from "@/models/Streak";
+import { StreakEntry } from "@/models/StreakEntry";
 
 const API_BASE = "/api/streaks";
 

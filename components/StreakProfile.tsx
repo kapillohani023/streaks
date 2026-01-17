@@ -1,29 +1,65 @@
-import React from 'react';
-import { Trash2, Check } from 'lucide-react';
-import { StreakCalendar } from './StreakCalendar';
-import { Streak } from '../lib/Streak';
-import { isCompletedToday } from '@/utils/streak';
+"use client"
+import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
+import { MarkAsCompleted } from "./streak-profile/MarkAsCompleted";
+import { Streak } from "@/models/Streak";
+import { fetchStreaks, deleteStreak } from "@/lib/api";
+import { StreakCalendar } from "./streak-profile/StreakCalendar";
+import { isCompletedToday } from "@/utils/streak";
+import { DeleteStreakButton } from "./streak-profile/DeleteStreakButton";
 
-interface StreakCardProps {
-  streak: Streak;
-  onDelete: (id: string) => void;
-  onToggleToday: (id: string) => void;
-}
+export default function StreakProfile() {
+  const params = useParams();
+  const router = useRouter();
+  const streakId = params.id;
+  const dummyStreak: Streak = {
+    id: '-',
+    name: '-',
+    description: '-',
+    startDate: new Date(),
+    entries: []
+  }
+  const [streak, setStreak] = useState<Streak>(dummyStreak);
+  const [isLoading, setIsLoading] = useState(true);
 
-export function StreakCard({ streak, onDelete, onToggleToday }: StreakCardProps) {
-  // Get completed entries' dates (already normalized to midnight)
+  const loadStreak = useCallback(async () => {
+    try {
+      const loadedStreaks = await fetchStreaks();
+      const streak = loadedStreaks.find((streak) => streak.id === streakId);
+      if (streak) {
+        setStreak(streak);
+      }
+    } catch (e) {
+      console.error('Failed to load streaks:', e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [streakId]);
+
+  useEffect(() => {
+    loadStreak();
+  }, [loadStreak]);
+
+  const handleDelete = async (streakId: string) => {
+    try {
+      await deleteStreak(streakId);
+      router.push('/dashboard');
+    } catch (e) {
+      console.error('Failed to delete streak:', e);
+    }
+  }
+
   const completedDates = streak.entries
     .filter((entry) => entry.completed)
     .map((entry) => entry.date);
 
-  // Create a set of timestamps for fast lookup
   const completedDatesSet = new Set(completedDates.map(d => d.getTime()));
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const todayTime = today.getTime();
 
-  // Calculate current streak
   const calculateCurrentStreak = () => {
     let count = 0;
 
@@ -36,14 +72,12 @@ export function StreakCard({ streak, onDelete, onToggleToday }: StreakCardProps)
     return count;
   };
 
-  // Calculate longest streak
   const calculateLongestStreak = () => {
     if (completedDatesSet.size === 0) return 0;
     let maxStreak = 1;
     let currentStreak = 1;
     const sortedDates = [...completedDatesSet].sort();
     for (let i = 1; i < sortedDates.length; i++) {
-      // sortedDates contains timestamps, so we calculate diff directly
       const diffTime = sortedDates[i] - sortedDates[i - 1];
       const diffDays = diffTime / (1000 * 60 * 60 * 24);
       if (diffDays === 1) {
@@ -59,11 +93,8 @@ export function StreakCard({ streak, onDelete, onToggleToday }: StreakCardProps)
   const currentStreak = calculateCurrentStreak();
   const longestStreak = calculateLongestStreak();
   const totalScore = completedDatesSet.size;
-
-
-
   return (
-    <div className="border-2 border-black rounded-lg p-6 bg-white">
+    <div className="p-6 text-black bg-white w-full h-full">
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
@@ -72,13 +103,7 @@ export function StreakCard({ streak, onDelete, onToggleToday }: StreakCardProps)
             <p className="text-zinc-600">{streak.description}</p>
           )}
         </div>
-        <button
-          onClick={() => onDelete(streak.id)}
-          className="text-zinc-600 hover:text-black transition-colors p-2"
-          aria-label="Delete streak"
-        >
-          <Trash2 size={20} />
-        </button>
+        <DeleteStreakButton streakId={streak.id} handleDelete={handleDelete} />
       </div>
 
       {/* Stats */}
@@ -103,18 +128,7 @@ export function StreakCard({ streak, onDelete, onToggleToday }: StreakCardProps)
       </div>
 
       {/* Today button */}
-      <button
-        onClick={() => onToggleToday(streak.id)}
-        className={`w-full py-3 rounded border-2 transition-colors ${isCompletedToday(streak)
-          ? 'border-black bg-black text-white hover:bg-zinc-800'
-          : 'border-black bg-white text-black hover:bg-zinc-100'
-          }`}
-      >
-        <span className="flex items-center justify-center gap-2">
-          {isCompletedToday(streak) && <Check size={20} />}
-          {isCompletedToday(streak) ? 'Completed Today' : 'Mark Today Complete'}
-        </span>
-      </button>
+      <MarkAsCompleted streak={streak} label={isCompletedToday(streak) ? 'Completed Today' : 'Mark Today Complete'} onSubmit={loadStreak} />
     </div>
   );
 }

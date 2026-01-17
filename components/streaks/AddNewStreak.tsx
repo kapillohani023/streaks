@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 
 interface CreateStreakDialogProps {
   isOpen: boolean;
@@ -7,7 +7,7 @@ interface CreateStreakDialogProps {
   onCreate: (name: string, description: string) => void;
 }
 
-export function CreateStreakDialog({ isOpen, onClose, onCreate }: CreateStreakDialogProps) {
+function CreateStreakDialog({ isOpen, onClose, onCreate }: CreateStreakDialogProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
@@ -88,5 +88,30 @@ export function CreateStreakDialog({ isOpen, onClose, onCreate }: CreateStreakDi
         </form>
       </div>
     </div>
+  );
+}
+
+interface AddNewStreakProps {
+  onCreateNew: (name: string, description: string) => void;
+}
+export function AddNewStreak({ onCreateNew }: AddNewStreakProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  return (
+    <>
+      <div className="p-4">
+        <button
+          onClick={() => setIsDialogOpen(true)}
+          className="w-full flex items-center justify-center gap-2 bg-black text-white px-4 py-3 rounded cursor-pointer"
+        >
+          <Plus size={20} />
+          New Streak
+        </button>
+      </div>
+      <CreateStreakDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onCreate={onCreateNew}
+      />
+    </>
   );
 }

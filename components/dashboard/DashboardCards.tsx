@@ -1,13 +1,12 @@
-import React from 'react';
 import { Flame, Target, TrendingUp, TrendingDown } from 'lucide-react';
-import { Streak } from '../lib/Streak';
+import { Streak } from '../../lib/Streak';
 import { isCompletedToday } from '@/utils/streak';
 
-interface HomeDashboardProps {
+interface DashboardCardsProps {
   streaks: Streak[];
 }
 
-export function HomeDashboard({ streaks }: HomeDashboardProps) {
+export function DashboardCards({ streaks }: DashboardCardsProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -26,12 +25,8 @@ export function HomeDashboard({ streaks }: HomeDashboardProps) {
     for (let i = 0; i < days; i++) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
       streaks.forEach(streak => {
-        const streakCompletedToday = streak.entries.find(entry => entry.date.toDateString() === dateStr);
-        if (streakCompletedToday) {
-          totalCompleted++;
-        }
+        if (isCompletedToday(streak)) totalCompleted++;
       });
     }
 
@@ -44,11 +39,6 @@ export function HomeDashboard({ streaks }: HomeDashboardProps) {
 
   return (
     <div className="p-8">
-      <div className="mb-8">
-        <h2 className="text-3xl mb-2">Dashboard</h2>
-        <p className="text-zinc-500">Your overall progress and statistics</p>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Completed Today */}
         <div className="border-2 border-black rounded-lg p-6 bg-white">
