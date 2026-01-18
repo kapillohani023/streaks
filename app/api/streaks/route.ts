@@ -2,10 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { CreateStreakSchema } from "@/lib/validation";
 
+import { auth } from "@/app/auth";
+
 // GET /api/streaks - List all streaks with entries
 export async function GET() {
     try {
+        const session = await auth();
+
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const streaks = await prisma.streak.findMany({
+            where: {
+                userId: session.user.id
+            },
             include: {
                 entries: {
                     orderBy: { date: "desc" },
@@ -27,6 +38,11 @@ export async function GET() {
 // POST /api/streaks - Create a new streak
 export async function POST(request: NextRequest) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const body = await request.json();
         const result = CreateStreakSchema.safeParse(body);
 
@@ -44,6 +60,7 @@ export async function POST(request: NextRequest) {
                 name,
                 description,
                 startDate: startDate ?? new Date(),
+                userId: session.user.id,
             },
             include: {
                 entries: true,

@@ -29,7 +29,7 @@ export async function SignIn() {
                     >
                         <button
                             type="submit"
-                            className="cursor-pointergroup relative flex w-full justify-center items-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 ease-in-out shadow-sm"
+                            className="cursor-pointer group relative flex w-full justify-center items-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 ease-in-out shadow-sm"
                         >
                             <FcGoogle className="h-6 w-6" />
                             Sign in with Google

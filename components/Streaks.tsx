@@ -1,5 +1,5 @@
 "use client"
-import { Streak } from "../lib/util";
+import { Streak } from "@/types/Streak";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { fetchStreaks, createStreak } from "../lib/api";

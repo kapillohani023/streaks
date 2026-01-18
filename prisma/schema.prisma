@@ -7,11 +7,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  streaks   Streak[]
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@map("users")
+}
+
 model Streak {
   id          String        @id @default(cuid())
   name        String
   description String
   startDate   DateTime      @map("start_date")
+  userId      String        @map("user_id")
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   entries     StreakEntry[]
 
   @@map("streaks")

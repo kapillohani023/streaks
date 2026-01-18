@@ -18,22 +18,29 @@ export const metadata: Metadata = {
   description: "Build habits better with streaks",
 };
 
-export default function RootLayout({
+import { auth } from "@/app/auth";
+import { SessionProvider } from "next-auth/react";
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="h-screen flex flex-col">
-          <div className="flex-1 min-h-0 overflow-y-auto">
-            {children}
+        <SessionProvider session={session}>
+          <div className="h-screen flex flex-col">
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              {children}
+            </div>
+            <Navbar />
           </div>
-          <Navbar />
-        </div>
+        </SessionProvider>
       </body>
     </html>
   );

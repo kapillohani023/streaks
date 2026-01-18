@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
-import Google from "next-auth/providers/google";
+import { prisma } from "@/lib/db";
+import { authConfig } from "@/app/auth.config";
 
 export const {
   handlers,
@@ -7,18 +8,46 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
-  providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-  ],
-  pages: {
-    signIn: "/signin",
-  },
+  ...authConfig,
   callbacks: {
-    authorized: async ({ auth }) => {
-      return !!auth;
+    ...authConfig.callbacks,
+    async signIn({ user }) {
+      if (!user.email) return false;
+      try {
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email },
+        });
+
+        if (!existingUser) {
+          await prisma.user.create({
+            data: {
+              name: user.name || "Anonymous",
+              email: user.email,
+            },
+          });
+        }
+        return true;
+      } catch (error) {
+        console.error("Error creating user", error);
+        return false;
+      }
+    },
+    async jwt({ token, user }) {
+      if (token.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email },
+        });
+        if (dbUser) {
+          token.id = dbUser.id;
+        }
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id as string;
+      }
+      return session;
     },
   },
 });

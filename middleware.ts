@@ -1,4 +1,7 @@
-export { auth as middleware } from "@/app/auth";
+import NextAuth from "next-auth";
+import { authConfig } from "@/app/auth.config";
+
+export const { auth: middleware } = NextAuth(authConfig);
 
 export const config = {
     matcher: ["/((?!api/auth|_next|favicon.ico|login).*)"],
