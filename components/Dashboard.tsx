@@ -2,7 +2,7 @@
 import { DashboardCards } from "./dashboard/DashboardCards";
 import { DailyCheckIn } from "./dashboard/DailyCheckIn";
 import { useState, useEffect, useCallback } from "react";
-import { Streak } from "@/models/Streak";
+import { Streak } from "@/types/Streak";
 import { fetchStreaks } from "@/lib/api";
 
 export function Dashboard() {

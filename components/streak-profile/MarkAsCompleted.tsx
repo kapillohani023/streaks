@@ -1,8 +1,8 @@
 "use client"
-import { Streak } from "@/models/Streak";
+import { Streak } from "@/types/Streak";
 import { Check, X } from "lucide-react";
 import { useState } from "react";
-import { isCompletedToday } from "@/utils/streak";
+import { isCompletedToday } from "@/lib/util";
 import { createStreakEntry } from "@/lib/api";
 
 
@@ -92,7 +92,7 @@ interface MarkAsCompletedProps {
 }
 export function MarkAsCompleted({ streak, label, onSubmit }: MarkAsCompletedProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const streakId = streak.id; 
+    const streakId = streak.id;
     const isCompleted = isCompletedToday(streak);
     return (
         <>
@@ -100,7 +100,7 @@ export function MarkAsCompleted({ streak, label, onSubmit }: MarkAsCompletedProp
                 isOpen={isDialogOpen}
                 onClose={() => setIsDialogOpen(false)}
                 streak={streak}
-                onSubmit={onSubmit ?? (() => {})}
+                onSubmit={onSubmit ?? (() => { })}
             />
             <button
                 key={streakId}

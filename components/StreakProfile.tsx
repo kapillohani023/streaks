@@ -3,10 +3,10 @@ import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import { MarkAsCompleted } from "./streak-profile/MarkAsCompleted";
-import { Streak } from "@/models/Streak";
+import { Streak } from "@/types/Streak";
 import { fetchStreaks, deleteStreak } from "@/lib/api";
 import { StreakCalendar } from "./streak-profile/StreakCalendar";
-import { isCompletedToday } from "@/utils/streak";
+import { isCompletedToday } from "@/lib/util";
 import { DeleteStreakButton } from "./streak-profile/DeleteStreakButton";
 
 export default function StreakProfile() {

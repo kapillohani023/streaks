@@ -1,5 +1,5 @@
-import { Streak } from "@/lib/Streak";
-import { isCompletedToday } from "@/utils/streak";
+import { Streak } from "@/lib/util";
+import { isCompletedToday } from "@/lib/util";
 
 interface StreaksListProps {
     streaks: Streak[];
