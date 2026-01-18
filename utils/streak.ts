@@ -1,8 +1,9 @@
-import { Streak } from "../lib/Streak";
+import { Streak } from "@/models/Streak";
+import { StreakEntry } from "@/models/StreakEntry";
 
 export const isCompletedToday = (streak: Streak) => {
     const today = new Date().toDateString();
-    return streak.entries.some(entry => entry.date.toDateString() === today);
+    return streak.entries.some((entry: StreakEntry) => entry.date.toDateString() === today);
 }
 
 export const normalizeToMidnight = (date: Date): Date => {

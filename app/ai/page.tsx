@@ -1,4 +1,5 @@
+import AIChat from "@/components/AIChat";
 
 export default function AIPage() {
-    return <div>comming soon</div>;
+    return <AIChat />;
 }
