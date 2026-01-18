@@ -1,0 +1,42 @@
+import { signIn, auth } from "@/app/auth";
+import { redirect } from "next/navigation";
+import { FcGoogle } from "react-icons/fc";
+
+export async function SignIn() {
+    const session = await auth();
+    if (session) {
+        redirect("/dashboard");
+    }
+
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-gray-50">
+            <div className="w-full max-w-md space-y-8 p-10 bg-white rounded-xl shadow-lg border border-gray-100">
+                <div className="text-center">
+                    <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">
+                        Build habits better with Streaks
+                    </h2>
+                    <p className="mt-2 text-sm text-gray-600">
+                        Sign in to start tracking your habits
+                    </p>
+                </div>
+
+                <div className="mt-8 space-y-6">
+                    <form
+                        action={async () => {
+                            "use server";
+                            await signIn("google", { redirectTo: "/dashboard" });
+                        }}
+                    >
+                        <button
+                            type="submit"
+                            className="cursor-pointergroup relative flex w-full justify-center items-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 ease-in-out shadow-sm"
+                        >
+                            <FcGoogle className="h-6 w-6" />
+                            Sign in with Google
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}

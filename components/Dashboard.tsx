@@ -4,6 +4,7 @@ import { DailyCheckIn } from "./dashboard/DailyCheckIn";
 import { useState, useEffect, useCallback } from "react";
 import { Streak } from "@/types/Streak";
 import { fetchStreaks } from "@/lib/api";
+import { signOut } from "next-auth/react";
 
 export function Dashboard() {
     const [streaks, setStreaks] = useState<Streak[]>([]);
@@ -35,6 +36,14 @@ export function Dashboard() {
     return (
         <div className="flex bg-white text-black h-full w-full min-h-0 overflow-y-scroll">
             <div className="flex-1 flex flex-col justify-start">
+                <div className="w-full flex justify-end p-2">
+                    <button 
+                    onClick={() => signOut()}
+                    className="bg-white text-black font-semibold hover:bg-zinc-100 p-2 rounded cursor-pointer border-black border-2"
+                    >
+                        Sign out
+                    </button>
+                </div>
                 <DashboardCards streaks={streaks} />
                 <DailyCheckIn streaks={streaks} onRefetch={loadStreaks} />
             </div>

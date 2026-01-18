@@ -11,6 +11,9 @@ enum NavbarLabel {
 export function Navbar() {
     const path = usePathname();
     const router = useRouter();
+    if (!Object.values(NavbarLabel).some(label => path.startsWith(label))) {
+        return null;
+    }
     const navButtonClass = (label: string) =>
         `flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 cursor-pointer
    ${path.startsWith(label)
