@@ -1,5 +1,5 @@
 import { Flame, Target, TrendingUp, TrendingDown } from 'lucide-react';
-import { Streak } from '../../lib/util';
+import { Streak } from '@/types/Streak';
 import { isCompletedToday } from '@/lib/util';
 
 interface DashboardCardsProps {
@@ -35,7 +35,7 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
 
   const consistencyLast30Days = calculateConsistency(30);
   const consistencyPrevious30Days = calculateConsistency(60) - consistencyLast30Days;
-  const growth = Math.round((consistencyLast30Days - consistencyPrevious30Days) / consistencyPrevious30Days * 100);
+  const growth = consistencyPrevious30Days == 0 ? 0 : Math.round((consistencyLast30Days - consistencyPrevious30Days) / consistencyPrevious30Days * 100);
 
   return (
     <div className="p-8">

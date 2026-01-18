@@ -11,7 +11,7 @@ export function DailyCheckIn({ streaks, onRefetch }: DailyCheckInProps) {
             {streaks.length > 0 && (
                 <div className="px-8 py-6">
                     <h2 className="text-sm text-zinc-600 mb-4">DAILY CHECK-IN</h2>
-                    <div className="flex gap-3 overflow-x-auto pb-2">
+                    <div className="flex flex-wrap gap-3 pb-2">
                         {streaks.map(streak => {
                             return (
                                 <div key={streak.id}>

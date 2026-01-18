@@ -33,8 +33,8 @@ export function Dashboard() {
         );
     }
     return (
-        <div className="flex bg-white text-black overflow-hidden h-full w-full">
-            <div className="flex-1 flex flex-col overflow-hidden justify-start">
+        <div className="flex bg-white text-black h-full w-full min-h-0 overflow-y-scroll">
+            <div className="flex-1 flex flex-col justify-start">
                 <DashboardCards streaks={streaks} />
                 <DailyCheckIn streaks={streaks} onRefetch={loadStreaks} />
             </div>
