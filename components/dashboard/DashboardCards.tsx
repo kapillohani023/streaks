@@ -81,13 +81,6 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
           <div className="text-sm text-zinc-500 mt-2">vs previous 30 days</div>
         </div>
       </div>
-
-      {/* Additional Info */}
-      {streaks.length === 0 && (
-        <div className="mt-8 p-6 border-2 border-dashed border-zinc-300 rounded-lg text-center">
-          <p className="text-zinc-600">Create your first streak to start tracking your progress</p>
-        </div>
-      )}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { chatCompletion } from "@/lib/ai";
 import { SendHorizontal } from "lucide-react";
 import { Streak } from '@/types/Streak'
 import { fetchStreaks } from "@/lib/api";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
@@ -18,6 +19,8 @@ interface Chip {
 }
 
 export default function AIChat() {
+    const currentUser = useCurrentUser();
+    const currentUserFirstName = currentUser?.name?.split(" ")[0];
     const [streaks, setStreaks] = useState<Streak[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
@@ -93,7 +96,7 @@ export default function AIChat() {
             <div className="flex-1 overflow-y-auto mb-4 space-y-4 pr-2">
                 {messages.length === 0 && (
                     <div className="text-gray-400 text-center mt-10">
-                        Start a conversation with your AI assistant.
+                        Hey, {currentUserFirstName}. What’s on the agenda today?
                     </div>
                 )}
                 {messages.map((msg, index) => (
