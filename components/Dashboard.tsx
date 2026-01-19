@@ -2,7 +2,7 @@
 import { DashboardCards } from "./dashboard/DashboardCards";
 import { DailyCheckIn } from "./dashboard/DailyCheckIn";
 import { useState, useEffect, useCallback } from "react";
-import { Streak } from "@/types/Streak";
+import { Streak } from "@/types/streak";
 import { fetchStreaks } from "@/lib/api";
 import { signOut } from "next-auth/react";
 

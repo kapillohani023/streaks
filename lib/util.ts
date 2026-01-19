@@ -1,5 +1,5 @@
-import { Streak } from "@/types/Streak";
-import { StreakEntry } from "@/types/StreakEntry";
+import { Streak } from "@/types/streak";
+import { StreakEntry } from "@/types/streak-entry";
 
 export const isCompletedToday = (streak: Streak) => {
     const today = new Date().toDateString();

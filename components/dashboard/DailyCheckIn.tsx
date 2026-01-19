@@ -1,4 +1,4 @@
-import { Streak } from '@/types/Streak';
+import { Streak } from '@/types/streak';
 import { MarkAsCompleted } from "../streak-profile/MarkAsCompleted";
 
 interface DailyCheckInProps {

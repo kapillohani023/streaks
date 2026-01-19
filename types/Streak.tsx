@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { StreakEntrySchema } from "./StreakEntry";
+import { StreakEntrySchema } from "./streak-entry";
 import { normalizeToMidnight } from "../lib/util";
 
 export const StreakSchema = z.object({

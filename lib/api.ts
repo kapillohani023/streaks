@@ -1,5 +1,5 @@
-import { Streak } from "@/types/Streak";
-import { StreakEntry } from "@/types/StreakEntry";
+import { Streak } from "@/types/streak";
+import { StreakEntry } from "@/types/streak-entry";
 const API_BASE = "/api/streaks";
 
 // Helper to parse dates in API responses

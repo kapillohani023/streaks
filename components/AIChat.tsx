@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react"
 import { chatCompletion } from "@/lib/ai";
 import { SendHorizontal } from "lucide-react";
-import { Streak } from '@/types/Streak'
+import { Streak } from '@/types/streak'
 import { fetchStreaks } from "@/lib/api";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import ReactMarkdown from 'react-markdown';
