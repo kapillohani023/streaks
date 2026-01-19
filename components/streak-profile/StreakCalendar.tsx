@@ -1,12 +1,16 @@
 import CalendarHeatmap from "react-calendar-heatmap";
 
 interface StreakCalendarProps {
-  completedDates: Array<Date>
+  completedDates: Array<Date>;
 }
 
 export function StreakCalendar({ completedDates }: StreakCalendarProps) {
   const today = new Date();
-  const lastYearToday = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+  const lastYearToday = new Date(
+    today.getFullYear() - 1,
+    today.getMonth(),
+    today.getDate()
+  );
 
   return (
     <>
@@ -33,14 +37,29 @@ export function StreakCalendar({ completedDates }: StreakCalendarProps) {
       <CalendarHeatmap
         startDate={lastYearToday}
         endDate={today}
-        values={completedDates.map(day => ({
+        values={completedDates.map((day) => ({
           date: day,
-          count: 1
+          count: 1,
         }))}
-        classForValue={(value: any) => (value && value.count > 0) ? 'color-filled' : 'color-empty'}
+        classForValue={(value: any) =>
+          value && value.count > 0 ? "color-filled" : "color-empty"
+        }
         showWeekdayLabels={true}
         gutterSize={2}
-        monthLabels={['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']}
+        monthLabels={[
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ]}
       />
     </>
   );

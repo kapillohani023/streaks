@@ -1,7 +1,7 @@
-"use client"
-import React, { useState } from 'react';
-import { X, Plus } from 'lucide-react';
-import { addStreak } from '@/app/actions/streak';
+"use client";
+import React, { useState } from "react";
+import { X, Plus } from "lucide-react";
+import { addStreak } from "@/app/actions/streak";
 
 interface CreateStreakDialogProps {
   isOpen: boolean;
@@ -9,8 +9,8 @@ interface CreateStreakDialogProps {
 }
 
 function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
@@ -27,22 +27,22 @@ function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
 
       await addStreak(formData);
 
-      setName('');
-      setDescription('');
+      setName("");
+      setDescription("");
       setIsSubmitting(false);
       onClose();
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-white border-2 border-black rounded-lg w-full max-w-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+      <div className="w-full max-w-md rounded-lg border-2 border-black bg-white">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b-2 border-black">
+        <div className="flex items-center justify-between border-b-2 border-black p-6">
           <h2 className="text-xl">Create New Streak</h2>
           <button
             onClick={onClose}
-            className="text-zinc-600 hover:text-black transition-colors"
+            className="text-zinc-600 transition-colors hover:text-black"
             aria-label="Close dialog"
           >
             <X size={24} />
@@ -52,7 +52,10 @@ function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6">
           <div className="mb-4">
-            <label htmlFor="streak-name" className="block text-sm text-zinc-600 mb-2">
+            <label
+              htmlFor="streak-name"
+              className="mb-2 block text-sm text-zinc-600"
+            >
               Streak Name
             </label>
             <input
@@ -60,21 +63,24 @@ function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-white border-2 border-black rounded px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full rounded border-2 border-black bg-white px-4 py-2 text-black focus:ring-2 focus:ring-black focus:outline-none"
               placeholder="e.g., Daily Exercise, Read Books..."
               autoFocus
             />
           </div>
 
           <div className="mb-6">
-            <label htmlFor="streak-description" className="block text-sm text-zinc-600 mb-2">
+            <label
+              htmlFor="streak-description"
+              className="mb-2 block text-sm text-zinc-600"
+            >
               Description (optional)
             </label>
             <textarea
               id="streak-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-white border-2 border-black rounded px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-black resize-none"
+              className="w-full resize-none rounded border-2 border-black bg-white px-4 py-2 text-black focus:ring-2 focus:ring-black focus:outline-none"
               placeholder="Add a description..."
               rows={3}
             />
@@ -84,13 +90,13 @@ function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 border-2 border-black rounded hover:bg-zinc-100 transition-colors"
+              className="flex-1 rounded border-2 border-black py-2 transition-colors hover:bg-zinc-100"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 py-2 bg-black text-white rounded hover:bg-zinc-800 transition-colors disabled:opacity-50"
+              className="flex-1 rounded bg-black py-2 text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
               disabled={!name.trim() || isSubmitting}
             >
               {isSubmitting ? "Creating..." : "Create Streak"}
@@ -109,7 +115,7 @@ export function AddNewStreak() {
       <div className="p-4">
         <button
           onClick={() => setIsDialogOpen(true)}
-          className="w-full flex items-center justify-center gap-2 bg-black text-white px-4 py-3 rounded cursor-pointer"
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-black px-4 py-3 text-white"
         >
           <Plus size={20} />
           New Streak

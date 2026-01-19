@@ -1,26 +1,26 @@
-"use client"
+"use client";
 import { Streak } from "@/types/streak";
 import { useRouter } from "next/navigation";
-import { StreaksList } from "./streaks/StreaksList";
-import { AddNewStreak } from "./streaks/AddNewStreak";
+import { StreaksList } from "@/components/streaks/StreaksList";
+import { AddNewStreak } from "@/components/streaks/AddNewStreak";
 
 interface StreaksContentProps {
-    streaks: Streak[];
+  streaks: Streak[];
 }
 
 export function StreaksContent({ streaks }: StreaksContentProps) {
-    const router = useRouter();
+  const router = useRouter();
 
-    const handleStreakClick = (streakId: string) => {
-        router.push(`/streaks/${streakId}`);
-    };
+  const handleStreakClick = (streakId: string) => {
+    router.push(`/streaks/${streakId}`);
+  };
 
-    return (
-        <div className="flex bg-white text-black overflow-hidden h-full w-full">
-            <div className="flex-1 flex flex-col overflow-hidden justify-start">
-                <StreaksList streaks={streaks} onStreakClick={handleStreakClick} />
-                <AddNewStreak />
-            </div>
-        </div>
-    );
+  return (
+    <div className="flex h-full w-full overflow-hidden bg-white text-black">
+      <div className="flex flex-1 flex-col justify-start overflow-hidden">
+        <StreaksList streaks={streaks} onStreakClick={handleStreakClick} />
+        <AddNewStreak />
+      </div>
+    </div>
+  );
 }

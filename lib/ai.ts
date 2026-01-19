@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import { GoogleGenerativeAI, Part } from "@google/generative-ai";
 
 const apiKey = process.env.GEMINI_API_KEY;
@@ -17,7 +17,7 @@ class AIService {
     const genAI = new GoogleGenerativeAI(apiKey);
     this.model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",
-      systemInstruction: SYSTEM_PROMPT
+      systemInstruction: SYSTEM_PROMPT,
     });
   }
 
@@ -26,9 +26,12 @@ class AIService {
     return result.response.text();
   }
 
-  async generateChat(history: { role: 'user' | 'model', parts: string }[], message: string) {
+  async generateChat(
+    history: { role: "user" | "model"; parts: string }[],
+    message: string
+  ) {
     const chat = this.model.startChat({
-      history: history.map(h => ({
+      history: history.map((h) => ({
         role: h.role,
         parts: [{ text: h.parts }] as Part[],
       })),
@@ -57,11 +60,14 @@ export async function generateAIResponse(prompt: string) {
   }
 }
 
-export async function chatCompletion(history: { role: 'user' | 'model', content: string }[], message: string) {
+export async function chatCompletion(
+  history: { role: "user" | "model"; content: string }[],
+  message: string
+) {
   try {
-    const formattedHistory = history.map(msg => ({
+    const formattedHistory = history.map((msg) => ({
       role: msg.role,
-      parts: msg.content
+      parts: msg.content,
     }));
 
     return await getService().generateChat(formattedHistory, message);
