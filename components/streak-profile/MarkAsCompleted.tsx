@@ -3,29 +3,34 @@ import { Streak } from "@/types/streak";
 import { Check, X } from "lucide-react";
 import { useState } from "react";
 import { isCompletedToday } from "@/lib/util";
-import { createStreakEntry } from "@/lib/api";
+import { createStreakEntry } from "@/app/actions/streak-entry";
 
 
 interface EntrySubmissionDialogProps {
     isOpen: boolean;
     streak: Streak;
     onClose: () => void;
-    onSubmit: () => void;
 }
 
-export function EntrySubmissionDialog({ isOpen, onClose, streak, onSubmit }: EntrySubmissionDialogProps) {
+export function EntrySubmissionDialog({ isOpen, onClose, streak }: EntrySubmissionDialogProps) {
     const [note, setNote] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     if (!isOpen) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await createStreakEntry(streak.id, {
-            date: new Date(),
-            completed: true,
-            note,
-        });
-        onSubmit();
+        setIsSubmitting(true);
+
+        const formData = new FormData();
+        formData.set("streakId", streak.id);
+        formData.set("date", new Date().toISOString());
+        formData.set("completed", "true");
+        formData.set("note", note);
+
+        await createStreakEntry(formData);
+        setNote("");
+        setIsSubmitting(false);
         onClose();
     };
 
@@ -74,9 +79,10 @@ export function EntrySubmissionDialog({ isOpen, onClose, streak, onSubmit }: Ent
                         </button>
                         <button
                             type="submit"
-                            className="flex-1 py-2 bg-black text-white rounded hover:bg-zinc-800 transition-colors"
+                            disabled={isSubmitting}
+                            className="flex-1 py-2 bg-black text-white rounded hover:bg-zinc-800 transition-colors disabled:opacity-50"
                         >
-                            Save Note
+                            {isSubmitting ? "Saving..." : "Save Note"}
                         </button>
                     </div>
                 </form>
@@ -88,19 +94,19 @@ export function EntrySubmissionDialog({ isOpen, onClose, streak, onSubmit }: Ent
 interface MarkAsCompletedProps {
     streak: Streak;
     label: string;
-    onSubmit?: () => void;
 }
-export function MarkAsCompleted({ streak, label, onSubmit }: MarkAsCompletedProps) {
+
+export function MarkAsCompleted({ streak, label }: MarkAsCompletedProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const streakId = streak.id;
     const isCompleted = isCompletedToday(streak);
+
     return (
         <>
             <EntrySubmissionDialog
                 isOpen={isDialogOpen}
                 onClose={() => setIsDialogOpen(false)}
                 streak={streak}
-                onSubmit={onSubmit ?? (() => { })}
             />
             <button
                 key={streakId}

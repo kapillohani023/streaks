@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from "react"
 import { chatCompletion } from "@/lib/ai";
 import { SendHorizontal } from "lucide-react";
 import { Streak } from '@/types/streak'
-import { fetchStreaks } from "@/lib/api";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import ReactMarkdown from 'react-markdown';
 
@@ -18,10 +17,13 @@ interface Chip {
     prompt: string;
 }
 
-export default function AIChat() {
+interface AIChatProps {
+    initialStreaks: Streak[];
+}
+
+export default function AIChat({ initialStreaks }: AIChatProps) {
     const currentUser = useCurrentUser();
     const currentUserFirstName = currentUser?.name?.split(" ")[0];
-    const [streaks, setStreaks] = useState<Streak[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -30,16 +32,6 @@ export default function AIChat() {
         { id: '2', label: 'Get Motivation', prompt: 'Give me some motivation to keep my streak' },
         { id: '3', label: 'Suggest Goals', prompt: 'Suggest some new habit goals for me' },
     ]);
-
-
-    useEffect(() => {
-        const loadStreaks = async () => {
-            const streaks = await fetchStreaks();
-            setStreaks(streaks);
-        };
-        loadStreaks();
-    }, []);
-
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const scrollToBottom = () => {
@@ -51,7 +43,7 @@ export default function AIChat() {
         if (!text.trim()) return;
         let streaksContext = "";
         if (messages.length === 0) {
-            const cleanStreaksData = streaks.map(streak => {
+            const cleanStreaksData = initialStreaks.map(streak => {
                 return {
                     name: streak.name,
                     description: streak.description,
@@ -96,7 +88,7 @@ export default function AIChat() {
             <div className="flex-1 overflow-y-auto mb-4 space-y-4 pr-2">
                 {messages.length === 0 && (
                     <div className="text-gray-400 text-center mt-10">
-                        Hey, {currentUserFirstName}. What’s on the agenda today?
+                        Hey, {currentUserFirstName}. What's on the agenda today?
                     </div>
                 )}
                 {messages.map((msg, index) => (

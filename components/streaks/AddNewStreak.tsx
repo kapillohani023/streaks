@@ -1,24 +1,35 @@
+"use client"
 import React, { useState } from 'react';
 import { X, Plus } from 'lucide-react';
+import { addStreak } from '@/app/actions/streak';
 
 interface CreateStreakDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: (name: string, description: string) => void;
 }
 
-function CreateStreakDialog({ isOpen, onClose, onCreate }: CreateStreakDialogProps) {
+function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      onCreate(name.trim(), description.trim());
+      setIsSubmitting(true);
+
+      const formData = new FormData();
+      formData.set("name", name.trim());
+      formData.set("description", description.trim());
+      formData.set("startDate", new Date().toISOString());
+
+      await addStreak(formData);
+
       setName('');
       setDescription('');
+      setIsSubmitting(false);
       onClose();
     }
   };
@@ -79,10 +90,10 @@ function CreateStreakDialog({ isOpen, onClose, onCreate }: CreateStreakDialogPro
             </button>
             <button
               type="submit"
-              className="flex-1 py-2 bg-black text-white rounded hover:bg-zinc-800 transition-colors"
-              disabled={!name.trim()}
+              className="flex-1 py-2 bg-black text-white rounded hover:bg-zinc-800 transition-colors disabled:opacity-50"
+              disabled={!name.trim() || isSubmitting}
             >
-              Create Streak
+              {isSubmitting ? "Creating..." : "Create Streak"}
             </button>
           </div>
         </form>
@@ -91,10 +102,7 @@ function CreateStreakDialog({ isOpen, onClose, onCreate }: CreateStreakDialogPro
   );
 }
 
-interface AddNewStreakProps {
-  onCreateNew: (name: string, description: string) => void;
-}
-export function AddNewStreak({ onCreateNew }: AddNewStreakProps) {
+export function AddNewStreak() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   return (
     <>
@@ -110,7 +118,6 @@ export function AddNewStreak({ onCreateNew }: AddNewStreakProps) {
       <CreateStreakDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        onCreate={onCreateNew}
       />
     </>
   );

@@ -1,5 +1,7 @@
-import { Streaks } from "@/components/Streaks";
+import { getStreaks } from "@/lib/data";
+import { StreaksContent } from "@/components/StreaksContent";
 
-export default function StreaksPage() {
-    return <Streaks />;
+export default async function StreaksPage() {
+    const streaks = await getStreaks();
+    return <StreaksContent streaks={streaks} />;
 }

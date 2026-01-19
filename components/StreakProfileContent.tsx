@@ -1,45 +1,18 @@
 "use client"
-import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useCallback } from "react";
 import { MarkAsCompleted } from "./streak-profile/MarkAsCompleted";
 import { Streak } from "@/types/streak";
-import { fetchStreaks, deleteStreak } from "@/lib/api";
 import { StreakCalendar } from "./streak-profile/StreakCalendar";
 import { isCompletedToday } from "@/lib/util";
 import { DeleteStreakButton } from "./streak-profile/DeleteStreakButton";
+import { deleteStreak } from "@/app/actions/streak";
 
-export default function StreakProfile() {
-  const params = useParams();
+interface StreakProfileContentProps {
+  streak: Streak;
+}
+
+export function StreakProfileContent({ streak }: StreakProfileContentProps) {
   const router = useRouter();
-  const streakId = params.id;
-  const dummyStreak: Streak = {
-    id: '-',
-    name: '-',
-    description: '-',
-    startDate: new Date(),
-    entries: []
-  }
-  const [streak, setStreak] = useState<Streak>(dummyStreak);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const loadStreak = useCallback(async () => {
-    try {
-      const loadedStreaks = await fetchStreaks();
-      const streak = loadedStreaks.find((streak) => streak.id === streakId);
-      if (streak) {
-        setStreak(streak);
-      }
-    } catch (e) {
-      console.error('Failed to load streaks:', e);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [streakId]);
-
-  useEffect(() => {
-    loadStreak();
-  }, [loadStreak]);
 
   const handleDelete = async (streakId: string) => {
     try {
@@ -58,7 +31,6 @@ export default function StreakProfile() {
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const todayTime = today.getTime();
 
   const calculateCurrentStreak = () => {
     let count = 0;
@@ -93,6 +65,7 @@ export default function StreakProfile() {
   const currentStreak = calculateCurrentStreak();
   const longestStreak = calculateLongestStreak();
   const totalScore = completedDatesSet.size;
+
   return (
     <div className="p-6 text-black bg-white w-full h-full">
       {/* Header */}
@@ -128,7 +101,7 @@ export default function StreakProfile() {
       </div>
 
       {/* Today button */}
-      <MarkAsCompleted streak={streak} label={isCompletedToday(streak) ? 'Completed Today' : 'Mark Today Complete'} onSubmit={loadStreak} />
+      <MarkAsCompleted streak={streak} label={isCompletedToday(streak) ? 'Completed Today' : 'Mark Today Complete'} />
     </div>
   );
 }

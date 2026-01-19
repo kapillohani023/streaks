@@ -3,9 +3,9 @@ import { MarkAsCompleted } from "../streak-profile/MarkAsCompleted";
 
 interface DailyCheckInProps {
     streaks: Streak[];
-    onRefetch: () => void;
 }
-export function DailyCheckIn({ streaks, onRefetch }: DailyCheckInProps) {
+
+export function DailyCheckIn({ streaks }: DailyCheckInProps) {
     return (
         <>
             {streaks.length > 0 && (
@@ -15,7 +15,7 @@ export function DailyCheckIn({ streaks, onRefetch }: DailyCheckInProps) {
                         {streaks.map(streak => {
                             return (
                                 <div key={streak.id}>
-                                    <MarkAsCompleted streak={streak} label={streak.name} onSubmit={onRefetch} />
+                                    <MarkAsCompleted streak={streak} label={streak.name} />
                                 </div>
                             )
                         })}
