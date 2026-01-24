@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { auth } from "@/app/auth";
 import { cache } from "react";
-import { Streak } from "@/types/_streak";
+import { Streak } from "@/types/streak";
 import { StreakEntry } from "@/types/streak-entry";
 
 function parseStreakDates(streak: {

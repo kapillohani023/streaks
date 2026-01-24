@@ -1,5 +1,5 @@
 "use client";
-import { Streak } from "@/types/_streak";
+import { Streak } from "@/types/streak";
 import { useRouter } from "next/navigation";
 import { StreaksList } from "@/components/streaks/StreaksList";
 import { AddNewStreak } from "@/components/streaks/AddNewStreak";
