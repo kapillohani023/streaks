@@ -1,5 +1,5 @@
 import { Flame, Target, TrendingUp, TrendingDown } from "lucide-react";
-import { Streak } from "@/types/streak";
+import { Streak } from "@/types/_streak";
 import { isCompletedToday } from "@/lib/util";
 
 interface DashboardCardsProps {

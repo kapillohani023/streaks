@@ -1,7 +1,7 @@
 "use client";
 import { DashboardCards } from "@/components/dashboard/DashboardCards";
 import { DailyCheckIn } from "@/components/dashboard/DailyCheckIn";
-import { Streak } from "@/types/streak";
+import { Streak } from "@/types/_streak";
 import { signOut } from "next-auth/react";
 
 interface DashboardContentProps {

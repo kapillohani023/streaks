@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { MarkAsCompleted } from "@/components/streak-profile/MarkAsCompleted";
-import { Streak } from "@/types/streak";
+import { Streak } from "@/types/_streak";
 import { StreakCalendar } from "@/components/streak-profile/StreakCalendar";
 import { isCompletedToday } from "@/lib/util";
 import { DeleteStreakButton } from "@/components/streak-profile/DeleteStreakButton";

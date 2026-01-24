@@ -1,5 +1,5 @@
 "use client";
-import { Streak } from "@/types/streak";
+import { Streak } from "@/types/_streak";
 import { Check, X } from "lucide-react";
 import { useState } from "react";
 import { isCompletedToday } from "@/lib/util";

@@ -1,4 +1,4 @@
-import { Streak } from "@/types/streak";
+import { Streak } from "@/types/_streak";
 import { StreakEntry } from "@/types/streak-entry";
 
 export const isCompletedToday = (streak: Streak) => {
