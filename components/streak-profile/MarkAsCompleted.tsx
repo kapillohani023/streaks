@@ -118,11 +118,10 @@ export function MarkAsCompleted({ streak, label }: MarkAsCompletedProps) {
         key={streakId}
         onClick={() => setIsDialogOpen(true)}
         disabled={isCompleted}
-        className={`flex items-center gap-2 rounded border-2 px-4 py-2 whitespace-nowrap transition-colors ${
-          isCompleted
-            ? "cursor-pointer border-black bg-black text-white"
-            : "border-black hover:bg-zinc-100"
-        }`}
+        className={`flex items-center gap-2 rounded border-2 px-4 py-2 whitespace-nowrap transition-colors ${isCompleted
+          ? "cursor-pointer border-black bg-black text-white"
+          : "border-black hover:bg-zinc-100"
+          }`}
       >
         {isCompleted && <Check size={16} />}
         {label}

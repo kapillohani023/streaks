@@ -42,10 +42,10 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
     consistencyPrevious30Days == 0
       ? 0
       : Math.round(
-          ((consistencyLast30Days - consistencyPrevious30Days) /
-            consistencyPrevious30Days) *
-            100
-        );
+        ((consistencyLast30Days - consistencyPrevious30Days) /
+          consistencyPrevious30Days) *
+        100
+      );
 
   return (
     <div className="p-8">

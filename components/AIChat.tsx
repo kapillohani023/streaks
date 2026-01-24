@@ -112,11 +112,10 @@ export default function AIChat({ initialStreaks }: AIChatProps) {
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[80%] rounded-2xl px-4 py-2 ${
-                msg.role === "user"
-                  ? "rounded-br-none bg-black text-white"
-                  : "rounded-bl-none bg-gray-100 text-black"
-              }`}
+              className={`max-w-[80%] rounded-2xl px-4 py-2 ${msg.role === "user"
+                ? "rounded-br-none bg-black text-white"
+                : "rounded-bl-none bg-gray-100 text-black"
+                }`}
             >
               {msg.role === "model" ? (
                 <ReactMarkdown
