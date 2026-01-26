@@ -1,6 +1,7 @@
 import { signIn, auth } from "@/app/auth";
 import { redirect } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
+import Link from "next/link";
 
 export async function SignIn() {
   const session = await auth();
@@ -35,6 +36,14 @@ export async function SignIn() {
               Sign in with Google
             </button>
           </form>
+          <div className="text-center">
+            <Link
+              href="/privacy"
+              className="text-xs text-gray-400 underline-offset-4 hover:text-gray-600 hover:underline transition-colors"
+            >
+              Privacy Policy
+            </Link>
+          </div>
         </div>
       </div>
     </div>
