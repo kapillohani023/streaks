@@ -36,10 +36,19 @@ export async function SignIn() {
               Sign in with Google
             </button>
           </form>
-          <div className="text-center">
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-xs text-gray-400">
+              By signing in, you agree to our{" "}
+              <Link
+                href="/terms"
+                className="underline underline-offset-4 hover:text-gray-600 transition-colors"
+              >
+                Terms of Service
+              </Link>
+            </p>
             <Link
               href="/privacy"
-              className="text-xs text-gray-400 underline-offset-4 hover:text-gray-600 hover:underline transition-colors"
+              className="text-xs text-gray-400 underline underline-offset-4 hover:text-gray-600 transition-colors"
             >
               Privacy Policy
             </Link>
