@@ -16,7 +16,7 @@ export function StreaksContent({ streaks }: StreaksContentProps) {
   };
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-white text-black">
+    <div className="flex h-full min-h-0 w-full overflow-y-scroll bg-white text-black">
       <div className="flex flex-1 flex-col justify-start overflow-hidden">
         <StreaksList streaks={streaks} onStreakClick={handleStreakClick} />
         <AddNewStreak />

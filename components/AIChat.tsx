@@ -99,7 +99,7 @@ export default function AIChat({ initialStreaks }: AIChatProps) {
   };
 
   return (
-    <div className="flex h-full w-full flex-col bg-white p-4 text-black">
+    <div className="flex h-full min-h-0 w-full flex-col p-4 overflow-y-scroll bg-white text-black">
       <div className="mb-4 flex-1 space-y-4 overflow-y-auto pr-2">
         {messages.length === 0 && (
           <div className="mt-10 text-center text-gray-400">
