@@ -1,6 +1,5 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { chatCompletion } from "@/lib/ai";
 import { SendHorizontal } from "lucide-react";
 import { Streak } from "@/types/streak";
 import { useCurrentUser } from "@/hooks/use-current-user";
@@ -54,7 +53,9 @@ export default function AIChat({ initialStreaks }: AIChatProps) {
   useEffect(scrollToBottom, [messages]);
 
   const handleSend = async (text: string) => {
-    if (!text.trim()) return;
+    const trimmedText = text.trim();
+    if (!trimmedText) return;
+
     let streaksContext = "";
     if (messages.length === 0) {
       const cleanStreaksData = initialStreaks.map((streak) => {
@@ -73,20 +74,83 @@ export default function AIChat({ initialStreaks }: AIChatProps) {
       streaksContext =
         "\n<context>" + JSON.stringify(cleanStreaksData) + "</context>";
     }
-    const userMsg: Message = { role: "user", content: text };
-    setMessages((prev) => [...prev, userMsg]);
+
+    const userMsg: Message = { role: "user", content: trimmedText };
+    const historySnapshot = [...messages];
+    setMessages((prev) => [...prev, userMsg, { role: "model", content: "" }]);
     setInput("");
     setIsLoading(true);
 
     try {
-      const response = await chatCompletion(messages, text + streaksContext);
-      setMessages((prev) => [...prev, { role: "model", content: response }]);
+      const response = await fetch("/api/ai/stream", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          history: historySnapshot,
+          message: trimmedText + streaksContext,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`);
+      }
+
+      if (!response.body) {
+        throw new Error("No response stream available");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let isFirstChunk = true;
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        if (!chunk) continue;
+
+        setMessages((prev) => {
+          const next = [...prev];
+          const modelIndex = next.length - 1;
+          if (next[modelIndex]?.role === "model") {
+            next[modelIndex] = {
+              ...next[modelIndex],
+              content: next[modelIndex].content + chunk,
+            };
+          }
+          return next;
+        });
+
+        isFirstChunk = false;
+      }
+
+      if (isFirstChunk) {
+        setMessages((prev) => {
+          const next = [...prev];
+          const modelIndex = next.length - 1;
+          if (next[modelIndex]?.role === "model") {
+            next[modelIndex] = {
+              ...next[modelIndex],
+              content: "Sorry, I am having trouble connecting right now.",
+            };
+          }
+          return next;
+        });
+      }
     } catch (error) {
       console.error(error);
-      setMessages((prev) => [
-        ...prev,
-        { role: "model", content: "Sorry, I encountered an error." },
-      ]);
+      setMessages((prev) => {
+        const next = [...prev];
+        const modelIndex = next.length - 1;
+        if (next[modelIndex]?.role === "model") {
+          next[modelIndex] = {
+            ...next[modelIndex],
+            content: "Sorry, I encountered an error.",
+          };
+        }
+        return next;
+      });
     } finally {
       setIsLoading(false);
     }
@@ -145,15 +209,6 @@ export default function AIChat({ initialStreaks }: AIChatProps) {
             </div>
           </div>
         ))}
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="flex items-center gap-1 rounded-2xl rounded-bl-none bg-gray-100 px-4 py-2">
-              <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400"></div>
-              <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400 delay-75"></div>
-              <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400 delay-150"></div>
-            </div>
-          </div>
-        )}
         <div ref={messagesEndRef} />
       </div>
 

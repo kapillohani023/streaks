@@ -1,4 +1,4 @@
-"use server";
+import "server-only";
 import { GoogleGenerativeAI, Part } from "@google/generative-ai";
 
 const apiKey = process.env.GEMINI_API_KEY;
@@ -40,6 +40,23 @@ class AIService {
     const result = await chat.sendMessage(message);
     return result.response.text();
   }
+
+  async *generateChatStream(
+    history: { role: "user" | "model"; parts: string }[],
+    message: string
+  ) {
+    const chat = this.model.startChat({
+      history: history.map((h) => ({
+        role: h.role,
+        parts: [{ text: h.parts }] as Part[],
+      })),
+    });
+
+    const result = await chat.sendMessageStream(message);
+    for await (const chunk of result.stream) {
+      yield chunk.text();
+    }
+  }
 }
 
 let aiServiceInstance: AIService | null = null;
@@ -71,7 +88,26 @@ export async function chatCompletion(
     }));
 
     return await getService().generateChat(formattedHistory, message);
-  } catch (error) {
+  } catch {
     return "Sorry, I am having trouble connecting right now.";
+  }
+}
+
+export async function* chatCompletionStream(
+  history: { role: "user" | "model"; content: string }[],
+  message: string
+) {
+  const formattedHistory = history.map((msg) => ({
+    role: msg.role,
+    parts: msg.content,
+  }));
+
+  for await (const chunk of getService().generateChatStream(
+    formattedHistory,
+    message
+  )) {
+    if (chunk) {
+      yield chunk;
+    }
   }
 }
