@@ -6,6 +6,8 @@ import { StreakCalendar } from "@/components/streak-profile/StreakCalendar";
 import { isCompletedToday } from "@/lib/util";
 import { DeleteStreakButton } from "@/components/streak-profile/DeleteStreakButton";
 import { deleteStreak } from "@/app/actions/streak";
+import { SsCard } from "@/components/ui/SsCard";
+import { SsTypography } from "@/components/ui/SsTypography";
 
 interface StreakProfileContentProps {
   streak: Streak;
@@ -71,9 +73,11 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
       {/* Header */}
       <div className="mb-6 flex items-start justify-between">
         <div>
-          <h2 className="mb-1 text-2xl">{streak.name}</h2>
+          <SsTypography variant="h3" className="mb-1">
+            {streak.name}
+          </SsTypography>
           {streak.description && (
-            <p className="text-zinc-600">{streak.description}</p>
+            <SsTypography variant="muted">{streak.description}</SsTypography>
           )}
         </div>
         <DeleteStreakButton streakId={streak.id} handleDelete={handleDelete} />
@@ -81,18 +85,30 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
 
       {/* Stats */}
       <div className="mb-6 grid grid-cols-3 gap-4">
-        <div className="rounded border-2 border-black p-4">
-          <div className="mb-1 text-sm text-zinc-600">Current Streak</div>
-          <div className="text-3xl">{currentStreak}</div>
-        </div>
-        <div className="rounded border-2 border-black p-4">
-          <div className="mb-1 text-sm text-zinc-600">Longest Streak</div>
-          <div className="text-3xl">{longestStreak}</div>
-        </div>
-        <div className="rounded border-2 border-black p-4">
-          <div className="mb-1 text-sm text-zinc-600">Total Score</div>
-          <div className="text-3xl">{totalScore}</div>
-        </div>
+        <SsCard className="rounded p-4">
+          <SsTypography variant="muted" className="mb-1">
+            Current Streak
+          </SsTypography>
+          <SsTypography as="p" className="text-3xl">
+            {currentStreak}
+          </SsTypography>
+        </SsCard>
+        <SsCard className="rounded p-4">
+          <SsTypography variant="muted" className="mb-1">
+            Longest Streak
+          </SsTypography>
+          <SsTypography as="p" className="text-3xl">
+            {longestStreak}
+          </SsTypography>
+        </SsCard>
+        <SsCard className="rounded p-4">
+          <SsTypography variant="muted" className="mb-1">
+            Total Score
+          </SsTypography>
+          <SsTypography as="p" className="text-3xl">
+            {totalScore}
+          </SsTypography>
+        </SsCard>
       </div>
 
       {/* Calendar */}

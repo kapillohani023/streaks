@@ -5,6 +5,8 @@ import { SendHorizontal } from "lucide-react";
 import { Streak } from "@/types/streak";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import ReactMarkdown from "react-markdown";
+import { SsButton } from "@/components/ui/SsButton";
+import { SsInput } from "@/components/ui/SsInput";
 
 interface Message {
   role: "user" | "model";
@@ -103,7 +105,7 @@ export default function AIChat({ initialStreaks }: AIChatProps) {
       <div className="mb-4 flex-1 space-y-4 overflow-y-auto pr-2">
         {messages.length === 0 && (
           <div className="mt-10 text-center text-gray-400">
-            Hey, {currentUserFirstName}. What's on the agenda today?
+            Hey, {currentUserFirstName}. What&apos;s on the agenda today?
           </div>
         )}
         {messages.map((msg, index) => (
@@ -158,34 +160,39 @@ export default function AIChat({ initialStreaks }: AIChatProps) {
       {chips.length > 0 && messages.length == 0 && (
         <div className="mb-4 flex flex-wrap justify-center gap-2">
           {chips.map((chip) => (
-            <button
+            <SsButton
               key={chip.id}
               onClick={() => onChipClick(chip.id)}
-              className="rounded-full border border-gray-200 bg-white px-3 py-1 text-sm transition-colors hover:border-black"
+              variant="secondary"
+              size="sm"
+              className="rounded-full border border-gray-200 px-3 py-1 text-sm hover:border-black"
             >
               {chip.label}
-            </button>
+            </SsButton>
           ))}
         </div>
       )}
 
       <div className="flex gap-2">
-        <input
+        <SsInput
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend(input)}
           placeholder="Type a message..."
-          className="flex-1 rounded-full border border-gray-200 px-4 py-2 focus:border-black focus:outline-none"
+          className="flex-1 rounded-full border border-gray-200 px-4 focus:border-black"
           disabled={isLoading}
+          fullWidth={false}
+          containerClassName="min-w-0 flex-1"
         />
-        <button
+        <SsButton
           onClick={() => handleSend(input)}
           disabled={isLoading || !input.trim()}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white transition-opacity hover:opacity-80 disabled:opacity-50"
+          size="icon"
+          className="rounded-full transition-opacity hover:opacity-80"
         >
           <SendHorizontal className="h-5 w-5" />
-        </button>
+        </SsButton>
       </div>
     </div>
   );

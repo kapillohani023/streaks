@@ -4,6 +4,15 @@ import { Check, X } from "lucide-react";
 import { useState } from "react";
 import { isCompletedToday } from "@/lib/util";
 import { createStreakEntry } from "@/app/actions/streak-entry";
+import {
+  SsCard,
+  SsCardContent,
+  SsCardHeader,
+  SsCardTitle,
+} from "@/components/ui/SsCard";
+import { SsButton } from "@/components/ui/SsButton";
+import { SsTextarea } from "@/components/ui/SsInput";
+import { SsTypography } from "@/components/ui/SsTypography";
 
 interface EntrySubmissionDialogProps {
   isOpen: boolean;
@@ -39,60 +48,48 @@ export function EntrySubmissionDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <div className="w-full max-w-md rounded-lg border-2 border-black bg-white">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b-2 border-black p-6">
+      <SsCard className="w-full max-w-md p-0">
+        <SsCardHeader className="mb-0 flex items-center justify-between border-b-2 border-black p-6">
           <div>
-            <h2 className="text-xl">Daily Note</h2>
-            <p className="text-sm text-zinc-600">{streak.name}</p>
+            <SsCardTitle>Daily Note</SsCardTitle>
+            <SsTypography variant="muted">{streak.name}</SsTypography>
           </div>
-          <button
+          <SsButton
             onClick={onClose}
-            className="text-zinc-600 transition-colors hover:text-black"
+            variant="ghost"
+            size="icon"
+            className="text-zinc-600 hover:text-black"
             aria-label="Close dialog"
           >
             <X size={24} />
-          </button>
-        </div>
+          </SsButton>
+        </SsCardHeader>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6">
-          <div className="mb-6">
-            <label
-              htmlFor="daily-note"
-              className="mb-2 block text-sm text-zinc-600"
-            >
-              How did it go today?
-            </label>
-            <textarea
-              id="daily-note"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              className="w-full resize-none rounded border-2 border-black bg-white px-4 py-3 text-black focus:ring-2 focus:ring-black focus:outline-none"
-              placeholder="Add your notes here..."
-              rows={6}
-              autoFocus
-            />
-          </div>
+        <SsCardContent className="p-6">
+          <form onSubmit={handleSubmit}>
+            <div className="mb-6">
+              <SsTextarea
+                id="daily-note"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                label="How did it go today?"
+                placeholder="Add your notes here..."
+                rows={6}
+                autoFocus
+              />
+            </div>
 
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 rounded border-2 border-black py-2 transition-colors hover:bg-zinc-100"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1 rounded bg-black py-2 text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
-            >
-              {isSubmitting ? "Saving..." : "Save Note"}
-            </button>
-          </div>
-        </form>
-      </div>
+            <div className="flex gap-3">
+              <SsButton type="button" onClick={onClose} variant="secondary" block>
+                Cancel
+              </SsButton>
+              <SsButton type="submit" block loading={isSubmitting}>
+                Save Note
+              </SsButton>
+            </div>
+          </form>
+        </SsCardContent>
+      </SsCard>
     </div>
   );
 }
@@ -114,18 +111,16 @@ export function MarkAsCompleted({ streak, label }: MarkAsCompletedProps) {
         onClose={() => setIsDialogOpen(false)}
         streak={streak}
       />
-      <button
+      <SsButton
         key={streakId}
         onClick={() => setIsDialogOpen(true)}
         disabled={isCompleted}
-        className={`flex items-center gap-2 rounded border-2 px-4 py-2 whitespace-nowrap transition-colors ${isCompleted
-          ? "cursor-pointer border-black bg-black text-white"
-          : "border-black hover:bg-zinc-100"
-          }`}
+        variant={isCompleted ? "primary" : "secondary"}
+        className="whitespace-nowrap"
+        leftIcon={isCompleted ? <Check size={16} /> : undefined}
       >
-        {isCompleted && <Check size={16} />}
         {label}
-      </button>
+      </SsButton>
     </>
   );
 }

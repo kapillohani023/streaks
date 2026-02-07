@@ -1,4 +1,5 @@
 import { Trash2 } from "lucide-react";
+import { SsButton } from "@/components/ui/SsButton";
 
 interface DeleteStreakButtonProps {
   streakId: string;
@@ -10,12 +11,14 @@ export function DeleteStreakButton({
   handleDelete,
 }: DeleteStreakButtonProps) {
   return (
-    <button
+    <SsButton
       onClick={() => handleDelete(streakId)}
-      className="cursor-pointer p-2 text-zinc-600 transition-colors hover:text-black"
+      variant="ghost"
+      size="icon"
+      className="text-zinc-600 hover:text-black"
       aria-label="Delete streak"
     >
       <Trash2 size={20} />
-    </button>
+    </SsButton>
   );
 }

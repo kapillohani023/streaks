@@ -1,6 +1,11 @@
 import { Flame, Target, TrendingUp, TrendingDown } from "lucide-react";
 import { Streak } from "@/types/streak";
 import { isCompletedToday } from "@/lib/util";
+import {
+  SsCard,
+  SsCardDescription,
+} from "@/components/ui/SsCard";
+import { SsTypography } from "@/components/ui/SsTypography";
 
 interface DashboardCardsProps {
   streaks: Streak[];
@@ -10,7 +15,7 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  var completedToday = 0;
+  let completedToday = 0;
   streaks.forEach((streak) => {
     if (isCompletedToday(streak)) completedToday++;
   });
@@ -19,7 +24,7 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
   const calculateConsistency = (days: number) => {
     if (streaks.length === 0) return 0;
 
-    let totalPossible = streaks.length * days;
+    const totalPossible = streaks.length * days;
     let totalCompleted = 0;
 
     for (let i = 0; i < days; i++) {
@@ -51,32 +56,36 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
     <div className="p-8">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {/* Completed Today */}
-        <div className="rounded-lg border-2 border-black bg-white p-6">
+        <SsCard className="p-6">
           <div className="mb-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white">
               <Flame size={20} />
             </div>
-            <div className="text-sm text-zinc-600">Completed Today</div>
+            <SsCardDescription>Completed Today</SsCardDescription>
           </div>
-          <div className="text-4xl">
+          <SsTypography as="p" className="text-4xl">
             {completedToday}/{streaks.length}
-          </div>
-        </div>
+          </SsTypography>
+        </SsCard>
 
         {/* Overall Consistency */}
-        <div className="rounded-lg border-2 border-black bg-white p-6">
+        <SsCard className="p-6">
           <div className="mb-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white">
               <Target size={20} />
             </div>
-            <div className="text-sm text-zinc-600">Overall Consistency</div>
+            <SsCardDescription>Overall Consistency</SsCardDescription>
           </div>
-          <div className="text-4xl">{consistencyLast30Days}%</div>
-          <div className="mt-2 text-sm text-zinc-500">Last 30 days</div>
-        </div>
+          <SsTypography as="p" className="text-4xl">
+            {consistencyLast30Days}%
+          </SsTypography>
+          <SsTypography variant="caption" className="mt-2">
+            Last 30 days
+          </SsTypography>
+        </SsCard>
 
         {/* Consistency Growth */}
-        <div className="rounded-lg border-2 border-black bg-white p-6">
+        <SsCard className="p-6">
           <div className="mb-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white">
               {growth >= 0 ? (
@@ -85,16 +94,19 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
                 <TrendingDown size={20} />
               )}
             </div>
-            <div className="text-sm text-zinc-600">Consistency Growth</div>
+            <SsCardDescription>Consistency Growth</SsCardDescription>
           </div>
-          <div
+          <SsTypography
+            as="p"
             className={`text-4xl ${growth >= 0 ? "text-black" : "text-black"}`}
           >
             {growth >= 0 ? "+" : ""}
             {growth.toFixed(2)}%
-          </div>
-          <div className="mt-2 text-sm text-zinc-500">vs previous 30 days</div>
-        </div>
+          </SsTypography>
+          <SsTypography variant="caption" className="mt-2">
+            vs previous 30 days
+          </SsTypography>
+        </SsCard>
       </div>
     </div>
   );
