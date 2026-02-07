@@ -11,6 +11,7 @@ import {
 import { SsButton } from "@/components/ui/SsButton";
 import { SsInput, SsTextarea } from "@/components/ui/SsInput";
 import { SsTypography } from "@/components/ui/SsTypography";
+import { SsLoaderOverlay } from "@/components/ui/SsLoader";
 
 interface CreateStreakDialogProps {
   isOpen: boolean;
@@ -44,63 +45,70 @@ function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <SsCard className="w-full max-w-md p-0">
-        <SsCardHeader className="mb-0 flex items-center justify-between border-b-2 border-black p-6">
-          <SsCardTitle>Create New Streak</SsCardTitle>
-          <SsButton
-            onClick={onClose}
-            variant="ghost"
-            size="icon"
-            className="text-zinc-600 hover:text-black"
-            aria-label="Close dialog"
-          >
-            <X size={24} />
-          </SsButton>
-        </SsCardHeader>
+    <>
+      <SsLoaderOverlay open={isSubmitting} label="Creating streak..." />
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+        <SsCard className="w-full max-w-md p-0">
+          <SsCardHeader className="mb-0 flex items-center justify-between border-b-2 border-black p-6">
+            <SsCardTitle>Create New Streak</SsCardTitle>
+            <SsButton
+              onClick={onClose}
+              variant="ghost"
+              size="icon"
+              className="text-zinc-600 hover:text-black"
+              aria-label="Close dialog"
+              disabled={isSubmitting}
+            >
+              <X size={24} />
+            </SsButton>
+          </SsCardHeader>
 
-        <SsCardContent className="p-6">
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <SsInput
-                id="streak-name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                label="Streak Name"
-                placeholder="e.g., Daily Exercise, Read Books..."
-                autoFocus
-              />
-            </div>
+          <SsCardContent className="p-6">
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <SsInput
+                  id="streak-name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  label="Streak Name"
+                  placeholder="e.g., Daily Exercise, Read Books..."
+                  autoFocus
+                  disabled={isSubmitting}
+                />
+              </div>
 
-            <div className="mb-6">
-              <SsTextarea
-                id="streak-description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                label="Description (optional)"
-                placeholder="Add a description..."
-                rows={3}
-              />
-            </div>
+              <div className="mb-6">
+                <SsTextarea
+                  id="streak-description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  label="Description (optional)"
+                  placeholder="Add a description..."
+                  rows={3}
+                  disabled={isSubmitting}
+                />
+              </div>
 
-            <div className="flex gap-3">
-              <SsButton type="button" onClick={onClose} variant="secondary" block>
-                Cancel
-              </SsButton>
-              <SsButton
-                type="submit"
-                block
-                loading={isSubmitting}
-                disabled={!name.trim()}
-              >
-                Create Streak
-              </SsButton>
-            </div>
-          </form>
-        </SsCardContent>
-      </SsCard>
-    </div>
+              <div className="flex gap-3">
+                <SsButton
+                  type="button"
+                  onClick={onClose}
+                  variant="secondary"
+                  block
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </SsButton>
+                <SsButton type="submit" block disabled={!name.trim() || isSubmitting}>
+                  Create Streak
+                </SsButton>
+              </div>
+            </form>
+          </SsCardContent>
+        </SsCard>
+      </div>
+    </>
   );
 }
 

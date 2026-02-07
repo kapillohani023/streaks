@@ -13,6 +13,7 @@ import {
 import { SsButton } from "@/components/ui/SsButton";
 import { SsTextarea } from "@/components/ui/SsInput";
 import { SsTypography } from "@/components/ui/SsTypography";
+import { SsLoaderOverlay } from "@/components/ui/SsLoader";
 
 interface EntrySubmissionDialogProps {
   isOpen: boolean;
@@ -47,50 +48,61 @@ export function EntrySubmissionDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <SsCard className="w-full max-w-md p-0">
-        <SsCardHeader className="mb-0 flex items-center justify-between border-b-2 border-black p-6">
-          <div>
-            <SsCardTitle>Daily Note</SsCardTitle>
-            <SsTypography variant="muted">{streak.name}</SsTypography>
-          </div>
-          <SsButton
-            onClick={onClose}
-            variant="ghost"
-            size="icon"
-            className="text-zinc-600 hover:text-black"
-            aria-label="Close dialog"
-          >
-            <X size={24} />
-          </SsButton>
-        </SsCardHeader>
-
-        <SsCardContent className="p-6">
-          <form onSubmit={handleSubmit}>
-            <div className="mb-6">
-              <SsTextarea
-                id="daily-note"
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                label="How did it go today?"
-                placeholder="Add your notes here..."
-                rows={6}
-                autoFocus
-              />
+    <>
+      <SsLoaderOverlay open={isSubmitting} label="Saving entry..." />
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+        <SsCard className="w-full max-w-md p-0">
+          <SsCardHeader className="mb-0 flex items-center justify-between border-b-2 border-black p-6">
+            <div>
+              <SsCardTitle>Daily Note</SsCardTitle>
+              <SsTypography variant="muted">{streak.name}</SsTypography>
             </div>
+            <SsButton
+              onClick={onClose}
+              variant="ghost"
+              size="icon"
+              className="text-zinc-600 hover:text-black"
+              aria-label="Close dialog"
+              disabled={isSubmitting}
+            >
+              <X size={24} />
+            </SsButton>
+          </SsCardHeader>
 
-            <div className="flex gap-3">
-              <SsButton type="button" onClick={onClose} variant="secondary" block>
-                Cancel
-              </SsButton>
-              <SsButton type="submit" block loading={isSubmitting}>
-                Save Note
-              </SsButton>
-            </div>
-          </form>
-        </SsCardContent>
-      </SsCard>
-    </div>
+          <SsCardContent className="p-6">
+            <form onSubmit={handleSubmit}>
+              <div className="mb-6">
+                <SsTextarea
+                  id="daily-note"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  label="How did it go today?"
+                  placeholder="Add your notes here..."
+                  rows={6}
+                  autoFocus
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <SsButton
+                  type="button"
+                  onClick={onClose}
+                  variant="secondary"
+                  block
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </SsButton>
+                <SsButton type="submit" block disabled={isSubmitting}>
+                  Save Note
+                </SsButton>
+              </div>
+            </form>
+          </SsCardContent>
+        </SsCard>
+      </div>
+    </>
   );
 }
 
