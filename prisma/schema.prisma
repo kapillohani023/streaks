@@ -12,6 +12,7 @@ model User {
   name      String
   email     String   @unique
   streaks   Streak[]
+  journal   JournalEntry[]
   createdAt DateTime @default(now())
 
   @@index([email])
@@ -40,4 +41,16 @@ model StreakEntry {
 
   @@index([streakId, date])
   @@map("streak_entries")
+}
+
+model JournalEntry {
+  id        String   @id @default(cuid())
+  entry     String
+  title     String
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("journal_entries")
 }
