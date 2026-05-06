@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/shared/Navbar";
+import { ServiceWorkerRegister } from "./sw-register";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -44,6 +45,7 @@ export default async function RootLayout({
             <Navbar />
           </div>
         </SessionProvider>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
