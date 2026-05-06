@@ -1,147 +1,149 @@
-import { Metadata } from "next";
+import { SsCard } from "@/components/ui/SsCard";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-export const metadata: Metadata = {
-    title: "Privacy Policy | Streaks",
-    description: "Learn how we handle your data and privacy at Streaks.",
-};
+export default function PrivacyPage() {
+  return (
+    <div className="flex min-h-screen items-start justify-center bg-gray-50 px-4 py-10">
+      <SsCard variant="default" padding="lg" className="w-full max-w-2xl">
+        <Link
+          href="/signin"
+          className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-zinc-700 transition-colors hover:text-black"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Sign In
+        </Link>
 
-export default function PrivacyPolicy() {
-    const lastUpdated = "January 26, 2026";
+        <h1 className="mb-6 text-4xl font-bold tracking-tight text-black">
+          Privacy Policy
+        </h1>
 
-    return (
-        <div className="min-h-screen bg-white pb-24 font-sans text-gray-900 selection:bg-black selection:text-white">
-            <div className="mx-auto max-w-3xl px-6 pt-16">
-                <Link
-                    href="/signin"
-                    className="group mb-12 inline-flex items-center gap-2 text-sm font-medium text-gray-400 transition-colors hover:text-black"
-                >
-                    <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
-                    Back to Sign In
-                </Link>
+        <p className="mb-6 text-sm text-zinc-500">Last updated: May 6, 2026</p>
 
-                <header className="mb-16">
-                    <div className="mb-4 inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-bold tracking-widest text-gray-500 uppercase">
-                        Legal
-                    </div>
-                    <h1 className="mb-6 text-5xl font-extrabold tracking-tight text-black sm:text-6xl">
-                        Privacy Policy
-                    </h1>
-                    <div className="h-1 w-20 bg-black mb-6"></div>
-                    <p className="text-lg font-medium text-gray-400">Last updated: {lastUpdated}</p>
-                </header>
+        <div className="space-y-6">
+          <section>
+            <h2 className="mb-2 text-xl font-semibold text-black">
+              1. Information We Collect
+            </h2>
+            <p className="text-base leading-relaxed text-black">
+              When you use Streaks, we collect:
+            </p>
+            <ul className="mt-2 list-inside list-disc space-y-1 text-base text-black">
+              <li>
+                <span className="font-medium">Account information</span>{" "}
+                &mdash; your name, email, and profile picture from Google
+                Sign-In
+              </li>
+              <li>
+                <span className="font-medium">Streak data</span> &mdash; the
+                streaks you create and your daily check-ins
+              </li>
+              <li>
+                <span className="font-medium">Journal entries</span> &mdash;
+                stored as ciphertext only; the date title and timestamp are
+                stored in plaintext
+              </li>
+            </ul>
+          </section>
 
-                <div className="space-y-10 leading-relaxed text-gray-700">
-                    <section>
-                        <h2 className="mb-4 text-2xl font-semibold text-black">Introduction</h2>
-                        <p>
-                            Welcome to <strong>Streaks</strong>. We are committed to protecting your personal
-                            information and your right to privacy. If you have any questions or concerns about our
-                            policy or our practices with regards to your personal information, please contact us.
-                        </p>
-                        <p className="mt-4">
-                            When you use our application, you trust us with your personal information. We take
-                            your privacy very seriously. In this privacy policy, we seek to explain to you in the
-                            clearest way possible what information we collect, how we use it, and what rights you
-                            have in relation to it.
-                        </p>
-                    </section>
+          <section>
+            <h2 className="mb-2 text-xl font-semibold text-black">
+              2. How We Use Your Information
+            </h2>
+            <p className="text-base leading-relaxed text-black">
+              Your information is used to:
+            </p>
+            <ul className="mt-2 list-inside list-disc space-y-1 text-base text-black">
+              <li>Authenticate your identity and manage your account</li>
+              <li>Display your streaks, progress, and journal entries</li>
+              <li>Power optional AI features using Google Gemini</li>
+            </ul>
+          </section>
 
-                    <section>
-                        <h2 className="mb-4 text-2xl font-semibold text-black">Information We Collect</h2>
-                        <p>
-                            We collect personal information that you provide to us when you sign in through Google
-                            OAuth. This includes:
-                        </p>
-                        <ul className="mt-4 list-inside list-disc space-y-2">
-                            <li>
-                                <strong>Account Data:</strong> We collect your name, email address, and profile
-                                picture provided by Google to create and manage your account.
-                            </li>
-                            <li>
-                                <strong>App Data:</strong> We collect and store the data you input into the app,
-                                specifically your habits, streaks, and completion history.
-                            </li>
-                        </ul>
-                    </section>
+          <section>
+            <h2 className="mb-2 text-xl font-semibold text-black">
+              3. Journal Encryption
+            </h2>
+            <p className="text-base leading-relaxed text-black">
+              Journal entries are encrypted in your browser before being sent
+              to our servers, using AES-256-GCM with a key derived from your
+              passphrase via PBKDF2-SHA256 (200,000 iterations) and a
+              per-entry random salt and IV. Your passphrase is never
+              transmitted to or stored by Streaks. We cannot read your
+              entries, and if you lose your passphrase they cannot be
+              recovered.
+            </p>
+          </section>
 
-                    <section>
-                        <h2 className="mb-4 text-2xl font-semibold text-black">How We Use Your Information</h2>
-                        <p>We use the information we collect or receive:</p>
-                        <ul className="mt-4 list-inside list-disc space-y-2">
-                            <li>
-                                <strong>To facilitate account creation and logon process:</strong> We use the
-                                information you allowed us to collect from Google to facilitate the creation of your
-                                account and the logon process.
-                            </li>
-                            <li>
-                                <strong>To provide the service:</strong> We use your habit and streak data to
-                                display your progress and provide the core functionality of the app.
-                            </li>
-                            <li>
-                                <strong>To improve our service:</strong> We may use your feedback and data (in an
-                                anonymized form) to understand usage patterns and enhance the user experience.
-                            </li>
-                            <li>
-                                <strong>AI Features:</strong> If you use our AI features, some of your input data
-                                may be processed by Google Gemini to provide intelligent insights and assistance.
-                            </li>
-                        </ul>
-                    </section>
+          <section>
+            <h2 className="mb-2 text-xl font-semibold text-black">
+              4. Data Storage
+            </h2>
+            <p className="text-base leading-relaxed text-black">
+              Your data is stored in a secured PostgreSQL database. We do not
+              sell, share, or distribute your data to third parties.
+            </p>
+          </section>
 
-                    <section>
-                        <h2 className="mb-4 text-2xl font-semibold text-black">
-                            How Your Information Is Shared
-                        </h2>
-                        <p>
-                            We only share information with your consent, to comply with laws, to provide you with
-                            services, to protect your rights, or to fulfill business obligations.
-                        </p>
-                        <ul className="mt-4 list-inside list-disc space-y-2">
-                            <li>
-                                <strong>Third-Party Service Providers:</strong> We use Google for authentication and
-                                Google Gemini for AI features. These providers have their own privacy policies.
-                            </li>
-                            <li>
-                                <strong>Hosting:</strong> Our app and database are hosted on secure infrastructure
-                                that complies with industry standards.
-                            </li>
-                        </ul>
-                    </section>
+          <section>
+            <h2 className="mb-2 text-xl font-semibold text-black">
+              5. Third-Party Services
+            </h2>
+            <p className="text-base leading-relaxed text-black">
+              Streaks integrates with:
+            </p>
+            <ul className="mt-2 list-inside list-disc space-y-1 text-base text-black">
+              <li>
+                <span className="font-medium">Google OAuth</span> &mdash; for
+                authentication
+              </li>
+              <li>
+                <span className="font-medium">Google Gemini API</span>{" "}
+                &mdash; to power optional AI features. Encrypted journal
+                ciphertext is never sent to AI providers.
+              </li>
+            </ul>
+            <p className="mt-2 text-base leading-relaxed text-black">
+              These services have their own privacy policies. We encourage
+              you to review them.
+            </p>
+          </section>
 
-                    <section>
-                        <h2 className="mb-4 text-2xl font-semibold text-black">Data Retention</h2>
-                        <p>
-                            We keep your information for as long as necessary to fulfill the purposes outlined in
-                            this privacy policy unless otherwise required by law. You can request deletion of
-                            your account and data at any time.
-                        </p>
-                    </section>
+          <section>
+            <h2 className="mb-2 text-xl font-semibold text-black">
+              6. Data Deletion
+            </h2>
+            <p className="text-base leading-relaxed text-black">
+              You can delete your streaks and journal entries at any time
+              from the app. Deleting your account removes all associated
+              data.
+            </p>
+          </section>
 
-                    <section>
-                        <h2 className="mb-4 text-2xl font-semibold text-black">Your Privacy Rights</h2>
-                        <p>
-                            Depending on your location, you may have certain rights regarding your personal
-                            information, such as the right to access, correct, or delete your data. You may
-                            exercise these rights by contacting us.
-                        </p>
-                    </section>
+          <section>
+            <h2 className="mb-2 text-xl font-semibold text-black">
+              7. Security
+            </h2>
+            <p className="text-base leading-relaxed text-black">
+              We take reasonable measures to protect your data. However, no
+              system is completely secure and we cannot guarantee absolute
+              protection.
+            </p>
+          </section>
 
-                    <section>
-                        <h2 className="mb-4 text-2xl font-semibold text-black">Updates To This Policy</h2>
-                        <p>
-                            We may update this privacy policy from time to time. The updated version will be
-                            indicated by an updated "Last Updated" date and the updated version will be effective
-                            as soon as it is accessible.
-                        </p>
-                    </section>
-
-                    <footer className="border-t border-gray-100 pt-10 text-sm text-gray-500">
-                        <p>&copy; {new Date().getFullYear()} Streaks. All rights reserved.</p>
-                    </footer>
-                </div>
-            </div>
+          <section>
+            <h2 className="mb-2 text-xl font-semibold text-black">
+              8. Changes to This Policy
+            </h2>
+            <p className="text-base leading-relaxed text-black">
+              We may update this privacy policy from time to time. Changes
+              will be reflected on this page with an updated date. Continued
+              use of the service constitutes acceptance of the revised
+              policy.
+            </p>
+          </section>
         </div>
-    );
+      </SsCard>
+    </div>
+  );
 }
