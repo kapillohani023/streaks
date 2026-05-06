@@ -49,6 +49,12 @@ const base64ToBytes = (b64: string): Uint8Array => {
   return out;
 };
 
+const toCryptoBytes = (bytes: Uint8Array): Uint8Array<ArrayBuffer> => {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy;
+};
+
 const SALT_LEN = 16;
 const IV_LEN = 12;
 const PBKDF2_ITERATIONS = 200_000;
@@ -59,7 +65,7 @@ const deriveAesKey = async (
 ): Promise<CryptoKey> => {
   const baseKey = await crypto.subtle.importKey(
     "raw",
-    new TextEncoder().encode(passphrase),
+    toCryptoBytes(new TextEncoder().encode(passphrase)),
     "PBKDF2",
     false,
     ["deriveKey"]
@@ -67,7 +73,7 @@ const deriveAesKey = async (
   return crypto.subtle.deriveKey(
     {
       name: "PBKDF2",
-      salt,
+      salt: toCryptoBytes(salt),
       iterations: PBKDF2_ITERATIONS,
       hash: "SHA-256",
     },
@@ -87,9 +93,9 @@ export const encryptEntry = async (
   const key = await deriveAesKey(passphrase, salt);
   const ct = new Uint8Array(
     await crypto.subtle.encrypt(
-      { name: "AES-GCM", iv },
+      { name: "AES-GCM", iv: toCryptoBytes(iv) },
       key,
-      new TextEncoder().encode(plaintext)
+      toCryptoBytes(new TextEncoder().encode(plaintext))
     )
   );
   const blob = new Uint8Array(salt.length + iv.length + ct.length);
@@ -109,6 +115,10 @@ export const decryptEntry = async (
   const iv = blob.slice(SALT_LEN, SALT_LEN + IV_LEN);
   const ct = blob.slice(SALT_LEN + IV_LEN);
   const key = await deriveAesKey(passphrase, salt);
-  const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ct);
+  const pt = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: toCryptoBytes(iv) },
+    key,
+    toCryptoBytes(ct)
+  );
   return new TextDecoder().decode(pt);
 };
