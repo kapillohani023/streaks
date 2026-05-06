@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/shared/Navbar";
 import { ServiceWorkerRegister } from "./sw-register";
@@ -24,6 +24,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  viewportFit: "cover",
+};
+
 import { auth } from "@/app/auth";
 import { SessionProvider } from "next-auth/react";
 
@@ -40,7 +44,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionProvider session={session}>
-          <div className="flex h-screen flex-col">
+          <div className="flex h-[100dvh] flex-col">
             <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
             <Navbar />
           </div>

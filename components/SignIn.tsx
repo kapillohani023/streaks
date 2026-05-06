@@ -12,7 +12,7 @@ export async function SignIn() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <SsCard variant="default" padding="lg" className="w-full max-w-sm">
         <h1 className="mb-6 text-center text-2xl font-semibold text-zinc-900">
-          Streaks
+          Streaks - Build habits better
         </h1>
         <form
           action={async () => {

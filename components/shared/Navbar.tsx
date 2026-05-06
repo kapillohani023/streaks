@@ -23,7 +23,7 @@ export function Navbar() {
     router.push(label);
   };
   return (
-    <div className="flex items-center justify-around border-t-2 border-black bg-white px-8 py-6">
+    <div className="flex items-center justify-around border-t-2 border-black bg-white px-8 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
       <div className="flex flex-1 items-center justify-around">
         <SsButton
           size="icon"
