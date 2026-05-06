@@ -18,6 +18,7 @@ export function JournalEntryForm() {
     setIsSubmitting(true);
     const formData = new FormData();
     formData.set("entry", text);
+    formData.set("title", formatJournalTitle(new Date()));
     await addJournalEntry(formData);
     setEntry("");
     setIsSubmitting(false);
