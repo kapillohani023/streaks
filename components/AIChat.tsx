@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { SendHorizontal } from "lucide-react";
+import { SendHorizontal, SquarePen } from "lucide-react";
 import { Streak } from "@/types/streak";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import ReactMarkdown from "react-markdown";
@@ -156,6 +156,28 @@ export default function AIChat({ initialStreaks }: AIChatProps) {
     }
   };
 
+  const handleNewChat = () => {
+    setMessages([]);
+    setInput("");
+    setChips([
+      {
+        id: "1",
+        label: "Analyze Performance",
+        prompt: "Analyze my streak performance",
+      },
+      {
+        id: "2",
+        label: "Get Motivation",
+        prompt: "Give me some motivation to keep my streak",
+      },
+      {
+        id: "3",
+        label: "Suggest Goals",
+        prompt: "Suggest some new habit goals for me",
+      },
+    ]);
+  };
+
   const onChipClick = (chipId: string) => {
     const chip = chips.find((c) => c.id === chipId);
     if (chip) {
@@ -184,6 +206,13 @@ export default function AIChat({ initialStreaks }: AIChatProps) {
                 }`}
             >
               {msg.role === "model" ? (
+                msg.content === "" ? (
+                  <div className="flex items-center gap-1 py-1" aria-label="Assistant is typing">
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-gray-500 [animation-delay:-0.3s]" />
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-gray-500 [animation-delay:-0.15s]" />
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-gray-500" />
+                  </div>
+                ) : (
                 <ReactMarkdown
                   components={{
                     ul: ({ ...props }) => (
@@ -203,6 +232,7 @@ export default function AIChat({ initialStreaks }: AIChatProps) {
                 >
                   {msg.content}
                 </ReactMarkdown>
+                )
               ) : (
                 msg.content
               )}
@@ -227,8 +257,18 @@ export default function AIChat({ initialStreaks }: AIChatProps) {
           ))}
         </div>
       )}
-
       <div className="flex gap-2">
+        <SsButton
+          onClick={handleNewChat}
+          disabled={isLoading || messages.length === 0}
+          size="icon"
+          variant="secondary"
+          aria-label="New chat"
+          title="New chat"
+          className="rounded-full transition-opacity hover:opacity-80"
+        >
+          <SquarePen className="h-5 w-5" />
+        </SsButton>
         <SsInput
           type="text"
           value={input}
@@ -244,6 +284,7 @@ export default function AIChat({ initialStreaks }: AIChatProps) {
           onClick={() => handleSend(input)}
           disabled={isLoading || !input.trim()}
           size="icon"
+          aria-label="Send message"
           className="rounded-full transition-opacity hover:opacity-80"
         >
           <SendHorizontal className="h-5 w-5" />

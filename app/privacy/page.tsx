@@ -56,7 +56,17 @@ export default function PrivacyPage() {
             <ul className="mt-2 list-inside list-disc space-y-1 text-base text-black">
               <li>Authenticate your identity and manage your account</li>
               <li>Display your streaks, progress, and journal entries</li>
-              <li>Power optional AI features using Google Gemini</li>
+              <li>
+                Power optional AI features via the T2A API at{" "}
+                <a
+                  href="https://t2a.kapillohani.site"
+                  className="underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://t2a.kapillohani.site
+                </a>
+              </li>
             </ul>
           </section>
 
@@ -98,9 +108,18 @@ export default function PrivacyPage() {
                 authentication
               </li>
               <li>
-                <span className="font-medium">Google Gemini API</span>{" "}
-                &mdash; to power optional AI features. Encrypted journal
-                ciphertext is never sent to AI providers.
+                <span className="font-medium">T2A API</span> &mdash; messages
+                you send to AI features are forwarded to{" "}
+                <a
+                  href="https://t2a.kapillohani.site"
+                  className="underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://t2a.kapillohani.site
+                </a>{" "}
+                to generate responses. Encrypted journal ciphertext is never
+                sent to AI providers.
               </li>
             </ul>
             <p className="mt-2 text-base leading-relaxed text-black">
