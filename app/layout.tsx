@@ -44,7 +44,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionProvider session={session}>
-          <div className="flex h-[100dvh] flex-col">
+          <div className="flex h-[100dvh] flex-col pt-[env(safe-area-inset-top)]">
             <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
             <Navbar />
           </div>
