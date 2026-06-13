@@ -34,33 +34,35 @@ export function StreakCalendar({ completedDates }: StreakCalendarProps) {
           font-size: 10px;
         }
       `}</style>
-      <CalendarHeatmap
-        startDate={lastYearToday}
-        endDate={today}
-        values={completedDates.map((day) => ({
-          date: day,
-          count: 1,
-        }))}
-        classForValue={(value: any) =>
-          value && value.count > 0 ? "color-filled" : "color-empty"
-        }
-        showWeekdayLabels={true}
-        gutterSize={2}
-        monthLabels={[
-          "Jan",
-          "Feb",
-          "Mar",
-          "Apr",
-          "May",
-          "Jun",
-          "Jul",
-          "Aug",
-          "Sep",
-          "Oct",
-          "Nov",
-          "Dec",
-        ]}
-      />
+      <div className="rounded border-2 border-black p-3">
+        <CalendarHeatmap
+          startDate={lastYearToday}
+          endDate={today}
+          values={completedDates.map((day) => ({
+            date: day,
+            count: 1,
+          }))}
+          classForValue={(value: any) =>
+            value && value.count > 0 ? "color-filled" : "color-empty"
+          }
+          showWeekdayLabels={true}
+          gutterSize={2}
+          monthLabels={[
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ]}
+        />
+      </div>
     </>
   );
 }
