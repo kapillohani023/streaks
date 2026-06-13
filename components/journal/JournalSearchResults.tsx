@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { JournalEntry } from "@/types/journal-entry";
 import { SsCard } from "@/components/ui/SsCard";
 import { SsTypography } from "@/components/ui/SsTypography";
@@ -9,8 +9,6 @@ interface JournalSearchResultsProps {
 }
 
 export function JournalSearchResults({ entries }: JournalSearchResultsProps) {
-  const router = useRouter();
-
   if (entries.length === 0) {
     return (
       <SsCard variant="default" padding="md" className="text-center">
@@ -27,9 +25,8 @@ export function JournalSearchResults({ entries }: JournalSearchResultsProps) {
             key={entry.id}
             className={idx > 0 ? "border-t-2 border-black" : ""}
           >
-            <button
-              type="button"
-              onClick={() => router.push(`/journal/${entry.id}`)}
+            <Link
+              href={`/journal/${entry.id}`}
               className="flex w-full cursor-pointer items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-zinc-100"
             >
               <SsTypography
@@ -44,7 +41,7 @@ export function JournalSearchResults({ entries }: JournalSearchResultsProps) {
                   minute: "2-digit",
                 })}
               </SsTypography>
-            </button>
+            </Link>
           </li>
         ))}
       </ul>

@@ -1,12 +1,11 @@
 "use client";
-import { useMemo, useState } from "react";
 import { LayoutDashboard } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { JournalEntry } from "@/types/journal-entry";
 import { SsButton } from "@/components/ui/SsButton";
-import { JournalSearchBar } from "@/components/journal/JournalSearchBar";
-import { JournalSearchResults } from "@/components/journal/JournalSearchResults";
+import { SsTypography } from "@/components/ui/SsTypography";
+import { JournalSearch } from "@/components/journal/JournalSearch";
 import { JournalEntryForm } from "@/components/journal/JournalEntryForm";
 
 interface JournalContentProps {
@@ -15,13 +14,8 @@ interface JournalContentProps {
 
 export function JournalContent({ entries }: JournalContentProps) {
   const router = useRouter();
-  const [query, setQuery] = useState("");
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    return entries.filter((e) => e.title.toLowerCase().includes(q));
-  }, [entries, query]);
+  const lastEntry = entries[0];
 
   return (
     <div className="flex h-full min-h-0 w-full overflow-y-auto bg-white text-black">
@@ -45,14 +39,29 @@ export function JournalContent({ entries }: JournalContentProps) {
         </div>
 
         <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 p-4">
-          <div className="relative">
-            <JournalSearchBar value={query} onChange={setQuery} />
-            {query.trim() && (
-              <div className="absolute top-full right-0 left-0 z-10 mt-2">
-                <JournalSearchResults entries={filtered} />
-              </div>
-            )}
-          </div>
+          {lastEntry && (
+            <button
+              type="button"
+              onClick={() => router.push(`/journal/${lastEntry.id}`)}
+              className="flex w-full cursor-pointer items-center gap-2 text-left"
+            >
+              <SsTypography variant="caption" className="shrink-0">
+                Last entry:
+              </SsTypography>
+              <SsTypography
+                as="span"
+                className="font-mono text-sm font-semibold tracking-tight underline underline-offset-2"
+              >
+                {lastEntry.title} ·{" "}
+                {lastEntry.createdAt.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </SsTypography>
+            </button>
+          )}
+
+          <JournalSearch entries={entries} />
 
           <div className="border-b-2 border-black" />
 

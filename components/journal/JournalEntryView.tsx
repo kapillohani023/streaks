@@ -6,10 +6,12 @@ import { JournalEntry } from "@/types/journal-entry";
 import { SsButton } from "@/components/ui/SsButton";
 import { SsCard } from "@/components/ui/SsCard";
 import { SsTypography } from "@/components/ui/SsTypography";
+import { JournalSearch } from "@/components/journal/JournalSearch";
 import { decryptEntry } from "@/lib/util";
 
 interface JournalEntryViewProps {
   entry: JournalEntry;
+  entries: JournalEntry[];
 }
 
 type DecryptState =
@@ -17,7 +19,7 @@ type DecryptState =
   | { status: "ok"; text: string }
   | { status: "error" };
 
-export function JournalEntryView({ entry }: JournalEntryViewProps) {
+export function JournalEntryView({ entry, entries }: JournalEntryViewProps) {
   const router = useRouter();
   const [key, setKey] = useState("");
   const [state, setState] = useState<DecryptState>({ status: "idle" });
@@ -59,6 +61,8 @@ export function JournalEntryView({ entry }: JournalEntryViewProps) {
             })}
           </SsTypography>
         </div>
+
+        <JournalSearch entries={entries} />
 
         <SsCard variant="default" padding="lg">
           <div className="mb-4 flex items-center justify-between gap-3 border-b-2 border-black pb-3">
