@@ -16,7 +16,7 @@ function formatHistory(
     .join("\n");
 }
 
-async function callT2A(message: string): Promise<string> {
+async function callT2A(message: string, userId: string): Promise<string> {
   if (!apiUrl || !apiToken) {
     throw new Error("T2A_API_URL or T2A_API_BEARER_TOKEN is not set");
   }
@@ -30,7 +30,9 @@ async function callT2A(message: string): Promise<string> {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiToken}`,
         },
-        body: JSON.stringify({ message }),
+        // userId is forwarded so the agent can scope its MCP streak tools to
+        // the current user (the tools take a userId argument).
+        body: JSON.stringify({ message, userId }),
       });
 
       if (!response.ok) {
@@ -57,9 +59,9 @@ async function callT2A(message: string): Promise<string> {
   throw lastError ?? new Error("T2A request failed");
 }
 
-export async function generateAIResponse(prompt: string) {
+export async function generateAIResponse(prompt: string, userId: string) {
   try {
-    return await callT2A(prompt);
+    return await callT2A(prompt, userId);
   } catch (error) {
     console.error("AI Generation Error:", error);
     return FALLBACK_MESSAGE;
@@ -68,13 +70,14 @@ export async function generateAIResponse(prompt: string) {
 
 export async function chatCompletion(
   history: { role: "user" | "model"; content: string }[],
-  message: string
+  message: string,
+  userId: string
 ) {
   try {
     const formatted = history.length
       ? `${formatHistory(history)}\nUser: ${message}`
       : message;
-    return await callT2A(formatted);
+    return await callT2A(formatted, userId);
   } catch {
     return FALLBACK_MESSAGE;
   }
@@ -82,13 +85,14 @@ export async function chatCompletion(
 
 export async function* chatCompletionStream(
   history: { role: "user" | "model"; content: string }[],
-  message: string
+  message: string,
+  userId: string
 ) {
   const formatted = history.length
     ? `${formatHistory(history)}\nUser: ${message}`
     : message;
   try {
-    const reply = await callT2A(formatted);
+    const reply = await callT2A(formatted, userId);
     yield reply;
   } catch (error) {
     console.error("AI Stream Error:", error);

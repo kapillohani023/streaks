@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/app/auth";
+import { createStreakForUser } from "@/lib/streak-service";
 
 export async function addStreak(formData: FormData) {
   const session = await auth();
@@ -12,8 +13,10 @@ export async function addStreak(formData: FormData) {
   const startDate =
     (formData.get("startDate") as string) || new Date().toISOString();
 
-  const streak = await prisma.streak.create({
-    data: { name, description, startDate, userId: session.user.id },
+  const streak = await createStreakForUser(session.user.id, {
+    name,
+    description,
+    startDate,
   });
 
   revalidatePath("/", "layout");

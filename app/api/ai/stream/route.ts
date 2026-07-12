@@ -11,6 +11,7 @@ export async function POST(request: Request) {
   if (!session?.user?.id) {
     return new Response("Unauthorized", { status: 401 });
   }
+  const userId = session.user.id;
 
   let body: StreamRequestBody;
   try {
@@ -30,7 +31,11 @@ export async function POST(request: Request) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        for await (const chunk of chatCompletionStream(history, message)) {
+        for await (const chunk of chatCompletionStream(
+          history,
+          message,
+          userId
+        )) {
           controller.enqueue(encoder.encode(chunk));
         }
       } catch (error) {

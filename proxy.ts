@@ -5,5 +5,5 @@ const { auth } = NextAuth(authConfig);
 export const proxy = auth;
 
 export const config = {
-  matcher: ["/((?!api/auth|_next|favicon.ico|manifest.webmanifest|sw.js|logo.png|logo-192.png|privacy|terms|signin|login).*)"],
+  matcher: ["/((?!api/auth|api/mcp|_next|favicon.ico|manifest.webmanifest|sw.js|logo.png|logo-192.png|privacy|terms|signin|login).*)"],
 };

@@ -1,7 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { SendHorizontal, SquarePen } from "lucide-react";
-import { Streak } from "@/types/streak";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import ReactMarkdown from "react-markdown";
 import { SsButton } from "@/components/ui/SsButton";
@@ -18,11 +17,7 @@ interface Chip {
   prompt: string;
 }
 
-interface AIChatProps {
-  initialStreaks: Streak[];
-}
-
-export default function AIChat({ initialStreaks }: AIChatProps) {
+export default function AIChat() {
   const currentUser = useCurrentUser();
   const currentUserFirstName = currentUser?.name?.split(" ")[0];
   const [messages, setMessages] = useState<Message[]>([]);
@@ -56,25 +51,6 @@ export default function AIChat({ initialStreaks }: AIChatProps) {
     const trimmedText = text.trim();
     if (!trimmedText) return;
 
-    let streaksContext = "";
-    if (messages.length === 0) {
-      const cleanStreaksData = initialStreaks.map((streak) => {
-        return {
-          name: streak.name,
-          description: streak.description,
-          startDate: streak.startDate,
-          entries: streak.entries.map((entry) => {
-            return {
-              date: entry.date,
-              note: entry.note,
-            };
-          }),
-        };
-      });
-      streaksContext =
-        "\n<context>" + JSON.stringify(cleanStreaksData) + "</context>";
-    }
-
     const userMsg: Message = { role: "user", content: trimmedText };
     const historySnapshot = [...messages];
     setMessages((prev) => [...prev, userMsg, { role: "model", content: "" }]);
@@ -87,7 +63,7 @@ export default function AIChat({ initialStreaks }: AIChatProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           history: historySnapshot,
-          message: trimmedText + streaksContext,
+          message: trimmedText,
         }),
       });
 
