@@ -85,7 +85,9 @@ export async function createStreakForUser(
 /**
  * Add an entry to a streak the user owns. Verifies ownership first so a
  * caller can't write into someone else's streak by guessing a streakId.
- * `date` defaults to now, `completed` to true.
+ * `date` defaults to now, `completed` to true. Used by the manual "log an
+ * entry" UI form, which lets a user backfill/edit any date — unlike
+ * markStreakCompletedTodayForUser, it does not dedupe against today.
  */
 export async function addStreakEntryForUser(
   userId: string,
@@ -96,11 +98,7 @@ export async function addStreakEntryForUser(
     note?: string;
   }
 ) {
-  const streak = await prisma.streak.findFirst({
-    where: { id: input.streakId, userId },
-    select: { id: true },
-  });
-  if (!streak) throw new Error("Streak not found");
+  await assertOwnedStreak(userId, input.streakId);
 
   return prisma.streakEntry.create({
     data: {
@@ -110,4 +108,73 @@ export async function addStreakEntryForUser(
       note: input.note,
     },
   });
+}
+
+/** [start of day, start of next day) for the given moment, in local time. */
+function todayBounds(): { start: Date; end: Date } {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 1);
+  return { start, end };
+}
+
+async function assertOwnedStreak(userId: string, streakId: string) {
+  const streak = await prisma.streak.findFirst({
+    where: { id: streakId, userId },
+    select: { id: true },
+  });
+  if (!streak) throw new Error("Streak not found");
+}
+
+/** Whether a streak the user owns already has a completed entry for today. */
+export async function isStreakCompletedTodayForUser(
+  userId: string,
+  streakId: string
+): Promise<boolean> {
+  await assertOwnedStreak(userId, streakId);
+  const { start, end } = todayBounds();
+  const entry = await prisma.streakEntry.findFirst({
+    where: {
+      streakId,
+      completed: true,
+      date: { gte: start, lt: end },
+    },
+    select: { id: true },
+  });
+  return entry !== null;
+}
+
+/**
+ * Mark a streak the user owns as completed for today. Idempotent: if
+ * today is already marked completed, the existing entry is returned
+ * instead of creating a duplicate.
+ */
+export async function markStreakCompletedTodayForUser(
+  userId: string,
+  input: { streakId: string; note?: string }
+): Promise<{ alreadyCompleted: boolean; entry: StreakRow["entries"][number] }> {
+  await assertOwnedStreak(userId, input.streakId);
+  const { start, end } = todayBounds();
+
+  const existing = await prisma.streakEntry.findFirst({
+    where: {
+      streakId: input.streakId,
+      completed: true,
+      date: { gte: start, lt: end },
+    },
+  });
+  if (existing) {
+    return { alreadyCompleted: true, entry: existing };
+  }
+
+  const entry = await prisma.streakEntry.create({
+    data: {
+      streakId: input.streakId,
+      date: new Date(),
+      completed: true,
+      note: input.note,
+    },
+  });
+  return { alreadyCompleted: false, entry };
 }

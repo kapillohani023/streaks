@@ -4,7 +4,8 @@ import {
   getStreaksForUser,
   getStreakEntriesForUser,
   createStreakForUser,
-  addStreakEntryForUser,
+  markStreakCompletedTodayForUser,
+  isStreakCompletedTodayForUser,
 } from "@/lib/streak-service";
 
 export const runtime = "nodejs";
@@ -119,40 +120,67 @@ const handler = createMcpHandler(
   );
 
   server.tool(
-    "add_streak_entry",
-    "Log an entry for a streak the user owns (e.g. mark today done). date defaults to today, completed defaults to true.",
+    "mark_streak_completed_today",
+    "Mark a streak the user owns as done for TODAY only (not for arbitrary past dates). " +
+      "Safe to call more than once: if today is already marked completed, no duplicate " +
+      "entry is created and the existing entry is returned instead — the response's " +
+      "`alreadyCompleted` field tells you which happened. Use `is_streak_completed_today` " +
+      "first if you only need to check status without writing anything.",
     {
       userId: z
         .string()
         .describe(
           "The acting user's id. Use the `userId` provided in the request input; never invent it or ask the user."
         ),
-      streakId: z.string().describe("The id of the streak to add an entry to"),
-      date: z
+      streakId: z
+        .string()
+        .describe("The id of the streak to mark completed for today"),
+      note: z
         .string()
         .optional()
-        .describe("ISO 8601 date of the entry; defaults to today"),
-      completed: z
-        .boolean()
-        .optional()
-        .describe("Whether the habit was completed; defaults to true"),
-      note: z.string().optional().describe("Optional note for the entry"),
+        .describe("Optional note to attach to today's entry"),
     },
-    async ({ userId, streakId, date, completed, note }) => {
+    async ({ userId, streakId, note }) => {
       try {
-        const entry = await addStreakEntryForUser(userId, {
-          streakId,
-          date,
-          completed,
-          note,
-        });
+        const { alreadyCompleted, entry } =
+          await markStreakCompletedTodayForUser(userId, { streakId, note });
         return ok({
-          id: entry.id,
-          streakId: entry.streakId,
-          date: entry.date.toISOString(),
-          completed: entry.completed,
-          note: entry.note ?? null,
+          alreadyCompleted,
+          entry: {
+            id: entry.id,
+            streakId: entry.streakId,
+            date: entry.date.toISOString(),
+            completed: entry.completed,
+            note: entry.note ?? null,
+          },
         });
+      } catch (e) {
+        return fail(e);
+      }
+    }
+  );
+
+  server.tool(
+    "is_streak_completed_today",
+    "Check whether a streak the user owns has already been marked completed for TODAY. " +
+      "Returns a plain boolean (`completedToday`) — use this before " +
+      "`mark_streak_completed_today` when you just need to know the status, e.g. to " +
+      "answer 'did I do X today?' or to decide whether to prompt the user.",
+    {
+      userId: z
+        .string()
+        .describe(
+          "The acting user's id. Use the `userId` provided in the request input; never invent it or ask the user."
+        ),
+      streakId: z.string().describe("The id of the streak to check"),
+    },
+    async ({ userId, streakId }) => {
+      try {
+        const completedToday = await isStreakCompletedTodayForUser(
+          userId,
+          streakId
+        );
+        return ok({ completedToday });
       } catch (e) {
         return fail(e);
       }
