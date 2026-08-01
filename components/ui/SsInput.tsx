@@ -12,12 +12,10 @@ interface BaseFieldProps {
 }
 
 export interface SsInputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "size">,
-    BaseFieldProps {}
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "size">, BaseFieldProps {}
 
 export interface SsTextareaProps
-  extends TextareaHTMLAttributes<HTMLTextAreaElement>,
-    BaseFieldProps {}
+  extends TextareaHTMLAttributes<HTMLTextAreaElement>, BaseFieldProps {}
 
 const wrapperClass = "flex flex-col gap-2";
 const baseInputClass =
@@ -47,7 +45,7 @@ export function SsInput({
         .join(" ")}
     >
       {label && (
-        <label htmlFor={id} className="text-sm text-muted-foreground">
+        <label htmlFor={id} className="text-muted-foreground text-sm">
           {label}
         </label>
       )}
@@ -59,7 +57,9 @@ export function SsInput({
         {...props}
       />
       {(error || hint) && (
-        <p className={`text-xs ${error ? "text-destructive" : "text-muted-foreground"}`}>
+        <p
+          className={`text-xs ${error ? "text-destructive" : "text-muted-foreground"}`}
+        >
           {error ?? hint}
         </p>
       )}
@@ -85,7 +85,7 @@ export function SsTextarea({
         .join(" ")}
     >
       {label && (
-        <label htmlFor={id} className="text-sm text-muted-foreground">
+        <label htmlFor={id} className="text-muted-foreground text-sm">
           {label}
         </label>
       )}
@@ -97,7 +97,9 @@ export function SsTextarea({
         {...props}
       />
       {(error || hint) && (
-        <p className={`text-xs ${error ? "text-destructive" : "text-muted-foreground"}`}>
+        <p
+          className={`text-xs ${error ? "text-destructive" : "text-muted-foreground"}`}
+        >
           {error ?? hint}
         </p>
       )}

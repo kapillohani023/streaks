@@ -12,11 +12,15 @@ export async function addStreak(formData: FormData) {
   const description = formData.get("description") as string;
   const startDate =
     (formData.get("startDate") as string) || new Date().toISOString();
+  // Absent when the user left the reminder toggle off; creation never depends
+  // on notification permission having been granted.
+  const reminderTime = (formData.get("reminderTime") as string) || null;
 
   const streak = await createStreakForUser(session.user.id, {
     name,
     description,
     startDate,
+    reminderTime,
   });
 
   revalidatePath("/", "layout");

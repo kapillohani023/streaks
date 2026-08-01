@@ -33,11 +33,11 @@ export function JournalSearchResults({ entries }: JournalSearchResultsProps) {
         {entries.map((entry, idx) => (
           <li
             key={entry.id}
-            className={idx > 0 ? "border-t border-border" : ""}
+            className={idx > 0 ? "border-border border-t" : ""}
           >
             <Link
               href={`/journal/${entry.id}`}
-              className="flex w-full cursor-pointer items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-muted"
+              className="hover:bg-muted flex w-full cursor-pointer items-center justify-between gap-4 px-4 py-3 text-left transition-colors"
             >
               <SsTypography
                 as="span"

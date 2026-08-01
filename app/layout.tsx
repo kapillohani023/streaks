@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/shared/Navbar";
 import { Header } from "@/components/shared/Header";
 import { ServiceWorkerRegister } from "./sw-register";
+import { TimezoneSync } from "./timezone-sync";
 import "./globals.css";
 
 const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('streaks-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.classList.add(t);}catch(e){}})();`;
@@ -51,13 +52,14 @@ export default async function RootLayout({
         className={`${plusJakartaSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionProvider session={session}>
-          <div className="fixed inset-0 flex flex-col bg-background pt-[env(safe-area-inset-top)]">
+          <div className="bg-background fixed inset-0 flex flex-col pt-[env(safe-area-inset-top)]">
             <Header />
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
               {children}
             </div>
             <Navbar />
           </div>
+          <TimezoneSync />
         </SessionProvider>
         <ServiceWorkerRegister />
       </body>

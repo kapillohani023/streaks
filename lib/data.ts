@@ -3,10 +3,7 @@ import { auth } from "@/app/auth";
 import { cache } from "react";
 import { Streak } from "@/types/streak";
 import { JournalEntry } from "@/types/journal-entry";
-import {
-  getStreaksForUser,
-  getStreakByIdForUser,
-} from "@/lib/streak-service";
+import { getStreaksForUser, getStreakByIdForUser } from "@/lib/streak-service";
 
 export const getStreaks = cache(async (): Promise<Streak[]> => {
   const session = await auth();
@@ -47,9 +44,7 @@ export const getJournalEntries = async (
   const entries = await prisma.journalEntry.findMany({
     where: {
       userId: session.user.id,
-      ...(query
-        ? { title: { contains: query, mode: "insensitive" } }
-        : {}),
+      ...(query ? { title: { contains: query, mode: "insensitive" } } : {}),
     },
     orderBy: { createdAt: "desc" },
   });

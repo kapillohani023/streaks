@@ -10,16 +10,16 @@ export async function SignIn() {
   if (session) redirect("/dashboard");
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="bg-background flex min-h-screen items-center justify-center px-4">
       <SsCard variant="elevated" padding="lg" className="w-full max-w-sm">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-foreground">
+          <div className="bg-muted text-foreground mb-4 flex h-14 w-14 items-center justify-center rounded-2xl">
             <ListChecks size={28} />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          <h1 className="text-foreground text-2xl font-semibold tracking-tight">
             Streaks
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-sm">
             Build habits better
           </p>
         </div>
@@ -39,13 +39,13 @@ export async function SignIn() {
             Sign in with Google
           </SsButton>
         </form>
-        <p className="mt-6 text-center text-xs text-muted-foreground">
+        <p className="text-muted-foreground mt-6 text-center text-xs">
           By signing in, you agree to our{" "}
-          <a href="/terms" className="underline hover:text-foreground">
+          <a href="/terms" className="hover:text-foreground underline">
             Terms
           </a>{" "}
           and{" "}
-          <a href="/privacy" className="underline hover:text-foreground">
+          <a href="/privacy" className="hover:text-foreground underline">
             Privacy Policy
           </a>
           .

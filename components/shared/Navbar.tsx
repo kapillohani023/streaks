@@ -24,8 +24,8 @@ export function Navbar() {
   }
 
   return (
-    <div className="flex justify-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2">
-      <div className="flex items-center gap-1 rounded-full border border-border bg-card px-2 py-2 shadow-lg">
+    <div className="flex justify-center px-4 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div className="border-border bg-card flex items-center gap-1 rounded-full border px-2 py-2 shadow-lg">
         {NAV_ITEMS.map(({ label, icon: Icon, name }) => {
           const isActive = path.startsWith(label);
           return (

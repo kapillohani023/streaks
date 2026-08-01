@@ -1,10 +1,7 @@
 import { Flame, Target, TrendingUp, TrendingDown } from "lucide-react";
 import { Streak } from "@/types/streak";
 import { isCompletedToday } from "@/lib/util";
-import {
-  SsCard,
-  SsCardDescription,
-} from "@/components/ui/SsCard";
+import { SsCard, SsCardDescription } from "@/components/ui/SsCard";
 import { SsTypography } from "@/components/ui/SsTypography";
 
 interface DashboardCardsProps {
@@ -47,10 +44,10 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
     consistencyPrevious30Days == 0
       ? 0
       : Math.round(
-        ((consistencyLast30Days - consistencyPrevious30Days) /
-          consistencyPrevious30Days) *
-        100
-      );
+          ((consistencyLast30Days - consistencyPrevious30Days) /
+            consistencyPrevious30Days) *
+            100
+        );
 
   return (
     <div className="p-8">
@@ -58,7 +55,7 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
         {/* Completed Today */}
         <SsCard padding="lg" variant="elevated" className="hover:shadow-md">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground">
+            <div className="bg-muted text-foreground flex h-10 w-10 items-center justify-center rounded-full">
               <Flame size={20} />
             </div>
             <SsCardDescription>Completed Today</SsCardDescription>
@@ -71,7 +68,7 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
         {/* Overall Consistency */}
         <SsCard padding="lg" variant="elevated" className="hover:shadow-md">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground">
+            <div className="bg-muted text-foreground flex h-10 w-10 items-center justify-center rounded-full">
               <Target size={20} />
             </div>
             <SsCardDescription>Overall Consistency</SsCardDescription>

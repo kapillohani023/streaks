@@ -50,7 +50,7 @@ export function ThemeToggle({ size = "md" }: ThemeToggleProps) {
       aria-label={
         theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
       }
-      className={`flex ${sizeClass[size]} cursor-pointer items-center justify-center rounded-full border border-border bg-card text-foreground shadow-sm transition-all duration-200 hover:bg-muted active:scale-95`}
+      className={`flex ${sizeClass[size]} border-border bg-card text-foreground hover:bg-muted cursor-pointer items-center justify-center rounded-full border shadow-sm transition-all duration-200 active:scale-95`}
     >
       {theme === "dark" ? (
         <Sun size={iconSize[size]} />

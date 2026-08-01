@@ -82,12 +82,7 @@ export function EncryptionKeyDialog({
           this entry cannot be recovered.
         </SsTypography>
         <div className="flex flex-col gap-2 pt-2">
-          <SsButton
-            type="button"
-            block
-            onClick={handleEncrypt}
-            disabled={busy}
-          >
+          <SsButton type="button" block onClick={handleEncrypt} disabled={busy}>
             Encrypt & Save
           </SsButton>
           <SsButton

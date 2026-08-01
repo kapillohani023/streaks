@@ -53,9 +53,7 @@ export function SsDialog({
 
   if (!open) return null;
 
-  const handleBackdropMouseDown = (
-    event: MouseEvent<HTMLDivElement>
-  ) => {
+  const handleBackdropMouseDown = (event: MouseEvent<HTMLDivElement>) => {
     if (disableClose || !closeOnBackdrop) return;
     if (event.currentTarget === event.target) {
       onClose();
@@ -75,10 +73,12 @@ export function SsDialog({
         className={`ss-animate-scale-in w-full ${maxWidthClassName} ${panelClassName}`}
       >
         {(title || subtitle || showCloseButton) && (
-          <SsCardHeader className="mb-0 flex items-center justify-between border-b border-border p-6">
+          <SsCardHeader className="border-border mb-0 flex items-center justify-between border-b p-6">
             <div>
               {title && <SsCardTitle>{title}</SsCardTitle>}
-              {subtitle && <SsTypography variant="muted">{subtitle}</SsTypography>}
+              {subtitle && (
+                <SsTypography variant="muted">{subtitle}</SsTypography>
+              )}
             </div>
             {showCloseButton && (
               <SsButton

@@ -19,7 +19,7 @@ export function JournalSearchBar({
     <div className="relative w-full">
       <Search
         size={18}
-        className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground"
+        className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
       />
       <input
         type="text"
@@ -28,7 +28,7 @@ export function JournalSearchBar({
         onFocus={onFocus}
         onBlur={onBlur}
         placeholder="Search by title (e.g., 02-MAY-2026)"
-        className="w-full rounded-xl border border-input-border bg-card py-2 pr-10 pl-10 text-base text-card-foreground transition-all focus:ring-2 focus:ring-ring focus:border-transparent focus:outline-none"
+        className="border-input-border bg-card text-card-foreground focus:ring-ring w-full rounded-xl border py-2 pr-10 pl-10 text-base transition-all focus:border-transparent focus:ring-2 focus:outline-none"
       />
       {value && (
         <SsButton

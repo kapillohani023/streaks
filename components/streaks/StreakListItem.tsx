@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
-import { CalendarDays, Check, Clock, Flame, Trash2 } from "lucide-react";
+import { Bell, CalendarDays, Check, Clock, Flame, Trash2 } from "lucide-react";
 import { Streak } from "@/types/streak";
 import {
   calculateCurrentStreak,
+  formatStreakDate,
   getCompletedDates,
   isCompletedToday,
 } from "@/lib/util";
@@ -12,6 +13,7 @@ import { SsTypography } from "@/components/ui/SsTypography";
 import { SsMenu } from "@/components/ui/SsMenu";
 import { EntrySubmissionDialog } from "@/components/streak-profile/MarkAsCompleted";
 import { DeleteStreakDialog } from "@/components/streak-profile/DeleteStreakButton";
+import { ReminderDialog } from "@/components/streaks/ReminderDialog";
 
 interface StreakListItemProps {
   streak: Streak;
@@ -26,6 +28,7 @@ export function StreakListItem({
 }: StreakListItemProps) {
   const [isEntryDialogOpen, setIsEntryDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isReminderDialogOpen, setIsReminderDialogOpen] = useState(false);
 
   const completedToday = isCompletedToday(streak);
   const currentStreak = calculateCurrentStreak(getCompletedDates(streak));
@@ -47,25 +50,38 @@ export function StreakListItem({
       >
         <div className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2">
               <SsTypography
                 as="span"
-                className="min-w-0 truncate text-lg font-medium"
+                className="min-w-0 flex-1 truncate text-lg font-medium"
                 title={streak.name}
               >
                 {streak.name}
               </SsTypography>
-              {completedToday ? (
-                <span className="bg-success/10 text-success inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs font-medium">
-                  <Check size={10} />
-                  completed
-                </span>
-              ) : (
-                <span className="bg-muted text-muted-foreground inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs font-medium">
-                  <Clock size={10} />
-                  pending
-                </span>
-              )}
+              {/* Pinned right so the chips line up down the list instead of
+                  drifting with each streak's name length. */}
+              <div className="flex shrink-0 items-center gap-2">
+                {completedToday ? (
+                  <span className="bg-success/10 text-success inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs font-medium">
+                    <Check size={10} />
+                    completed
+                  </span>
+                ) : (
+                  <span className="bg-muted text-muted-foreground inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs font-medium">
+                    <Clock size={10} />
+                    pending
+                  </span>
+                )}
+                {streak.reminderEnabled && streak.reminderTime && (
+                  <span
+                    className="bg-muted text-muted-foreground inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs font-medium"
+                    title={`Daily reminder at ${streak.reminderTime}`}
+                  >
+                    <Bell size={10} />
+                    {streak.reminderTime}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Always rendered (even when empty) so every card is the same height */}
@@ -94,7 +110,7 @@ export function StreakListItem({
                 className="inline-flex items-center gap-1"
               >
                 <CalendarDays size={12} />
-                Since {streak.startDate.toDateString()}
+                Since {formatStreakDate(streak.startDate)}
               </SsTypography>
             </div>
           </div>
@@ -104,14 +120,21 @@ export function StreakListItem({
             items={[
               {
                 label: completedToday
-                  ? "Already completed today"
-                  : "Mark today complete",
+                  ? "Completed today"
+                  : "Mark complete",
                 icon: <Check size={16} />,
                 disabled: completedToday,
                 onSelect: () => setIsEntryDialogOpen(true),
               },
               {
-                label: "Delete streak",
+                label: streak.reminderEnabled
+                  ? `Reminder at ${streak.reminderTime}`
+                  : "Set reminder",
+                icon: <Bell size={16} />,
+                onSelect: () => setIsReminderDialogOpen(true),
+              },
+              {
+                label: "Delete",
                 icon: <Trash2 size={16} />,
                 danger: true,
                 onSelect: () => setIsDeleteDialogOpen(true),
@@ -125,6 +148,11 @@ export function StreakListItem({
         isOpen={isEntryDialogOpen}
         onClose={() => setIsEntryDialogOpen(false)}
         streak={streak}
+      />
+      <ReminderDialog
+        open={isReminderDialogOpen}
+        streak={streak}
+        onClose={() => setIsReminderDialogOpen(false)}
       />
       <DeleteStreakDialog
         open={isDeleteDialogOpen}

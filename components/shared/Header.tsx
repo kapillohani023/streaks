@@ -15,10 +15,10 @@ export function Header() {
   return (
     <div className="flex items-center justify-between px-4 pt-3 pb-2">
       <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+        <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg">
           <ListChecks size={18} />
         </div>
-        <span className="text-sm font-semibold tracking-tight text-foreground">
+        <span className="text-foreground text-sm font-semibold tracking-tight">
           Streaks
         </span>
       </div>

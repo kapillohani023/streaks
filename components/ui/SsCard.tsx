@@ -28,7 +28,12 @@ export function SsCard({
 
   return (
     <div
-      className={["rounded-2xl transition-shadow duration-200", variantClass[variant], paddingClass[padding], className]
+      className={[
+        "rounded-2xl transition-shadow duration-200",
+        variantClass[variant],
+        paddingClass[padding],
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
       {...props}
@@ -40,7 +45,9 @@ export function SsCardHeader({
   className = "",
   ...props
 }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={["mb-4", className].filter(Boolean).join(" ")} {...props} />;
+  return (
+    <div className={["mb-4", className].filter(Boolean).join(" ")} {...props} />
+  );
 }
 
 export function SsCardTitle({
@@ -49,7 +56,12 @@ export function SsCardTitle({
   ...props
 }: HTMLAttributes<HTMLHeadingElement> & { children: ReactNode }) {
   return (
-    <h3 className={["text-xl font-semibold text-card-foreground", className].filter(Boolean).join(" ")} {...props}>
+    <h3
+      className={["text-card-foreground text-xl font-semibold", className]
+        .filter(Boolean)
+        .join(" ")}
+      {...props}
+    >
       {children}
     </h3>
   );
@@ -59,7 +71,14 @@ export function SsCardDescription({
   className = "",
   ...props
 }: HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={["text-sm text-muted-foreground", className].filter(Boolean).join(" ")} {...props} />;
+  return (
+    <p
+      className={["text-muted-foreground text-sm", className]
+        .filter(Boolean)
+        .join(" ")}
+      {...props}
+    />
+  );
 }
 
 export function SsCardContent({
@@ -73,5 +92,7 @@ export function SsCardFooter({
   className = "",
   ...props
 }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={["mt-4", className].filter(Boolean).join(" ")} {...props} />;
+  return (
+    <div className={["mt-4", className].filter(Boolean).join(" ")} {...props} />
+  );
 }

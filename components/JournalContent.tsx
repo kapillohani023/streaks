@@ -15,7 +15,7 @@ export function JournalContent({ entries }: JournalContentProps) {
   const lastEntry = entries[0];
 
   return (
-    <div className="flex h-full min-h-0 w-full overflow-y-auto bg-background text-foreground">
+    <div className="bg-background text-foreground flex h-full min-h-0 w-full overflow-y-auto">
       <div className="flex flex-1 flex-col">
         <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 p-4">
           {lastEntry && (
@@ -42,7 +42,7 @@ export function JournalContent({ entries }: JournalContentProps) {
 
           <JournalSearch entries={entries} />
 
-          <div className="border-b border-border" />
+          <div className="border-border border-b" />
 
           <JournalEntryForm />
         </div>

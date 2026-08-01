@@ -2,6 +2,12 @@ import "server-only";
 import { prisma } from "@/lib/db";
 import { Streak } from "@/types/streak";
 import { StreakEntry } from "@/types/streak-entry";
+import {
+  DEFAULT_TIMEZONE,
+  isValidTimezone,
+  localDayBounds,
+  parseReminderTime,
+} from "@/lib/timezone";
 
 type StreakRow = {
   id: string;
@@ -9,6 +15,8 @@ type StreakRow = {
   description: string | null;
   startDate: Date;
   userId: string;
+  reminderEnabled: boolean;
+  reminderTime: string | null;
   entries: {
     id: string;
     streakId: string;
@@ -24,6 +32,8 @@ function parseStreakDates(streak: StreakRow): Streak {
     name: streak.name,
     description: streak.description ?? "",
     startDate: new Date(streak.startDate),
+    reminderEnabled: streak.reminderEnabled,
+    reminderTime: streak.reminderTime ?? undefined,
     entries: streak.entries.map(
       (entry): StreakEntry => ({
         id: entry.id,
@@ -70,14 +80,29 @@ export async function getStreakEntriesForUser(
 /** Create a streak owned by the user. `startDate` defaults to now. */
 export async function createStreakForUser(
   userId: string,
-  input: { name: string; description?: string; startDate?: string | Date }
+  input: {
+    name: string;
+    description?: string;
+    startDate?: string | Date;
+    /** Optional daily reminder, local "HH:MM" in the owner's timezone. */
+    reminderTime?: string | null;
+  }
 ) {
+  const reminderTime = input.reminderTime?.trim() || null;
+  if (reminderTime && parseReminderTime(reminderTime) === null) {
+    throw new Error(
+      `Invalid reminder time "${reminderTime}" — expected 24h HH:MM`
+    );
+  }
+
   return prisma.streak.create({
     data: {
       name: input.name,
       description: input.description ?? "",
       startDate: input.startDate ? new Date(input.startDate) : new Date(),
       userId,
+      reminderEnabled: reminderTime !== null,
+      reminderTime,
     },
   });
 }
@@ -110,13 +135,24 @@ export async function addStreakEntryForUser(
   });
 }
 
-/** [start of day, start of next day) for the given moment, in local time. */
-function todayBounds(): { start: Date; end: Date } {
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(start);
-  end.setDate(end.getDate() + 1);
-  return { start, end };
+/**
+ * [start of day, start of next day) for right now, in the given IANA zone.
+ *
+ * This used to use the *server's* local time, which on a UTC host meant an
+ * entry logged at 01:00 IST counted as the previous day. Everything that
+ * decides what "today" means now goes through the user's stored timezone.
+ */
+function todayBounds(timezone: string): { start: Date; end: Date } {
+  return localDayBounds(timezone);
+}
+
+/** The user's IANA zone, falling back to UTC if the row is somehow missing. */
+export async function getUserTimezone(userId: string): Promise<string> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { timezone: true },
+  });
+  return user?.timezone ?? DEFAULT_TIMEZONE;
 }
 
 async function assertOwnedStreak(userId: string, streakId: string) {
@@ -133,7 +169,7 @@ export async function isStreakCompletedTodayForUser(
   streakId: string
 ): Promise<boolean> {
   await assertOwnedStreak(userId, streakId);
-  const { start, end } = todayBounds();
+  const { start, end } = todayBounds(await getUserTimezone(userId));
   const entry = await prisma.streakEntry.findFirst({
     where: {
       streakId,
@@ -155,7 +191,7 @@ export async function markStreakCompletedTodayForUser(
   input: { streakId: string; note?: string }
 ): Promise<{ alreadyCompleted: boolean; entry: StreakRow["entries"][number] }> {
   await assertOwnedStreak(userId, input.streakId);
-  const { start, end } = todayBounds();
+  const { start, end } = todayBounds(await getUserTimezone(userId));
 
   const existing = await prisma.streakEntry.findFirst({
     where: {
@@ -177,4 +213,59 @@ export async function markStreakCompletedTodayForUser(
     },
   });
   return { alreadyCompleted: false, entry };
+}
+
+/**
+ * Set a streak's daily reminder. `time` is local wall-clock "HH:MM" in the
+ * owner's timezone.
+ *
+ * Saving is deliberately unconditional: enabling records *intent* even when
+ * the caller has no push subscription (a denied permission, another device,
+ * or the MCP tools, which have no browser at all). Callers surface that gap in
+ * the UI instead — see `hasPushSubscription`.
+ *
+ * `lastRemindedOn` is cleared on every change so that moving a reminder to a
+ * later time today, or re-enabling it, can still fire today rather than being
+ * deduped against an earlier send.
+ */
+export async function setStreakReminderForUser(
+  userId: string,
+  input: { streakId: string; enabled: boolean; time?: string | null }
+) {
+  await assertOwnedStreak(userId, input.streakId);
+
+  const time = input.time?.trim() || null;
+  if (input.enabled) {
+    if (!time) throw new Error("A reminder time is required to enable alerts");
+    if (parseReminderTime(time) === null) {
+      throw new Error(`Invalid reminder time "${time}" — expected 24h HH:MM`);
+    }
+  }
+
+  return prisma.streak.update({
+    where: { id: input.streakId },
+    data: {
+      reminderEnabled: input.enabled,
+      reminderTime: time,
+      lastRemindedOn: null,
+    },
+    select: { id: true, reminderEnabled: true, reminderTime: true },
+  });
+}
+
+/** Whether the user has at least one device registered for push. */
+export async function hasPushSubscription(userId: string): Promise<boolean> {
+  const count = await prisma.pushSubscription.count({ where: { userId } });
+  return count > 0;
+}
+
+/** Persist the browser-detected IANA zone. Ignores unknown zone names. */
+export async function setUserTimezone(userId: string, timezone: string) {
+  if (!isValidTimezone(timezone)) {
+    throw new Error(`Unknown timezone "${timezone}"`);
+  }
+  await prisma.user.update({
+    where: { id: userId },
+    data: { timezone },
+  });
 }

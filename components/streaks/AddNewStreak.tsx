@@ -7,6 +7,11 @@ import { SsInput, SsTextarea } from "@/components/ui/SsInput";
 import { SsTypography } from "@/components/ui/SsTypography";
 import { SsLoaderOverlay } from "@/components/ui/SsLoader";
 import { SsDialog } from "@/components/ui/SsDialog";
+import {
+  DEFAULT_REMINDER_TIME,
+  DeliveryNotice,
+  ReminderFields,
+} from "@/components/streaks/ReminderSettings";
 
 interface CreateStreakDialogProps {
   isOpen: boolean;
@@ -17,6 +22,11 @@ function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reminderEnabled, setReminderEnabled] = useState(false);
+  const [reminderTime, setReminderTime] = useState(DEFAULT_REMINDER_TIME);
+  const [reminderNotice, setReminderNotice] = useState<DeliveryNotice | null>(
+    null
+  );
 
   if (!isOpen) return null;
 
@@ -29,11 +39,20 @@ function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
       formData.set("name", name.trim());
       formData.set("description", description.trim());
       formData.set("startDate", new Date().toISOString());
+      // A denied notification permission must never block creating the streak:
+      // the preference is saved either way and the warning already showed
+      // inline while they were toggling.
+      if (reminderEnabled && reminderTime) {
+        formData.set("reminderTime", reminderTime);
+      }
 
       await addStreak(formData);
 
       setName("");
       setDescription("");
+      setReminderEnabled(false);
+      setReminderTime(DEFAULT_REMINDER_TIME);
+      setReminderNotice(null);
       setIsSubmitting(false);
       onClose();
     }
@@ -74,6 +93,18 @@ function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
             />
           </div>
 
+          <div className="border-border mb-6 border-t pt-4">
+            <ReminderFields
+              enabled={reminderEnabled}
+              time={reminderTime}
+              onEnabledChange={setReminderEnabled}
+              onTimeChange={setReminderTime}
+              disabled={isSubmitting}
+              notice={reminderNotice}
+              onNoticeChange={setReminderNotice}
+            />
+          </div>
+
           <div className="flex gap-3">
             <SsButton
               type="button"
@@ -84,7 +115,11 @@ function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
             >
               Cancel
             </SsButton>
-            <SsButton type="submit" block disabled={!name.trim() || isSubmitting}>
+            <SsButton
+              type="submit"
+              block
+              disabled={!name.trim() || isSubmitting}
+            >
               Create Streak
             </SsButton>
           </div>

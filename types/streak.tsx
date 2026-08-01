@@ -7,6 +7,10 @@ export const StreakSchema = z.object({
   name: z.string(),
   description: z.string(),
   startDate: z.coerce.date().transform(normalizeToMidnight),
+  /** Reminder intent — may be true even when no device can receive push. */
+  reminderEnabled: z.boolean().default(false),
+  /** Local wall-clock "HH:MM" in the owner's timezone. */
+  reminderTime: z.string().optional(),
   entries: z.array(StreakEntrySchema),
 });
 

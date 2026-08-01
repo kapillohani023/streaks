@@ -1,6 +1,7 @@
 "use client";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MarkAsCompleted } from "@/components/streak-profile/MarkAsCompleted";
+import { EntrySubmissionDialog } from "@/components/streak-profile/MarkAsCompleted";
 import { Streak } from "@/types/streak";
 import { StreakCalendar } from "@/components/streak-profile/StreakCalendar";
 import {
@@ -8,12 +9,14 @@ import {
   getCompletedDates,
   isCompletedToday,
 } from "@/lib/util";
-import { DeleteStreakButton } from "@/components/streak-profile/DeleteStreakButton";
+import { DeleteStreakDialog } from "@/components/streak-profile/DeleteStreakButton";
+import { ReminderDialog } from "@/components/streaks/ReminderDialog";
 import { deleteStreak } from "@/app/actions/streak";
 import { SsCard } from "@/components/ui/SsCard";
 import { SsTypography } from "@/components/ui/SsTypography";
 import { SsButton } from "@/components/ui/SsButton";
-import { ArrowLeft } from "lucide-react";
+import { SsMenu } from "@/components/ui/SsMenu";
+import { ArrowLeft, Bell, Check, Trash2 } from "lucide-react";
 
 interface StreakProfileContentProps {
   streak: Streak;
@@ -21,6 +24,10 @@ interface StreakProfileContentProps {
 
 export function StreakProfileContent({ streak }: StreakProfileContentProps) {
   const router = useRouter();
+  const [isReminderDialogOpen, setIsReminderDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEntryDialogOpen, setIsEntryDialogOpen] = useState(false);
+  const completedToday = isCompletedToday(streak);
 
   const handleBack = () => {
     // Fall back to the list when the page was opened directly (no history to pop).
@@ -84,7 +91,32 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
             <SsTypography variant="muted">{streak.description}</SsTypography>
           )}
         </div>
-        <DeleteStreakButton streakId={streak.id} handleDelete={handleDelete} />
+        <SsMenu
+          label={`Actions for ${streak.name}`}
+          items={[
+            {
+              label: completedToday
+                ? "Completed today"
+                : "Mark complete",
+              icon: <Check size={16} />,
+              disabled: completedToday,
+              onSelect: () => setIsEntryDialogOpen(true),
+            },
+            {
+              label: streak.reminderEnabled
+                ? `Reminder at ${streak.reminderTime}`
+                : "Set reminder",
+              icon: <Bell size={16} />,
+              onSelect: () => setIsReminderDialogOpen(true),
+            },
+            {
+              label: "Delete",
+              icon: <Trash2 size={16} />,
+              danger: true,
+              onSelect: () => setIsDeleteDialogOpen(true),
+            },
+          ]}
+        />
       </div>
 
       {/* Stats */}
@@ -121,11 +153,22 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
       </div>
 
       {/* Today button */}
-      <MarkAsCompleted
+      <EntrySubmissionDialog
+        isOpen={isEntryDialogOpen}
+        onClose={() => setIsEntryDialogOpen(false)}
         streak={streak}
-        label={
-          isCompletedToday(streak) ? "Completed Today" : "Mark Today Complete"
-        }
+      />
+      <ReminderDialog
+        open={isReminderDialogOpen}
+        streak={streak}
+        onClose={() => setIsReminderDialogOpen(false)}
+      />
+      <DeleteStreakDialog
+        open={isDeleteDialogOpen}
+        streakId={streak.id}
+        streakName={streak.name}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        handleDelete={handleDelete}
       />
     </div>
   );

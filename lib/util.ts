@@ -54,6 +54,14 @@ const MONTHS = [
   "DEC",
 ];
 
+/** "Aug 01, 2026" — no weekday, unlike Date.toDateString(). */
+export const formatStreakDate = (date: Date): string =>
+  date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+
 export const formatJournalTitle = (date: Date): string => {
   const day = String(date.getDate()).padStart(2, "0");
   const month = MONTHS[date.getMonth()];

@@ -1,5 +1,4 @@
 "use client";
-import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { SsButton } from "@/components/ui/SsButton";
 import { SsDialog } from "@/components/ui/SsDialog";
@@ -64,38 +63,5 @@ export function DeleteStreakDialog({
         </SsButton>
       </div>
     </SsDialog>
-  );
-}
-
-interface DeleteStreakButtonProps {
-  streakId: string;
-  handleDelete: (streakId: string) => Promise<void> | void;
-}
-
-export function DeleteStreakButton({
-  streakId,
-  handleDelete,
-}: DeleteStreakButtonProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  return (
-    <>
-      <SsButton
-        onClick={() => setIsDialogOpen(true)}
-        variant="ghost"
-        size="icon"
-        className="text-muted-foreground hover:text-destructive"
-        aria-label="Delete streak"
-      >
-        <Trash2 size={20} />
-      </SsButton>
-
-      <DeleteStreakDialog
-        open={isDialogOpen}
-        streakId={streakId}
-        onClose={() => setIsDialogOpen(false)}
-        handleDelete={handleDelete}
-      />
-    </>
   );
 }

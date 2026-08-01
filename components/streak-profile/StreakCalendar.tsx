@@ -34,7 +34,7 @@ export function StreakCalendar({ completedDates }: StreakCalendarProps) {
           font-size: 10px;
         }
       `}</style>
-      <div className="rounded-xl border border-border bg-card p-3 shadow-sm">
+      <div className="border-border bg-card rounded-xl border p-3 shadow-sm">
         <CalendarHeatmap
           startDate={lastYearToday}
           endDate={today}

@@ -26,15 +26,15 @@ export function SsLoaderOverlay({
 
   return (
     <div
-      className="ss-animate-fade-in fixed inset-0 z-[1000] flex items-center justify-center bg-background/95 backdrop-blur-sm"
+      className="ss-animate-fade-in bg-background/95 fixed inset-0 z-[1000] flex items-center justify-center backdrop-blur-sm"
       aria-live="polite"
       aria-label={label}
       role="status"
     >
       <div className="flex items-center">
-        <span className="bar inline-block h-5 w-[3px] rounded-[10px] bg-primary"></span>
-        <span className="bar bar-2 mx-[5px] inline-block h-[35px] w-[3px] rounded-[10px] bg-primary"></span>
-        <span className="bar bar-3 inline-block h-5 w-[3px] rounded-[10px] bg-primary"></span>
+        <span className="bar bg-primary inline-block h-5 w-[3px] rounded-[10px]"></span>
+        <span className="bar bar-2 bg-primary mx-[5px] inline-block h-[35px] w-[3px] rounded-[10px]"></span>
+        <span className="bar bar-3 bg-primary inline-block h-5 w-[3px] rounded-[10px]"></span>
       </div>
 
       <style jsx>{`

@@ -9,7 +9,7 @@ interface DashboardContentProps {
 
 export function DashboardContent({ streaks }: DashboardContentProps) {
   return (
-    <div className="flex h-full min-h-0 w-full overflow-y-scroll bg-background text-foreground">
+    <div className="bg-background text-foreground flex h-full min-h-0 w-full overflow-y-scroll">
       <div className="flex flex-1 flex-col justify-start">
         <DashboardCards streaks={streaks} />
         <DailyCheckIn streaks={streaks} />

@@ -8,12 +8,16 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  streaks   Streak[]
-  journal   JournalEntry[]
-  createdAt DateTime @default(now())
+  id            String             @id @default(cuid())
+  name          String
+  email         String             @unique
+  /// IANA zone (e.g. "Asia/Kolkata"). Defines what "today" means for this
+  /// user and when their reminders fire. Auto-detected from the browser.
+  timezone      String             @default("UTC")
+  streaks       Streak[]
+  journal       JournalEntry[]
+  subscriptions PushSubscription[]
+  createdAt     DateTime           @default(now())
 
   @@index([email])
   @@map("users")
@@ -28,7 +32,33 @@ model Streak {
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   entries     StreakEntry[]
 
+  /// Reminder preference. `reminderEnabled` records *intent* and is saved even
+  /// when no device can currently receive push — the UI surfaces that gap
+  /// rather than silently refusing the write.
+  reminderEnabled Boolean   @default(false) @map("reminder_enabled")
+  /// Local wall-clock time in the owner's timezone, "HH:MM" 24h.
+  reminderTime    String?   @map("reminder_time")
+  /// Midnight UTC of the user-local date a reminder was last sent for. Used to
+  /// dedupe so a streak is nudged at most once per local day.
+  lastRemindedOn  DateTime? @map("last_reminded_on")
+
+  @@index([reminderEnabled])
   @@map("streaks")
+}
+
+/// One row per browser/device. Subscriptions are device-scoped, so a user with
+/// a laptop and a phone has two; reminders fan out to all of them.
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("push_subscriptions")
 }
 
 model StreakEntry {

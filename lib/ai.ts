@@ -5,8 +5,7 @@ const apiToken = process.env.T2A_API_BEARER_TOKEN;
 
 const MAX_ATTEMPTS = 3;
 const RETRY_BASE_DELAY_MS = 500;
-const FALLBACK_MESSAGE =
-  "Something went wrong. Please try again later.";
+const FALLBACK_MESSAGE = "Something went wrong. Please try again later.";
 
 function formatHistory(
   history: { role: "user" | "model"; content: string }[]
@@ -49,9 +48,7 @@ async function callT2A(message: string, userId: string): Promise<string> {
       lastError = error;
       console.error(`T2A attempt ${attempt} failed:`, error);
       if (attempt < MAX_ATTEMPTS) {
-        await new Promise((r) =>
-          setTimeout(r, RETRY_BASE_DELAY_MS * attempt)
-        );
+        await new Promise((r) => setTimeout(r, RETRY_BASE_DELAY_MS * attempt));
       }
     }
   }

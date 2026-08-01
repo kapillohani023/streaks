@@ -163,10 +163,10 @@ export default function AIChat() {
   };
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col p-4 overflow-y-scroll bg-background text-foreground">
+    <div className="bg-background text-foreground flex h-full min-h-0 w-full flex-col overflow-y-scroll p-4">
       <div className="mb-4 flex-1 space-y-4 overflow-y-auto pr-2">
         {messages.length === 0 && (
-          <div className="mt-10 text-center text-muted-foreground">
+          <div className="text-muted-foreground mt-10 text-center">
             Hey, {currentUserFirstName}. What&apos;s on the agenda today?
           </div>
         )}
@@ -176,38 +176,42 @@ export default function AIChat() {
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`ss-animate-scale-in max-w-[80%] rounded-2xl px-4 py-2 ${msg.role === "user"
-                ? "rounded-br-none bg-primary text-primary-foreground"
-                : "rounded-bl-none bg-muted text-foreground"
-                }`}
+              className={`ss-animate-scale-in max-w-[80%] rounded-2xl px-4 py-2 ${
+                msg.role === "user"
+                  ? "bg-primary text-primary-foreground rounded-br-none"
+                  : "bg-muted text-foreground rounded-bl-none"
+              }`}
             >
               {msg.role === "model" ? (
                 msg.content === "" ? (
-                  <div className="flex items-center gap-1 py-1" aria-label="Assistant is typing">
-                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
-                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
-                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground" />
+                  <div
+                    className="flex items-center gap-1 py-1"
+                    aria-label="Assistant is typing"
+                  >
+                    <span className="bg-muted-foreground h-2 w-2 animate-bounce rounded-full [animation-delay:-0.3s]" />
+                    <span className="bg-muted-foreground h-2 w-2 animate-bounce rounded-full [animation-delay:-0.15s]" />
+                    <span className="bg-muted-foreground h-2 w-2 animate-bounce rounded-full" />
                   </div>
                 ) : (
-                <ReactMarkdown
-                  components={{
-                    ul: ({ ...props }) => (
-                      <ul className="mb-2 list-disc pl-4" {...props} />
-                    ),
-                    ol: ({ ...props }) => (
-                      <ol className="mb-2 list-decimal pl-4" {...props} />
-                    ),
-                    li: ({ ...props }) => <li className="mb-1" {...props} />,
-                    p: ({ ...props }) => (
-                      <p className="mb-2 last:mb-0" {...props} />
-                    ),
-                    strong: ({ ...props }) => (
-                      <strong className="font-semibold" {...props} />
-                    ),
-                  }}
-                >
-                  {msg.content}
-                </ReactMarkdown>
+                  <ReactMarkdown
+                    components={{
+                      ul: ({ ...props }) => (
+                        <ul className="mb-2 list-disc pl-4" {...props} />
+                      ),
+                      ol: ({ ...props }) => (
+                        <ol className="mb-2 list-decimal pl-4" {...props} />
+                      ),
+                      li: ({ ...props }) => <li className="mb-1" {...props} />,
+                      p: ({ ...props }) => (
+                        <p className="mb-2 last:mb-0" {...props} />
+                      ),
+                      strong: ({ ...props }) => (
+                        <strong className="font-semibold" {...props} />
+                      ),
+                    }}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
                 )
               ) : (
                 msg.content
@@ -226,7 +230,7 @@ export default function AIChat() {
               onClick={() => onChipClick(chip.id)}
               variant="secondary"
               size="sm"
-              className="rounded-full border border-border px-3 py-1 text-sm hover:border-foreground"
+              className="border-border hover:border-foreground rounded-full border px-3 py-1 text-sm"
             >
               {chip.label}
             </SsButton>
@@ -251,7 +255,7 @@ export default function AIChat() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend(input)}
           placeholder="Type a message..."
-          className="flex-1 rounded-full border border-input-border px-4 focus:border-transparent focus:ring-2 focus:ring-ring"
+          className="border-input-border focus:ring-ring flex-1 rounded-full border px-4 focus:border-transparent focus:ring-2"
           disabled={isLoading}
           fullWidth={false}
           containerClassName="min-w-0 flex-1"
