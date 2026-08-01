@@ -95,9 +95,7 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
           label={`Actions for ${streak.name}`}
           items={[
             {
-              label: completedToday
-                ? "Completed today"
-                : "Mark complete",
+              label: completedToday ? "Completed today" : "Mark complete",
               icon: <Check size={16} />,
               disabled: completedToday,
               onSelect: () => setIsEntryDialogOpen(true),

@@ -52,6 +52,10 @@ externally — set up a job on [cron-job.org](https://cron-job.org):
 - **Schedule**: every 5 minutes
 - **Header**: `Authorization: Bearer <CRON_SECRET>`
 
+The route is excluded from the session proxy in `proxy.ts` — it has no session
+cookie and authenticates with `CRON_SECRET` instead. Without that exclusion the
+proxy redirects the scheduler to `/signin` and the job never runs.
+
 Each run returns a JSON summary (`checked`, `sent`, `failed`, `pruned`,
 `skippedCompleted`, `undeliverable`), which cron-job.org stores in its request
 log — that log is the observability story for reminders.
