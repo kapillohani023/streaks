@@ -106,7 +106,7 @@ export function MarkAsCompleted({ streak, label }: MarkAsCompletedProps) {
         key={streakId}
         onClick={() => setIsDialogOpen(true)}
         disabled={isCompleted}
-        variant={isCompleted ? "primary" : "secondary"}
+        variant={isCompleted ? "secondary" : "primary"}
         className="whitespace-nowrap"
         leftIcon={isCompleted ? <Check size={16} /> : undefined}
       >

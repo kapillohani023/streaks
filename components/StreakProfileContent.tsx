@@ -85,7 +85,7 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
 
       {/* Stats */}
       <div className="mb-6 grid grid-cols-3 gap-4">
-        <SsCard className="rounded p-4">
+        <SsCard>
           <SsTypography variant="muted" className="mb-1">
             Current Streak
           </SsTypography>
@@ -93,7 +93,7 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
             {currentStreak}
           </SsTypography>
         </SsCard>
-        <SsCard className="rounded p-4">
+        <SsCard>
           <SsTypography variant="muted" className="mb-1">
             Longest Streak
           </SsTypography>
@@ -101,7 +101,7 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
             {longestStreak}
           </SsTypography>
         </SsCard>
-        <SsCard className="rounded p-4">
+        <SsCard>
           <SsTypography variant="muted" className="mb-1">
             Total Score
           </SsTypography>

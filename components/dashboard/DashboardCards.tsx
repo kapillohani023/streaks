@@ -56,7 +56,7 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
     <div className="p-8">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {/* Completed Today */}
-        <SsCard className="p-6">
+        <SsCard padding="lg">
           <div className="mb-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white">
               <Flame size={20} />
@@ -69,7 +69,7 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
         </SsCard>
 
         {/* Overall Consistency */}
-        <SsCard className="p-6">
+        <SsCard padding="lg">
           <div className="mb-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white">
               <Target size={20} />
@@ -85,7 +85,7 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
         </SsCard>
 
         {/* Consistency Growth */}
-        <SsCard className="p-6">
+        <SsCard padding="lg">
           <div className="mb-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white">
               {growth >= 0 ? (

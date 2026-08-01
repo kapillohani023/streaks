@@ -69,7 +69,7 @@ export function SsDialog({
       aria-modal="true"
       onMouseDown={handleBackdropMouseDown}
     >
-      <SsCard className={`w-full p-0 ${maxWidthClassName} ${panelClassName}`}>
+      <SsCard padding="none" className={`w-full ${maxWidthClassName} ${panelClassName}`}>
         {(title || subtitle || showCloseButton) && (
           <SsCardHeader className="mb-0 flex items-center justify-between border-b-2 border-black p-6">
             <div>
