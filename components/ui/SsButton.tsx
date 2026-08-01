@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode, Ref } from "react";
 
 type ButtonVariant =
   | "primary"
@@ -9,8 +9,10 @@ type ButtonVariant =
   | "icon";
 type ButtonSize = "sm" | "md" | "lg" | "icon";
 
-export interface SsButtonProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> {
+export interface SsButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  "children"
+> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   block?: boolean;
@@ -18,6 +20,7 @@ export interface SsButtonProps
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
   children?: ReactNode;
+  ref?: Ref<HTMLButtonElement>;
 }
 
 const baseClass =
@@ -28,12 +31,10 @@ const variantClass: Record<ButtonVariant, string> = {
     "border-primary bg-primary text-primary-foreground shadow-sm hover:opacity-90",
   secondary:
     "border-border bg-card text-card-foreground shadow-sm hover:bg-muted",
-  ghost:
-    "border-transparent bg-transparent text-foreground hover:bg-muted",
+  ghost: "border-transparent bg-transparent text-foreground hover:bg-muted",
   danger:
     "border-destructive bg-destructive text-destructive-foreground shadow-sm hover:opacity-90",
-  outline:
-    "border-border bg-transparent text-foreground hover:bg-muted",
+  outline: "border-border bg-transparent text-foreground hover:bg-muted",
   icon: "border-transparent bg-transparent text-foreground hover:bg-muted",
 };
 

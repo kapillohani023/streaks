@@ -3,11 +3,17 @@ import { useRouter } from "next/navigation";
 import { MarkAsCompleted } from "@/components/streak-profile/MarkAsCompleted";
 import { Streak } from "@/types/streak";
 import { StreakCalendar } from "@/components/streak-profile/StreakCalendar";
-import { isCompletedToday } from "@/lib/util";
+import {
+  calculateCurrentStreak,
+  getCompletedDates,
+  isCompletedToday,
+} from "@/lib/util";
 import { DeleteStreakButton } from "@/components/streak-profile/DeleteStreakButton";
 import { deleteStreak } from "@/app/actions/streak";
 import { SsCard } from "@/components/ui/SsCard";
 import { SsTypography } from "@/components/ui/SsTypography";
+import { SsButton } from "@/components/ui/SsButton";
+import { ArrowLeft } from "lucide-react";
 
 interface StreakProfileContentProps {
   streak: Streak;
@@ -15,6 +21,12 @@ interface StreakProfileContentProps {
 
 export function StreakProfileContent({ streak }: StreakProfileContentProps) {
   const router = useRouter();
+
+  const handleBack = () => {
+    // Fall back to the list when the page was opened directly (no history to pop).
+    if (window.history.length > 1) router.back();
+    else router.push("/streaks");
+  };
 
   const handleDelete = async (streakId: string) => {
     try {
@@ -25,26 +37,9 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
     }
   };
 
-  const completedDates = streak.entries
-    .filter((entry) => entry.completed)
-    .map((entry) => entry.date);
+  const completedDates = getCompletedDates(streak);
 
   const completedDatesSet = new Set(completedDates.map((d) => d.getTime()));
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const calculateCurrentStreak = () => {
-    let count = 0;
-
-    for (let i = 0; i < 365; i++) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      if (completedDatesSet.has(date.getTime())) count++;
-      else break;
-    }
-    return count;
-  };
 
   const calculateLongestStreak = () => {
     if (completedDatesSet.size === 0) return 0;
@@ -64,15 +59,24 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
     return maxStreak;
   };
 
-  const currentStreak = calculateCurrentStreak();
+  const currentStreak = calculateCurrentStreak(completedDates);
   const longestStreak = calculateLongestStreak();
   const totalScore = completedDatesSet.size;
 
   return (
-    <div className="h-full w-full bg-background p-6 text-foreground">
+    <div className="bg-background text-foreground h-full w-full p-6">
       {/* Header */}
-      <div className="mb-6 flex items-start justify-between">
-        <div>
+      <div className="mb-6 flex items-start gap-2">
+        <SsButton
+          onClick={handleBack}
+          variant="ghost"
+          size="icon"
+          className="text-muted-foreground hover:text-foreground shrink-0"
+          aria-label="Go back"
+        >
+          <ArrowLeft size={20} />
+        </SsButton>
+        <div className="min-w-0 flex-1">
           <SsTypography variant="h3" className="mb-1">
             {streak.name}
           </SsTypography>

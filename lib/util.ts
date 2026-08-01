@@ -8,6 +8,31 @@ export const isCompletedToday = (streak: Streak) => {
   );
 };
 
+export const getCompletedDates = (streak: Streak): Date[] =>
+  streak.entries
+    .filter((entry: StreakEntry) => entry.completed)
+    .map((entry: StreakEntry) => entry.date);
+
+/**
+ * Number of consecutive completed days ending today (looking back up to a year).
+ */
+export const calculateCurrentStreak = (completedDates: Date[]): number => {
+  const completedTimes = new Set(
+    completedDates.map((date) => normalizeToMidnight(date).getTime())
+  );
+
+  const today = normalizeToMidnight(new Date());
+  let count = 0;
+
+  for (let i = 0; i < 365; i++) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    if (!completedTimes.has(date.getTime())) break;
+    count++;
+  }
+  return count;
+};
+
 export const normalizeToMidnight = (date: Date): Date => {
   const normalized = new Date(date);
   normalized.setHours(0, 0, 0, 0);
