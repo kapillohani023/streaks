@@ -20,21 +20,21 @@ export function StreakCalendar({ completedDates }: StreakCalendarProps) {
         }
         .react-calendar-heatmap text {
           font-size: 8px;
-          fill: #71717a;
+          fill: var(--muted-foreground);
         }
         .react-calendar-heatmap rect {
-          fill: #e4e4e7;
+          fill: var(--muted);
           rx: 2;
           ry: 2;
         }
         .react-calendar-heatmap .color-filled {
-          fill: #000 !important;
+          fill: var(--primary) !important;
         }
         .react-calendar-heatmap-month-label {
           font-size: 10px;
         }
       `}</style>
-      <div className="rounded border-2 border-black p-3">
+      <div className="rounded-xl border border-border bg-card p-3 shadow-sm">
         <CalendarHeatmap
           startDate={lastYearToday}
           endDate={today}

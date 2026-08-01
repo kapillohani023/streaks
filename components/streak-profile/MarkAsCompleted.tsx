@@ -108,7 +108,11 @@ export function MarkAsCompleted({ streak, label }: MarkAsCompletedProps) {
         disabled={isCompleted}
         variant={isCompleted ? "secondary" : "primary"}
         className="whitespace-nowrap"
-        leftIcon={isCompleted ? <Check size={16} /> : undefined}
+        leftIcon={
+          isCompleted ? (
+            <Check size={16} className="ss-animate-scale-in text-success" />
+          ) : undefined
+        }
       >
         {label}
       </SsButton>

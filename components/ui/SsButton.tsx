@@ -21,15 +21,20 @@ export interface SsButtonProps
 }
 
 const baseClass =
-  "inline-flex cursor-pointer items-center justify-center gap-2 rounded border-2 font-medium transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border font-medium transition-all duration-200 ease-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100";
 
 const variantClass: Record<ButtonVariant, string> = {
-  primary: "border-black bg-black text-white hover:bg-zinc-800",
-  secondary: "border-black bg-white text-black hover:bg-zinc-100",
-  ghost: "border-transparent bg-transparent text-black hover:bg-zinc-100",
-  danger: "border-black bg-black text-white hover:bg-red-900",
-  outline: "border-black bg-transparent text-black hover:bg-zinc-100",
-  icon: "border-transparent bg-transparent text-black hover:bg-zinc-100",
+  primary:
+    "border-primary bg-primary text-primary-foreground shadow-sm hover:opacity-90",
+  secondary:
+    "border-border bg-card text-card-foreground shadow-sm hover:bg-muted",
+  ghost:
+    "border-transparent bg-transparent text-foreground hover:bg-muted",
+  danger:
+    "border-destructive bg-destructive text-destructive-foreground shadow-sm hover:opacity-90",
+  outline:
+    "border-border bg-transparent text-foreground hover:bg-muted",
+  icon: "border-transparent bg-transparent text-foreground hover:bg-muted",
 };
 
 const sizeClass: Record<ButtonSize, string> = {

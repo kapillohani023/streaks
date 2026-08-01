@@ -33,7 +33,7 @@ export function DeleteStreakButton({
         onClick={() => setIsDialogOpen(true)}
         variant="ghost"
         size="icon"
-        className="text-zinc-600 hover:text-black"
+        className="text-muted-foreground hover:text-destructive"
         aria-label="Delete streak"
       >
         <Trash2 size={20} />

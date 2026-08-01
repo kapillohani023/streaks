@@ -105,7 +105,7 @@ export function AddNewStreak() {
           size="lg"
           leftIcon={<Plus size={20} />}
         >
-          <SsTypography as="span" className="text-white">
+          <SsTypography as="span" className="text-primary-foreground">
             New Streak
           </SsTypography>
         </SsButton>

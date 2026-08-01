@@ -9,7 +9,7 @@ interface StreaksListProps {
 
 export function StreaksList({ streaks, onStreakClick }: StreaksListProps) {
   return (
-    <div className="h-100 flex-1 overflow-y-auto bg-white p-4">
+    <div className="h-100 flex-1 overflow-y-auto bg-background p-4">
       <div className="mb-4 flex items-center justify-between">
         <SsTypography variant="h3">Streaks List</SsTypography>
       </div>
@@ -21,7 +21,7 @@ export function StreaksList({ streaks, onStreakClick }: StreaksListProps) {
               onClick={() => onStreakClick(streak.id)}
               variant="secondary"
               block
-              className="justify-between rounded-none border-l-2 border-black bg-zinc-100 px-6 py-3 text-left hover:bg-zinc-200"
+              className="justify-between rounded-xl border-l-4 border-l-primary bg-card px-6 py-3 text-left hover:bg-muted"
             >
               <SsTypography as="span" className="text-lg font-medium">
                 {streak.name}

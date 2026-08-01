@@ -1,54 +1,59 @@
 "use client";
-import { LayoutDashboard, ListChecks, Sparkles } from "lucide-react";
+import { LayoutDashboard, ListChecks, Notebook, Sparkles } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { SsButton } from "@/components/ui/SsButton";
 
 enum NavbarLabel {
   Dashboard = "/dashboard",
   Streaks = "/streaks",
   AI = "/ai",
+  Journal = "/journal",
 }
 
+const NAV_ITEMS = [
+  { label: NavbarLabel.Dashboard, icon: LayoutDashboard, name: "Dashboard" },
+  { label: NavbarLabel.Streaks, icon: ListChecks, name: "Streaks" },
+  { label: NavbarLabel.AI, icon: Sparkles, name: "AI" },
+  { label: NavbarLabel.Journal, icon: Notebook, name: "Journal" },
+];
+
 export function Navbar() {
-  const path = usePathname();
+  const path = usePathname() ?? "";
   const router = useRouter();
   if (!Object.values(NavbarLabel).some((label) => path.startsWith(label))) {
     return null;
   }
-  const navButtonClass = (label: string) =>
-    path.startsWith(label)
-      ? "!bg-black !text-white hover:!bg-black"
-      : "!bg-transparent !text-black hover:!bg-gray-100";
-  const handleNavigation = (label: string) => {
-    router.push(label);
-  };
+
   return (
-    <div className="flex items-center justify-around border-t-2 border-black bg-white px-8 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-      <div className="flex flex-1 items-center justify-around">
-        <SsButton
-          size="icon"
-          variant="icon"
-          className={navButtonClass(NavbarLabel.Dashboard)}
-          onClick={() => handleNavigation(NavbarLabel.Dashboard)}
-        >
-          <LayoutDashboard size={32} />
-        </SsButton>
-        <SsButton
-          size="icon"
-          variant="icon"
-          className={navButtonClass(NavbarLabel.Streaks)}
-          onClick={() => handleNavigation(NavbarLabel.Streaks)}
-        >
-          <ListChecks size={32} />
-        </SsButton>
-        <SsButton
-          size="icon"
-          variant="icon"
-          className={navButtonClass(NavbarLabel.AI)}
-          onClick={() => handleNavigation(NavbarLabel.AI)}
-        >
-          <Sparkles size={32} />
-        </SsButton>
+    <div className="flex justify-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2">
+      <div className="flex items-center gap-1 rounded-full border border-border bg-card px-2 py-2 shadow-lg">
+        {NAV_ITEMS.map(({ label, icon: Icon, name }) => {
+          const isActive = path.startsWith(label);
+          return (
+            <button
+              key={label}
+              type="button"
+              aria-label={name}
+              aria-current={isActive ? "page" : undefined}
+              onClick={() => router.push(label)}
+              style={
+                isActive
+                  ? {
+                      backgroundColor: "var(--primary)",
+                      color: "var(--primary-foreground)",
+                    }
+                  : undefined
+              }
+              className={[
+                "flex h-12 w-16 cursor-pointer items-center justify-center rounded-full transition-all duration-200 ease-out active:scale-95",
+                isActive
+                  ? "shadow-sm"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              ].join(" ")}
+            >
+              <Icon size={24} />
+            </button>
+          );
+        })}
       </div>
     </div>
   );

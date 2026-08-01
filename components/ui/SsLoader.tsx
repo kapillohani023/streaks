@@ -26,15 +26,15 @@ export function SsLoaderOverlay({
 
   return (
     <div
-      className="fixed inset-0 z-[1000] flex items-center justify-center bg-white"
+      className="ss-animate-fade-in fixed inset-0 z-[1000] flex items-center justify-center bg-background/95 backdrop-blur-sm"
       aria-live="polite"
       aria-label={label}
       role="status"
     >
       <div className="flex items-center">
-        <span className="bar inline-block h-5 w-[3px] rounded-[10px] bg-black/50"></span>
-        <span className="bar bar-2 mx-[5px] inline-block h-[35px] w-[3px] rounded-[10px] bg-black/50"></span>
-        <span className="bar bar-3 inline-block h-5 w-[3px] rounded-[10px] bg-black/50"></span>
+        <span className="bar inline-block h-5 w-[3px] rounded-[10px] bg-primary"></span>
+        <span className="bar bar-2 mx-[5px] inline-block h-[35px] w-[3px] rounded-[10px] bg-primary"></span>
+        <span className="bar bar-3 inline-block h-5 w-[3px] rounded-[10px] bg-primary"></span>
       </div>
 
       <style jsx>{`
@@ -52,7 +52,6 @@ export function SsLoaderOverlay({
 
         @keyframes scale-up4 {
           20% {
-            background-color: #000;
             transform: scaleY(1.5);
           }
 

@@ -14,9 +14,9 @@ export function SsCard({
   ...props
 }: SsCardProps) {
   const variantClass: Record<CardVariant, string> = {
-    default: "border-2 border-black bg-white text-black",
-    subtle: "border border-zinc-200 bg-white text-black",
-    elevated: "border-2 border-black bg-white text-black shadow-lg",
+    default: "border border-border bg-card text-card-foreground shadow-sm",
+    subtle: "border border-border/60 bg-card text-card-foreground",
+    elevated: "border border-border bg-card text-card-foreground shadow-md",
   };
 
   const paddingClass: Record<NonNullable<SsCardProps["padding"]>, string> = {
@@ -28,7 +28,7 @@ export function SsCard({
 
   return (
     <div
-      className={["rounded-lg", variantClass[variant], paddingClass[padding], className]
+      className={["rounded-2xl transition-shadow duration-200", variantClass[variant], paddingClass[padding], className]
         .filter(Boolean)
         .join(" ")}
       {...props}
@@ -49,7 +49,7 @@ export function SsCardTitle({
   ...props
 }: HTMLAttributes<HTMLHeadingElement> & { children: ReactNode }) {
   return (
-    <h3 className={["text-xl font-semibold", className].filter(Boolean).join(" ")} {...props}>
+    <h3 className={["text-xl font-semibold text-card-foreground", className].filter(Boolean).join(" ")} {...props}>
       {children}
     </h3>
   );
@@ -59,7 +59,7 @@ export function SsCardDescription({
   className = "",
   ...props
 }: HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={["text-sm text-zinc-600", className].filter(Boolean).join(" ")} {...props} />;
+  return <p className={["text-sm text-muted-foreground", className].filter(Boolean).join(" ")} {...props} />;
 }
 
 export function SsCardContent({

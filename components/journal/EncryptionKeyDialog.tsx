@@ -77,7 +77,7 @@ export function EncryptionKeyDialog({
           error={error || undefined}
           disabled={busy}
         />
-        <SsTypography variant="caption" className="text-zinc-500">
+        <SsTypography variant="caption" className="text-muted-foreground">
           The passphrase is never sent to the server or stored. If you lose it,
           this entry cannot be recovered.
         </SsTypography>

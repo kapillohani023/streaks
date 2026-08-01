@@ -69,7 +69,7 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
   const totalScore = completedDatesSet.size;
 
   return (
-    <div className="h-full w-full bg-white p-6 text-black">
+    <div className="h-full w-full bg-background p-6 text-foreground">
       {/* Header */}
       <div className="mb-6 flex items-start justify-between">
         <div>

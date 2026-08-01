@@ -39,9 +39,9 @@ export function JournalEntryForm() {
       <SsLoaderOverlay open={isSubmitting} label="Saving entry..." />
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-zinc-700">
+          <span className="text-sm font-medium text-muted-foreground">
             New entry for{" "}
-            <span className="font-mono text-black">{todayTitle}</span>
+            <span className="font-mono text-foreground">{todayTitle}</span>
           </span>
         </div>
         <SsTextarea

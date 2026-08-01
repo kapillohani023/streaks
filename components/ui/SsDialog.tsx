@@ -64,14 +64,18 @@ export function SsDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+      className="ss-animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       onMouseDown={handleBackdropMouseDown}
     >
-      <SsCard padding="none" className={`w-full ${maxWidthClassName} ${panelClassName}`}>
+      <SsCard
+        variant="elevated"
+        padding="none"
+        className={`ss-animate-scale-in w-full ${maxWidthClassName} ${panelClassName}`}
+      >
         {(title || subtitle || showCloseButton) && (
-          <SsCardHeader className="mb-0 flex items-center justify-between border-b-2 border-black p-6">
+          <SsCardHeader className="mb-0 flex items-center justify-between border-b border-border p-6">
             <div>
               {title && <SsCardTitle>{title}</SsCardTitle>}
               {subtitle && <SsTypography variant="muted">{subtitle}</SsTypography>}
@@ -81,7 +85,7 @@ export function SsDialog({
                 onClick={onClose}
                 variant="ghost"
                 size="icon"
-                className="text-zinc-600 hover:text-black"
+                className="text-muted-foreground hover:text-foreground"
                 aria-label="Close dialog"
                 disabled={disableClose}
               >

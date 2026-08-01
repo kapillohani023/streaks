@@ -11,23 +11,33 @@ interface JournalSearchResultsProps {
 export function JournalSearchResults({ entries }: JournalSearchResultsProps) {
   if (entries.length === 0) {
     return (
-      <SsCard variant="default" padding="md" className="text-center">
+      <SsCard
+        variant="elevated"
+        padding="md"
+        className="text-center"
+        style={{ backgroundColor: "var(--card)" }}
+      >
         <SsTypography variant="muted">No matching entries.</SsTypography>
       </SsCard>
     );
   }
 
   return (
-    <SsCard variant="default" padding="none" className="overflow-hidden">
+    <SsCard
+      variant="elevated"
+      padding="none"
+      className="overflow-hidden"
+      style={{ backgroundColor: "var(--card)" }}
+    >
       <ul className="max-h-80 overflow-y-auto">
         {entries.map((entry, idx) => (
           <li
             key={entry.id}
-            className={idx > 0 ? "border-t-2 border-black" : ""}
+            className={idx > 0 ? "border-t border-border" : ""}
           >
             <Link
               href={`/journal/${entry.id}`}
-              className="flex w-full cursor-pointer items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-zinc-100"
+              className="flex w-full cursor-pointer items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-muted"
             >
               <SsTypography
                 as="span"

@@ -56,9 +56,9 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
     <div className="p-8">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {/* Completed Today */}
-        <SsCard padding="lg">
+        <SsCard padding="lg" variant="elevated" className="hover:shadow-md">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground">
               <Flame size={20} />
             </div>
             <SsCardDescription>Completed Today</SsCardDescription>
@@ -69,9 +69,9 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
         </SsCard>
 
         {/* Overall Consistency */}
-        <SsCard padding="lg">
+        <SsCard padding="lg" variant="elevated" className="hover:shadow-md">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground">
               <Target size={20} />
             </div>
             <SsCardDescription>Overall Consistency</SsCardDescription>
@@ -85,9 +85,15 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
         </SsCard>
 
         {/* Consistency Growth */}
-        <SsCard padding="lg">
+        <SsCard padding="lg" variant="elevated" className="hover:shadow-md">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white">
+            <div
+              className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                growth >= 0
+                  ? "bg-success/10 text-success"
+                  : "bg-destructive/10 text-destructive"
+              }`}
+            >
               {growth >= 0 ? (
                 <TrendingUp size={20} />
               ) : (
@@ -98,7 +104,7 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
           </div>
           <SsTypography
             as="p"
-            className={`text-4xl ${growth >= 0 ? "text-black" : "text-black"}`}
+            className={`text-4xl ${growth >= 0 ? "text-success" : "text-destructive"}`}
           >
             {growth >= 0 ? "+" : ""}
             {growth.toFixed(2)}%

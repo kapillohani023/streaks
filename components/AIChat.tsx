@@ -163,10 +163,10 @@ export default function AIChat() {
   };
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col p-4 overflow-y-scroll bg-white text-black">
+    <div className="flex h-full min-h-0 w-full flex-col p-4 overflow-y-scroll bg-background text-foreground">
       <div className="mb-4 flex-1 space-y-4 overflow-y-auto pr-2">
         {messages.length === 0 && (
-          <div className="mt-10 text-center text-gray-400">
+          <div className="mt-10 text-center text-muted-foreground">
             Hey, {currentUserFirstName}. What&apos;s on the agenda today?
           </div>
         )}
@@ -176,17 +176,17 @@ export default function AIChat() {
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[80%] rounded-2xl px-4 py-2 ${msg.role === "user"
-                ? "rounded-br-none bg-black text-white"
-                : "rounded-bl-none bg-gray-100 text-black"
+              className={`ss-animate-scale-in max-w-[80%] rounded-2xl px-4 py-2 ${msg.role === "user"
+                ? "rounded-br-none bg-primary text-primary-foreground"
+                : "rounded-bl-none bg-muted text-foreground"
                 }`}
             >
               {msg.role === "model" ? (
                 msg.content === "" ? (
                   <div className="flex items-center gap-1 py-1" aria-label="Assistant is typing">
-                    <span className="h-2 w-2 animate-bounce rounded-full bg-gray-500 [animation-delay:-0.3s]" />
-                    <span className="h-2 w-2 animate-bounce rounded-full bg-gray-500 [animation-delay:-0.15s]" />
-                    <span className="h-2 w-2 animate-bounce rounded-full bg-gray-500" />
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground" />
                   </div>
                 ) : (
                 <ReactMarkdown
@@ -226,7 +226,7 @@ export default function AIChat() {
               onClick={() => onChipClick(chip.id)}
               variant="secondary"
               size="sm"
-              className="rounded-full border border-gray-200 px-3 py-1 text-sm hover:border-black"
+              className="rounded-full border border-border px-3 py-1 text-sm hover:border-foreground"
             >
               {chip.label}
             </SsButton>
@@ -251,7 +251,7 @@ export default function AIChat() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend(input)}
           placeholder="Type a message..."
-          className="flex-1 rounded-full border border-gray-200 px-4 focus:border-black"
+          className="flex-1 rounded-full border border-input-border px-4 focus:border-transparent focus:ring-2 focus:ring-ring"
           disabled={isLoading}
           fullWidth={false}
           containerClassName="min-w-0 flex-1"

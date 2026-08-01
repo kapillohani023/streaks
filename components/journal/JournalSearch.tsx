@@ -33,7 +33,7 @@ export function JournalSearch({ entries }: JournalSearchProps) {
         onBlur={() => setTimeout(() => setFocused(false), 150)}
       />
       {showResults && (
-        <div className="absolute top-full right-0 left-0 z-10 mt-2">
+        <div className="absolute top-full right-0 left-0 z-20 mt-2">
           <JournalSearchResults entries={results} />
         </div>
       )}
