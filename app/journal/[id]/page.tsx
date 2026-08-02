@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getJournalEntries, getJournalEntryById } from "@/lib/data";
+import { getJournalEntryById } from "@/lib/data";
 import { JournalEntryView } from "@/components/journal/JournalEntryView";
 
 interface JournalEntryPageProps {
@@ -10,14 +10,11 @@ export default async function JournalEntryPage({
   params,
 }: JournalEntryPageProps) {
   const { id } = await params;
-  const [entry, entries] = await Promise.all([
-    getJournalEntryById(id),
-    getJournalEntries(),
-  ]);
+  const entry = await getJournalEntryById(id);
 
   if (!entry) {
     notFound();
   }
 
-  return <JournalEntryView entry={entry} entries={entries} />;
+  return <JournalEntryView entry={entry} />;
 }

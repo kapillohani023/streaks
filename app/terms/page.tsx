@@ -39,9 +39,9 @@ export default function TermsPage() {
               2. Description of Service
             </h2>
             <p className="text-foreground text-base leading-relaxed">
-              Streaks helps you track daily habits and keep an encrypted
-              personal journal. AI-assisted features are available to help you
-              reflect on your progress.
+              Streaks helps you track daily habits and keep a personal journal.
+              AI-assisted features are available to help you reflect on your
+              progress.
             </p>
           </section>
 
@@ -57,15 +57,13 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-foreground mb-2 text-xl font-semibold">
-              4. Journal Encryption &amp; Passphrase Responsibility
+              4. Journal Content
             </h2>
             <p className="text-foreground text-base leading-relaxed">
-              Journal entries are encrypted in your browser using AES-256-GCM
-              with a key derived from a passphrase you choose. The passphrase is
-              never sent to or stored by Streaks. You are solely responsible for
-              remembering your passphrase. If you lose it, the corresponding
-              entries are permanently unreadable, and we cannot assist in their
-              recovery.
+              Journal entries are stored as plain text and are not end-to-end
+              encrypted. You are responsible for what you choose to write, and
+              deleting an entry is permanent &mdash; deleted entries cannot be
+              recovered.
             </p>
           </section>
 
@@ -108,8 +106,8 @@ export default function TermsPage() {
             <p className="text-foreground text-base leading-relaxed">
               Streaks is provided &quot;as is&quot; without warranties of any
               kind. We are not liable for any damages arising from your use of
-              the service, including but not limited to loss of journal entries
-              following passphrase loss.
+              the service, including but not limited to loss of streaks or
+              journal entries.
             </p>
           </section>
 

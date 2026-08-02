@@ -10,7 +10,7 @@ export function DailyCheckIn({ streaks }: DailyCheckInProps) {
   return (
     <>
       {streaks.length > 0 && (
-        <div className="px-8 py-6">
+        <div>
           <SsTypography as="h2" variant="label" className="mb-4">
             DAILY CHECK-IN
           </SsTypography>

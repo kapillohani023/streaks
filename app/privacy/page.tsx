@@ -73,15 +73,15 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-foreground mb-2 text-xl font-semibold">
-              3. Journal Encryption
+              3. Journal Entries
             </h2>
             <p className="text-foreground text-base leading-relaxed">
-              Journal entries are encrypted in your browser before being sent to
-              our servers, using AES-256-GCM with a key derived from your
-              passphrase via PBKDF2-SHA256 (200,000 iterations) and a per-entry
-              random salt and IV. Your passphrase is never transmitted to or
-              stored by Streaks. We cannot read your entries, and if you lose
-              your passphrase they cannot be recovered.
+              Journal entries are stored as plain text in our database and are
+              readable by anyone with administrative access to it. They are
+              transmitted over HTTPS and are only served back to your
+              authenticated account, but they are not end-to-end encrypted.
+              Please keep this in mind when writing sensitive information. You
+              can permanently delete any entry at any time from the journal.
             </p>
           </section>
 
@@ -118,8 +118,8 @@ export default function PrivacyPage() {
                 >
                   https://t2a.kapillohani.site
                 </a>{" "}
-                to generate responses. Encrypted journal ciphertext is never
-                sent to AI providers.
+                to generate responses. Journal entries are never sent to AI
+                providers.
               </li>
             </ul>
             <p className="text-foreground mt-2 text-base leading-relaxed">

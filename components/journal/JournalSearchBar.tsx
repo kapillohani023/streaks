@@ -27,7 +27,7 @@ export function JournalSearchBar({
         onChange={(e) => onChange(e.target.value)}
         onFocus={onFocus}
         onBlur={onBlur}
-        placeholder="Search by title (e.g., 02-MAY-2026)"
+        placeholder="Search entries or dates (e.g., 02-MAY-2026)"
         className="border-input-border bg-card text-card-foreground focus:ring-ring w-full rounded-xl border py-2 pr-10 pl-10 text-base transition-all focus:border-transparent focus:ring-2 focus:outline-none"
       />
       {value && (

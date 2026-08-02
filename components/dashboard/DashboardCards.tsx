@@ -50,8 +50,8 @@ export function DashboardCards({ streaks }: DashboardCardsProps) {
         );
 
   return (
-    <div className="p-8">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+    <div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {/* Completed Today */}
         <SsCard padding="lg" variant="elevated" className="hover:shadow-md">
           <div className="mb-4 flex items-center gap-3">
