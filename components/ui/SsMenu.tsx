@@ -23,6 +23,8 @@ interface SsMenuProps {
   label?: string;
   align?: "left" | "right";
   triggerClassName?: string;
+  /** Replaces the default kebab icon inside the trigger button. */
+  trigger?: ReactNode;
 }
 
 const ESTIMATED_MENU_HEIGHT = 120;
@@ -32,6 +34,7 @@ export function SsMenu({
   label = "Open menu",
   align = "right",
   triggerClassName = "",
+  trigger,
 }: SsMenuProps) {
   const [open, setOpen] = useState(false);
   const [openUpward, setOpenUpward] = useState(false);
@@ -88,7 +91,7 @@ export function SsMenu({
         aria-label={label}
         className={`text-muted-foreground hover:text-foreground ${triggerClassName}`}
       >
-        <MoreVertical size={18} />
+        {trigger ?? <MoreVertical size={18} />}
       </SsButton>
 
       {open && (

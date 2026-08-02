@@ -2,8 +2,7 @@
 
 import { ListChecks } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
-import { SsButton } from "@/components/ui/SsButton";
+import { AccountMenu } from "@/components/shared/AccountMenu";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 const APP_ROUTES = ["/dashboard", "/streaks", "/ai", "/journal"];
@@ -25,9 +24,7 @@ export function Header() {
       {showActions && (
         <div className="flex items-center gap-2">
           <ThemeToggle size="sm" />
-          <SsButton onClick={() => signOut()} variant="secondary" size="sm">
-            Sign out
-          </SsButton>
+          <AccountMenu />
         </div>
       )}
     </div>

@@ -14,6 +14,9 @@ model User {
   /// IANA zone (e.g. "Asia/Kolkata"). Defines what "today" means for this
   /// user and when their reminders fire. Auto-detected from the browser.
   timezone      String             @default("UTC")
+  /// Global mute. Per-streak `reminderEnabled` records intent and is left
+  /// untouched, so unsnoozing restores exactly what the user had before.
+  remindersSnoozed Boolean         @default(false) @map("reminders_snoozed")
   streaks       Streak[]
   journal       JournalEntry[]
   subscriptions PushSubscription[]

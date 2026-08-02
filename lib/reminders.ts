@@ -74,7 +74,14 @@ export async function runDueReminders(
   now: Date = new Date()
 ): Promise<ReminderRunSummary> {
   const streaks = await prisma.streak.findMany({
-    where: { reminderEnabled: true, reminderTime: { not: null } },
+    // A globally snoozed user drops out here rather than having their per-streak
+    // preferences rewritten, so unsnoozing restores everything untouched. Their
+    // streaks are never claimed, so a snooze that ends mid-window can still fire.
+    where: {
+      reminderEnabled: true,
+      reminderTime: { not: null },
+      user: { remindersSnoozed: false },
+    },
     include: { user: { select: { id: true, timezone: true } } },
   });
 
