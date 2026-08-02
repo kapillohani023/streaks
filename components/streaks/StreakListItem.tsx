@@ -1,19 +1,15 @@
 "use client";
-import { useState } from "react";
-import { Bell, CalendarDays, Check, Clock, Flame, Trash2 } from "lucide-react";
+import { CalendarDays, Flame } from "lucide-react";
 import { Streak } from "@/types/streak";
 import {
   calculateCurrentStreak,
   formatStreakDate,
   getCompletedDates,
-  isCompletedToday,
 } from "@/lib/util";
 import { SsCard } from "@/components/ui/SsCard";
 import { SsTypography } from "@/components/ui/SsTypography";
-import { SsMenu } from "@/components/ui/SsMenu";
-import { EntrySubmissionDialog } from "@/components/streak-profile/MarkAsCompleted";
-import { DeleteStreakDialog } from "@/components/streak-profile/DeleteStreakButton";
-import { ReminderDialog } from "@/components/streaks/ReminderDialog";
+import { useStreakActions } from "@/components/streaks/StreakActions";
+import { StreakChips } from "@/components/streaks/StreakChips";
 
 interface StreakListItemProps {
   streak: Streak;
@@ -26,11 +22,8 @@ export function StreakListItem({
   onStreakClick,
   onDelete,
 }: StreakListItemProps) {
-  const [isEntryDialogOpen, setIsEntryDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isReminderDialogOpen, setIsReminderDialogOpen] = useState(false);
+  const { menu, dialogs } = useStreakActions({ streak, onDelete });
 
-  const completedToday = isCompletedToday(streak);
   const currentStreak = calculateCurrentStreak(getCompletedDates(streak));
 
   return (
@@ -60,28 +53,7 @@ export function StreakListItem({
               </SsTypography>
               {/* Pinned right so the chips line up down the list instead of
                   drifting with each streak's name length. */}
-              <div className="flex shrink-0 items-center gap-2">
-                {completedToday ? (
-                  <span className="bg-success/10 text-success inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs font-medium">
-                    <Check size={10} />
-                    completed
-                  </span>
-                ) : (
-                  <span className="bg-muted text-muted-foreground inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs font-medium">
-                    <Clock size={10} />
-                    pending
-                  </span>
-                )}
-                {streak.reminderEnabled && streak.reminderTime && (
-                  <span
-                    className="bg-muted text-muted-foreground inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs font-medium"
-                    title={`Daily reminder at ${streak.reminderTime}`}
-                  >
-                    <Bell size={10} />
-                    {streak.reminderTime}
-                  </span>
-                )}
-              </div>
+              <StreakChips streak={streak} />
             </div>
 
             {/* Always rendered (even when empty) so every card is the same height */}
@@ -115,50 +87,11 @@ export function StreakListItem({
             </div>
           </div>
 
-          <SsMenu
-            label={`Actions for ${streak.name}`}
-            items={[
-              {
-                label: completedToday ? "Completed today" : "Mark complete",
-                icon: <Check size={16} />,
-                disabled: completedToday,
-                onSelect: () => setIsEntryDialogOpen(true),
-              },
-              {
-                label: streak.reminderEnabled
-                  ? `Reminder at ${streak.reminderTime}`
-                  : "Set reminder",
-                icon: <Bell size={16} />,
-                onSelect: () => setIsReminderDialogOpen(true),
-              },
-              {
-                label: "Delete",
-                icon: <Trash2 size={16} />,
-                danger: true,
-                onSelect: () => setIsDeleteDialogOpen(true),
-              },
-            ]}
-          />
+          {menu}
         </div>
       </SsCard>
 
-      <EntrySubmissionDialog
-        isOpen={isEntryDialogOpen}
-        onClose={() => setIsEntryDialogOpen(false)}
-        streak={streak}
-      />
-      <ReminderDialog
-        open={isReminderDialogOpen}
-        streak={streak}
-        onClose={() => setIsReminderDialogOpen(false)}
-      />
-      <DeleteStreakDialog
-        open={isDeleteDialogOpen}
-        streakId={streak.id}
-        streakName={streak.name}
-        onClose={() => setIsDeleteDialogOpen(false)}
-        handleDelete={onDelete}
-      />
+      {dialogs}
     </>
   );
 }

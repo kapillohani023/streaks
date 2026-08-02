@@ -1,22 +1,16 @@
 "use client";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { EntrySubmissionDialog } from "@/components/streak-profile/MarkAsCompleted";
 import { Streak } from "@/types/streak";
 import { StreakCalendar } from "@/components/streak-profile/StreakCalendar";
-import {
-  calculateCurrentStreak,
-  getCompletedDates,
-  isCompletedToday,
-} from "@/lib/util";
-import { DeleteStreakDialog } from "@/components/streak-profile/DeleteStreakButton";
-import { ReminderDialog } from "@/components/streaks/ReminderDialog";
+import { StreakEntryHistory } from "@/components/streak-profile/StreakEntryHistory";
+import { calculateCurrentStreak, getCompletedDates } from "@/lib/util";
 import { deleteStreak } from "@/app/actions/streak";
 import { SsCard } from "@/components/ui/SsCard";
 import { SsTypography } from "@/components/ui/SsTypography";
 import { SsButton } from "@/components/ui/SsButton";
-import { SsMenu } from "@/components/ui/SsMenu";
-import { ArrowLeft, Bell, Check, Trash2 } from "lucide-react";
+import { useStreakActions } from "@/components/streaks/StreakActions";
+import { StreakChips } from "@/components/streaks/StreakChips";
+import { ArrowLeft } from "lucide-react";
 
 interface StreakProfileContentProps {
   streak: Streak;
@@ -24,11 +18,6 @@ interface StreakProfileContentProps {
 
 export function StreakProfileContent({ streak }: StreakProfileContentProps) {
   const router = useRouter();
-  const [isReminderDialogOpen, setIsReminderDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isEntryDialogOpen, setIsEntryDialogOpen] = useState(false);
-  const completedToday = isCompletedToday(streak);
-
   const handleBack = () => {
     // Fall back to the list when the page was opened directly (no history to pop).
     if (window.history.length > 1) router.back();
@@ -43,6 +32,11 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
       console.error("Failed to delete streak:", e);
     }
   };
+
+  const { menu, dialogs, markComplete } = useStreakActions({
+    streak,
+    onDelete: handleDelete,
+  });
 
   const completedDates = getCompletedDates(streak);
 
@@ -90,31 +84,11 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
           {streak.description && (
             <SsTypography variant="muted">{streak.description}</SsTypography>
           )}
+          {/* Own row rather than trailing the title, so the chips share a left
+              edge with the name and description instead of shifting with it. */}
+          <StreakChips streak={streak} className="mt-2" />
         </div>
-        <SsMenu
-          label={`Actions for ${streak.name}`}
-          items={[
-            {
-              label: completedToday ? "Completed today" : "Mark complete",
-              icon: <Check size={16} />,
-              disabled: completedToday,
-              onSelect: () => setIsEntryDialogOpen(true),
-            },
-            {
-              label: streak.reminderEnabled
-                ? `Reminder at ${streak.reminderTime}`
-                : "Set reminder",
-              icon: <Bell size={16} />,
-              onSelect: () => setIsReminderDialogOpen(true),
-            },
-            {
-              label: "Delete",
-              icon: <Trash2 size={16} />,
-              danger: true,
-              onSelect: () => setIsDeleteDialogOpen(true),
-            },
-          ]}
-        />
+        {menu}
       </div>
 
       {/* Stats */}
@@ -150,24 +124,15 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
         <StreakCalendar completedDates={completedDates} />
       </div>
 
-      {/* Today button */}
-      <EntrySubmissionDialog
-        isOpen={isEntryDialogOpen}
-        onClose={() => setIsEntryDialogOpen(false)}
-        streak={streak}
-      />
-      <ReminderDialog
-        open={isReminderDialogOpen}
-        streak={streak}
-        onClose={() => setIsReminderDialogOpen(false)}
-      />
-      <DeleteStreakDialog
-        open={isDeleteDialogOpen}
-        streakId={streak.id}
-        streakName={streak.name}
-        onClose={() => setIsDeleteDialogOpen(false)}
-        handleDelete={handleDelete}
-      />
+      {/* Entry history — newest first */}
+      <div className="mb-6">
+        <StreakEntryHistory
+          entries={streak.entries}
+          onAddEntry={markComplete}
+        />
+      </div>
+
+      {dialogs}
     </div>
   );
 }
