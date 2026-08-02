@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getJournalEntryById } from "@/lib/data";
+import { getAdjacentJournalEntries, getJournalEntryById } from "@/lib/data";
 import { JournalEntryView } from "@/components/journal/JournalEntryView";
 
 interface JournalEntryPageProps {
@@ -16,5 +16,7 @@ export default async function JournalEntryPage({
     notFound();
   }
 
-  return <JournalEntryView entry={entry} />;
+  const { newer, older } = await getAdjacentJournalEntries(entry);
+
+  return <JournalEntryView entry={entry} newer={newer} older={older} />;
 }
