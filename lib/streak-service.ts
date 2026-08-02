@@ -108,6 +108,31 @@ export async function createStreakForUser(
 }
 
 /**
+ * Update a streak's descriptive fields. Reminders are deliberately *not*
+ * handled here — they go through `setStreakReminderForUser`, which owns the
+ * time validation and the `lastRemindedOn` reset. Renaming a streak must never
+ * re-arm a reminder that already fired today.
+ */
+export async function updateStreakDetailsForUser(
+  userId: string,
+  input: { streakId: string; name: string; description?: string }
+) {
+  await assertOwnedStreak(userId, input.streakId);
+
+  const name = input.name.trim();
+  if (!name) throw new Error("A streak needs a name");
+
+  return prisma.streak.update({
+    where: { id: input.streakId },
+    data: {
+      name,
+      description: input.description?.trim() ?? "",
+    },
+    select: { id: true, name: true, description: true },
+  });
+}
+
+/**
  * Add an entry to a streak the user owns. Verifies ownership first so a
  * caller can't write into someone else's streak by guessing a streakId.
  * `date` defaults to now, `completed` to true. Used by the manual "log an
@@ -251,6 +276,26 @@ export async function setStreakReminderForUser(
     },
     select: { id: true, reminderEnabled: true, reminderTime: true },
   });
+}
+
+/**
+ * A streak's stored reminder, without loading its entries. Lets a caller tell
+ * whether a reminder actually changed before writing one — see
+ * `setStreakReminderForUser` on why a needless write is not harmless.
+ */
+export async function getStreakReminderForUser(
+  userId: string,
+  streakId: string
+): Promise<{ enabled: boolean; time: string | null }> {
+  await assertOwnedStreak(userId, streakId);
+  const streak = await prisma.streak.findUnique({
+    where: { id: streakId },
+    select: { reminderEnabled: true, reminderTime: true },
+  });
+  return {
+    enabled: streak?.reminderEnabled ?? false,
+    time: streak?.reminderTime ?? null,
+  };
 }
 
 /** Whether the user has at least one device registered for push. */

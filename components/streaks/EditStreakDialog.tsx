@@ -5,23 +5,29 @@ import { Streak } from "@/types/streak";
 import { SsDialog } from "@/components/ui/SsDialog";
 import { SsButton } from "@/components/ui/SsButton";
 import { SsTypography } from "@/components/ui/SsTypography";
-import { saveStreakReminder } from "@/app/actions/reminder";
+import { updateStreak } from "@/app/actions/streak";
+import { StreakFields } from "@/components/streaks/StreakFields";
 import {
   blockedNotice,
   DEFAULT_REMINDER_TIME,
   DeliveryNotice,
-  ReminderFields,
 } from "@/components/streaks/ReminderSettings";
 
-interface ReminderDialogProps {
+interface EditStreakDialogProps {
   open: boolean;
   streak: Streak;
   onClose: () => void;
 }
 
-export function ReminderDialog({ open, streak, onClose }: ReminderDialogProps) {
-  const [enabled, setEnabled] = useState(streak.reminderEnabled);
-  const [time, setTime] = useState(
+export function EditStreakDialog({
+  open,
+  streak,
+  onClose,
+}: EditStreakDialogProps) {
+  const [name, setName] = useState(streak.name);
+  const [description, setDescription] = useState(streak.description);
+  const [reminderEnabled, setReminderEnabled] = useState(streak.reminderEnabled);
+  const [reminderTime, setReminderTime] = useState(
     streak.reminderTime ?? DEFAULT_REMINDER_TIME
   );
   const [notice, setNotice] = useState<DeliveryNotice | null>(null);
@@ -32,23 +38,36 @@ export function ReminderDialog({ open, streak, onClose }: ReminderDialogProps) {
   // doesn't linger, and surface an already-blocked permission up front.
   useEffect(() => {
     if (!open) return;
-    setEnabled(streak.reminderEnabled);
-    setTime(streak.reminderTime ?? DEFAULT_REMINDER_TIME);
+    setName(streak.name);
+    setDescription(streak.description);
+    setReminderEnabled(streak.reminderEnabled);
+    setReminderTime(streak.reminderTime ?? DEFAULT_REMINDER_TIME);
     setNotice(streak.reminderEnabled ? blockedNotice() : null);
     setError(null);
-  }, [open, streak.reminderEnabled, streak.reminderTime]);
+  }, [
+    open,
+    streak.name,
+    streak.description,
+    streak.reminderEnabled,
+    streak.reminderTime,
+  ]);
 
   const handleSave = async () => {
     setIsSaving(true);
     setError(null);
     try {
-      const { hasDevice } = await saveStreakReminder({
-        streakId: streak.id,
-        enabled,
-        time: enabled ? time : null,
+      const { reminderChanged, hasDevice } = await updateStreak({
+        id: streak.id,
+        name,
+        description,
+        reminderEnabled,
+        reminderTime: reminderEnabled ? reminderTime : null,
       });
 
-      if (enabled && !hasDevice) {
+      // Only hold the dialog open when this edit is the thing that asked for a
+      // notification. A stale "no device" condition must not block someone who
+      // came here to fix a name.
+      if (reminderChanged && reminderEnabled && !hasDevice) {
         setNotice({
           message:
             "Saved — but no device is set up to receive notifications yet, so nothing will arrive until you enable them on a device.",
@@ -58,7 +77,7 @@ export function ReminderDialog({ open, streak, onClose }: ReminderDialogProps) {
       }
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't save the reminder.");
+      setError(e instanceof Error ? e.message : "Couldn't save your changes.");
     } finally {
       setIsSaving(false);
     }
@@ -68,19 +87,25 @@ export function ReminderDialog({ open, streak, onClose }: ReminderDialogProps) {
     <SsDialog
       open={open}
       onClose={onClose}
-      title="Reminder"
+      title="Edit Streak"
       subtitle={streak.name}
       disableClose={isSaving}
     >
       <div className="flex flex-col gap-5">
-        <ReminderFields
-          enabled={enabled}
-          time={time}
-          onEnabledChange={setEnabled}
-          onTimeChange={setTime}
-          disabled={isSaving}
+        <StreakFields
+          name={name}
+          description={description}
+          onNameChange={setName}
+          onDescriptionChange={setDescription}
+          reminderEnabled={reminderEnabled}
+          reminderTime={reminderTime}
+          onReminderEnabledChange={setReminderEnabled}
+          onReminderTimeChange={setReminderTime}
           notice={notice}
           onNoticeChange={setNotice}
+          disabled={isSaving}
+          autoFocusName
+          idPrefix="edit-streak"
         />
 
         {error && (
@@ -104,7 +129,7 @@ export function ReminderDialog({ open, streak, onClose }: ReminderDialogProps) {
             block
             onClick={handleSave}
             loading={isSaving}
-            disabled={enabled && !time}
+            disabled={!name.trim() || (reminderEnabled && !reminderTime)}
           >
             Save
           </SsButton>

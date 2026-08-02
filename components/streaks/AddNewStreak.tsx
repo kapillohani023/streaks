@@ -3,14 +3,13 @@ import React, { useState } from "react";
 import { Plus } from "lucide-react";
 import { addStreak } from "@/app/actions/streak";
 import { SsButton } from "@/components/ui/SsButton";
-import { SsInput, SsTextarea } from "@/components/ui/SsInput";
 import { SsTypography } from "@/components/ui/SsTypography";
 import { SsLoaderOverlay } from "@/components/ui/SsLoader";
 import { SsDialog } from "@/components/ui/SsDialog";
+import { StreakFields } from "@/components/streaks/StreakFields";
 import {
   DEFAULT_REMINDER_TIME,
   DeliveryNotice,
-  ReminderFields,
 } from "@/components/streaks/ReminderSettings";
 
 interface CreateStreakDialogProps {
@@ -68,40 +67,21 @@ function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
         disableClose={isSubmitting}
       >
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <SsInput
-              id="streak-name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              label="Streak Name"
-              placeholder="e.g., Daily Exercise, Read Books..."
-              autoFocus
-              disabled={isSubmitting}
-            />
-          </div>
-
           <div className="mb-6">
-            <SsTextarea
-              id="streak-description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              label="Description (optional)"
-              placeholder="Add a description..."
-              rows={3}
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <div className="border-border mb-6 border-t pt-4">
-            <ReminderFields
-              enabled={reminderEnabled}
-              time={reminderTime}
-              onEnabledChange={setReminderEnabled}
-              onTimeChange={setReminderTime}
-              disabled={isSubmitting}
+            <StreakFields
+              name={name}
+              description={description}
+              onNameChange={setName}
+              onDescriptionChange={setDescription}
+              reminderEnabled={reminderEnabled}
+              reminderTime={reminderTime}
+              onReminderEnabledChange={setReminderEnabled}
+              onReminderTimeChange={setReminderTime}
               notice={reminderNotice}
               onNoticeChange={setReminderNotice}
+              disabled={isSubmitting}
+              autoFocusName
+              idPrefix="new-streak"
             />
           </div>
 

@@ -1,12 +1,12 @@
 "use client";
 import { useState, type ReactNode } from "react";
-import { Bell, Check, Trash2 } from "lucide-react";
+import { Check, Pencil, Trash2 } from "lucide-react";
 import { Streak } from "@/types/streak";
 import { isCompletedToday } from "@/lib/util";
 import { SsMenu } from "@/components/ui/SsMenu";
 import { EntrySubmissionDialog } from "@/components/streak-profile/MarkAsCompleted";
 import { DeleteStreakDialog } from "@/components/streak-profile/DeleteStreakButton";
-import { ReminderDialog } from "@/components/streaks/ReminderDialog";
+import { EditStreakDialog } from "@/components/streaks/EditStreakDialog";
 
 interface UseStreakActionsOptions {
   streak: Streak;
@@ -24,8 +24,8 @@ export interface StreakActions {
 }
 
 /**
- * The action set a streak carries with it — mark complete, set a reminder,
- * delete — together with the dialogs each one opens.
+ * The action set a streak carries with it — mark complete, edit, delete —
+ * together with the dialogs each one opens.
  *
  * A hook rather than a component because the list and the profile put the
  * trigger in different places, and the profile also needs to fire the
@@ -38,7 +38,7 @@ export function useStreakActions({
   onDelete,
 }: UseStreakActionsOptions): StreakActions {
   const [isEntryDialogOpen, setIsEntryDialogOpen] = useState(false);
-  const [isReminderDialogOpen, setIsReminderDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const completedToday = isCompletedToday(streak);
@@ -54,11 +54,9 @@ export function useStreakActions({
           onSelect: () => setIsEntryDialogOpen(true),
         },
         {
-          label: streak.reminderEnabled
-            ? `Reminder at ${streak.reminderTime}`
-            : "Set reminder",
-          icon: <Bell size={16} />,
-          onSelect: () => setIsReminderDialogOpen(true),
+          label: "Edit",
+          icon: <Pencil size={16} />,
+          onSelect: () => setIsEditDialogOpen(true),
         },
         {
           label: "Delete",
@@ -77,10 +75,10 @@ export function useStreakActions({
         onClose={() => setIsEntryDialogOpen(false)}
         streak={streak}
       />
-      <ReminderDialog
-        open={isReminderDialogOpen}
+      <EditStreakDialog
+        open={isEditDialogOpen}
         streak={streak}
-        onClose={() => setIsReminderDialogOpen(false)}
+        onClose={() => setIsEditDialogOpen(false)}
       />
       <DeleteStreakDialog
         open={isDeleteDialogOpen}

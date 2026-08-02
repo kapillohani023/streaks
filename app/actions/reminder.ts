@@ -1,11 +1,6 @@
 "use server";
-import { revalidatePath } from "next/cache";
 import { auth } from "@/app/auth";
-import {
-  hasPushSubscription,
-  setStreakReminderForUser,
-  setUserTimezone,
-} from "@/lib/streak-service";
+import { setUserTimezone } from "@/lib/streak-service";
 import { saveSubscription } from "@/lib/push";
 
 async function requireUserId(): Promise<string> {
@@ -43,21 +38,4 @@ export async function registerPushSubscription(subscription: {
 }) {
   const userId = await requireUserId();
   await saveSubscription(userId, subscription);
-}
-
-/**
- * Save a streak's reminder preference.
- *
- * Always writes, even with no device registered — the returned `hasDevice`
- * tells the UI whether to warn that nothing will actually arrive.
- */
-export async function saveStreakReminder(input: {
-  streakId: string;
-  enabled: boolean;
-  time?: string | null;
-}): Promise<{ hasDevice: boolean }> {
-  const userId = await requireUserId();
-  await setStreakReminderForUser(userId, input);
-  revalidatePath("/", "layout");
-  return { hasDevice: await hasPushSubscription(userId) };
 }
