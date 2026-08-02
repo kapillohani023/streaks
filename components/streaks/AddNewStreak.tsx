@@ -133,18 +133,16 @@ export function AddNewStreak() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   return (
     <>
-      <div className="p-4">
-        <SsButton
-          onClick={() => setIsDialogOpen(true)}
-          block
-          size="lg"
-          leftIcon={<Plus size={20} />}
-        >
-          <SsTypography as="span" className="text-primary-foreground">
-            New Streak
-          </SsTypography>
-        </SsButton>
-      </div>
+      <SsButton
+        onClick={() => setIsDialogOpen(true)}
+        block
+        size="lg"
+        leftIcon={<Plus size={20} />}
+      >
+        <SsTypography as="span" className="text-primary-foreground">
+          New Streak
+        </SsTypography>
+      </SsButton>
       <CreateStreakDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}

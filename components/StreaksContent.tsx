@@ -1,9 +1,12 @@
 "use client";
+import { ListChecks } from "lucide-react";
 import { Streak } from "@/types/streak";
 import { useRouter } from "next/navigation";
 import { StreaksList } from "@/components/streaks/StreaksList";
 import { AddNewStreak } from "@/components/streaks/AddNewStreak";
+import { PageHeader, PageShell } from "@/components/shared/PageShell";
 import { deleteStreak } from "@/app/actions/streak";
+import { isCompletedToday } from "@/lib/util";
 
 interface StreaksContentProps {
   streaks: Streak[];
@@ -24,16 +27,25 @@ export function StreaksContent({ streaks }: StreaksContentProps) {
     }
   };
 
+  const completedCount = streaks.filter(isCompletedToday).length;
+
   return (
-    <div className="bg-background text-foreground flex h-full min-h-0 w-full overflow-y-scroll">
-      <div className="flex flex-1 flex-col justify-start overflow-hidden">
-        <StreaksList
-          streaks={streaks}
-          onStreakClick={handleStreakClick}
-          onDelete={handleDelete}
-        />
-        <AddNewStreak />
-      </div>
-    </div>
+    <PageShell width="wide">
+      <PageHeader
+        icon={<ListChecks size={20} />}
+        title="My Streaks"
+        subtitle={
+          streaks.length === 0
+            ? "No streaks yet"
+            : `${completedCount} of ${streaks.length} done today`
+        }
+      />
+      <StreaksList
+        streaks={streaks}
+        onStreakClick={handleStreakClick}
+        onDelete={handleDelete}
+      />
+      <AddNewStreak />
+    </PageShell>
   );
 }

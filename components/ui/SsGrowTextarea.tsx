@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useRef, type TextareaHTMLAttributes } from "react";
+import {
+  useEffect,
+  useRef,
+  type Ref,
+  type TextareaHTMLAttributes,
+} from "react";
 
 export interface SsGrowTextareaProps extends Omit<
   TextareaHTMLAttributes<HTMLTextAreaElement>,
@@ -13,6 +18,8 @@ export interface SsGrowTextareaProps extends Omit<
   maxHeight?: number;
   /** Set false where the container owns the height and a drag handle would fight it. */
   resizable?: boolean;
+  /** Merged with the internal measuring ref, so callers can still focus the box. */
+  ref?: Ref<HTMLTextAreaElement>;
 }
 
 /**
@@ -29,6 +36,7 @@ export function SsGrowTextarea({
   maxHeight = 640,
   resizable = true,
   className = "",
+  ref: externalRef,
   ...props
 }: SsGrowTextareaProps) {
   const ref = useRef<HTMLTextAreaElement>(null);
@@ -61,7 +69,11 @@ export function SsGrowTextarea({
 
   return (
     <textarea
-      ref={ref}
+      ref={(node) => {
+        ref.current = node;
+        if (typeof externalRef === "function") externalRef(node);
+        else if (externalRef) externalRef.current = node;
+      }}
       value={value}
       className={[
         "border-input-border bg-card text-card-foreground placeholder:text-muted-foreground focus:ring-ring w-full rounded-xl border px-4 py-3 text-base leading-relaxed transition-colors duration-200 focus:border-transparent focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60",
