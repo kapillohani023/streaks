@@ -39,13 +39,13 @@ export function StreaksContent({ streaks }: StreaksContentProps) {
             ? "No streaks yet"
             : `${completedCount} of ${streaks.length} done today`
         }
+        actions={<AddNewStreak />}
       />
       <StreaksList
         streaks={streaks}
         onStreakClick={handleStreakClick}
         onDelete={handleDelete}
       />
-      <AddNewStreak />
     </PageShell>
   );
 }

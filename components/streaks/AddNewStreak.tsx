@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Plus } from "lucide-react";
 import { addStreak } from "@/app/actions/streak";
 import { SsButton } from "@/components/ui/SsButton";
-import { SsTypography } from "@/components/ui/SsTypography";
 import { SsLoaderOverlay } from "@/components/ui/SsLoader";
 import { SsDialog } from "@/components/ui/SsDialog";
 import { StreakFields } from "@/components/streaks/StreakFields";
@@ -115,13 +114,13 @@ export function AddNewStreak() {
     <>
       <SsButton
         onClick={() => setIsDialogOpen(true)}
-        block
-        size="lg"
-        leftIcon={<Plus size={20} />}
+        size="icon"
+        variant="ghost"
+        aria-label="New streak"
+        title="New streak"
+        className="rounded-full"
       >
-        <SsTypography as="span" className="text-primary-foreground">
-          New Streak
-        </SsTypography>
+        <Plus size={20} />
       </SsButton>
       <CreateStreakDialog
         isOpen={isDialogOpen}

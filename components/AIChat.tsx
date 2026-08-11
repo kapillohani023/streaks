@@ -215,7 +215,7 @@ export default function AIChat() {
       {/* The composer has to stay pinned, so this page owns its own scroll
           shell rather than PageShell's — but it borrows the same track. */}
       <div className="border-border shrink-0 border-b">
-        <div className={`mx-auto w-full px-4 pt-4 pb-3 ${PAGE_WIDTH.narrow}`}>
+        <div className={`mx-auto w-full px-4 pt-4 pb-3 ${PAGE_WIDTH.wide}`}>
           <PageHeader
             icon={<Sparkles size={20} />}
             title="Assistant"
