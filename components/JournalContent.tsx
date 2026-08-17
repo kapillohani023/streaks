@@ -1,11 +1,12 @@
 "use client";
 import Link from "next/link";
-import { Notebook } from "lucide-react";
 import { JournalEntry } from "@/types/journal-entry";
 import { PageHeader, PageShell } from "@/components/shared/PageShell";
 import { JournalEntryForm } from "@/components/journal/JournalEntryForm";
 import { JournalEntryList } from "@/components/journal/JournalEntryList";
 import { JournalCalendar } from "@/components/journal/JournalCalendar";
+import { WritingStreak } from "@/components/journal/WritingStreak";
+import { MonoLabel } from "@/components/ui/SsMono";
 
 interface JournalContentProps {
   entries: JournalEntry[];
@@ -22,29 +23,27 @@ export function JournalContent({ entries }: JournalContentProps) {
     */
     <PageShell
       width="wide"
-      layoutClassName="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-x-8"
+      layoutClassName="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-x-7"
     >
       <PageHeader
         className="lg:col-start-1 lg:row-start-1"
-        icon={<Notebook size={20} />}
+        eyebrow="LOGBOOK"
         title="Journal"
         subtitle={
-          <>
-            {entries.length === 0
-              ? "Your writing space"
-              : `${entries.length} ${entries.length === 1 ? "entry" : "entries"}`}
+          <MonoLabel as="span" size="tile" className="tracking-[0.08em]">
+            {entries.length} {entries.length === 1 ? "ENTRY" : "ENTRIES"}
             {lastEntry && (
               <>
-                {" · last written "}
+                {" · LAST "}
                 <Link
                   href={`/journal/${lastEntry.id}`}
-                  className="text-foreground font-mono underline underline-offset-2"
+                  className="text-foreground underline underline-offset-2"
                 >
                   {lastEntry.title}
                 </Link>
               </>
             )}
-          </>
+          </MonoLabel>
         }
       />
 
@@ -52,11 +51,12 @@ export function JournalContent({ entries }: JournalContentProps) {
         <JournalEntryForm />
       </div>
 
-      <aside className="border-border border-t pt-6 lg:sticky lg:top-4 lg:col-start-2 lg:row-span-3 lg:row-start-1 lg:self-start lg:border-t-0 lg:pt-0">
+      <aside className="flex flex-col gap-3.5 lg:sticky lg:top-5 lg:col-start-2 lg:row-span-3 lg:row-start-1 lg:self-start">
         <JournalCalendar days={entries} />
+        <WritingStreak days={entries} />
       </aside>
 
-      <div className="border-border min-w-0 border-t pt-6 lg:col-start-1 lg:row-start-3">
+      <div className="min-w-0 lg:col-start-1 lg:row-start-3">
         <JournalEntryList entries={entries} />
       </div>
     </PageShell>

@@ -8,6 +8,8 @@ interface BaseFieldProps {
   error?: string;
   fullWidth?: boolean;
   size?: InputSize;
+  /** Sets the *value* in mono — for times, dates and other typed-in data. */
+  mono?: boolean;
   containerClassName?: string;
 }
 
@@ -17,15 +19,37 @@ export interface SsInputProps
 export interface SsTextareaProps
   extends TextareaHTMLAttributes<HTMLTextAreaElement>, BaseFieldProps {}
 
-const wrapperClass = "flex flex-col gap-2";
+const wrapperClass = "flex flex-col gap-1.5";
+
+/*
+  Focus moves the border to full foreground rather than adding a ring. On a
+  surface this dark a ring reads as a second, floating rectangle; recolouring
+  the edge the field already has keeps the geometry still.
+*/
 const baseInputClass =
-  "rounded-xl border border-input-border bg-card px-4 text-card-foreground transition-all duration-200 placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent disabled:cursor-not-allowed disabled:opacity-60";
+  "border-border bg-input-bg text-foreground placeholder:text-faint focus:border-foreground w-full rounded-lg border px-3.5 transition-colors duration-150 outline-none disabled:cursor-not-allowed disabled:opacity-60";
 
 const sizeClass: Record<InputSize, string> = {
-  sm: "py-1.5 text-sm",
-  md: "py-2 text-base",
-  lg: "py-3 text-base",
+  sm: "py-2 text-[13px]",
+  md: "py-2.5 text-sm",
+  lg: "py-3 text-[15px]",
 };
+
+const labelClass =
+  "text-soft font-mono text-[11px] tracking-[0.06em] uppercase";
+
+function FieldNote({ error, hint }: { error?: string; hint?: string }) {
+  if (!error && !hint) return null;
+  return (
+    <p
+      className={`font-mono text-[10px] tracking-[0.06em] uppercase ${
+        error ? "text-bad" : "text-faint"
+      }`}
+    >
+      {error ?? hint}
+    </p>
+  );
+}
 
 export function SsInput({
   label,
@@ -33,6 +57,7 @@ export function SsInput({
   error,
   fullWidth = true,
   size = "md",
+  mono = false,
   containerClassName = "",
   className = "",
   id,
@@ -45,24 +70,23 @@ export function SsInput({
         .join(" ")}
     >
       {label && (
-        <label htmlFor={id} className="text-muted-foreground text-sm">
+        <label htmlFor={id} className={labelClass}>
           {label}
         </label>
       )}
       <input
         id={id}
-        className={[baseInputClass, sizeClass[size], className]
+        className={[
+          baseInputClass,
+          sizeClass[size],
+          mono ? "font-mono" : "",
+          className,
+        ]
           .filter(Boolean)
           .join(" ")}
         {...props}
       />
-      {(error || hint) && (
-        <p
-          className={`text-xs ${error ? "text-destructive" : "text-muted-foreground"}`}
-        >
-          {error ?? hint}
-        </p>
-      )}
+      <FieldNote error={error} hint={hint} />
     </div>
   );
 }
@@ -73,6 +97,7 @@ export function SsTextarea({
   error,
   fullWidth = true,
   size = "md",
+  mono = false,
   containerClassName = "",
   className = "",
   id,
@@ -85,24 +110,24 @@ export function SsTextarea({
         .join(" ")}
     >
       {label && (
-        <label htmlFor={id} className="text-muted-foreground text-sm">
+        <label htmlFor={id} className={labelClass}>
           {label}
         </label>
       )}
       <textarea
         id={id}
-        className={[baseInputClass, "resize-none", sizeClass[size], className]
+        className={[
+          baseInputClass,
+          "resize-none leading-relaxed",
+          sizeClass[size],
+          mono ? "font-mono" : "",
+          className,
+        ]
           .filter(Boolean)
           .join(" ")}
         {...props}
       />
-      {(error || hint) && (
-        <p
-          className={`text-xs ${error ? "text-destructive" : "text-muted-foreground"}`}
-        >
-          {error ?? hint}
-        </p>
-      )}
+      <FieldNote error={error} hint={hint} />
     </div>
   );
 }

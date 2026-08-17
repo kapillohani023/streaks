@@ -35,17 +35,20 @@ export function DeleteStreakDialog({
     <SsDialog
       open={open}
       onClose={onClose}
-      title="Delete streak?"
-      subtitle={streakName}
+      eyebrow="DESTRUCTIVE"
+      eyebrowTone="bad"
+      title={streakName ? `Delete ${streakName}?` : "Delete streak?"}
       disableClose={isDeleting}
+      maxWidthClassName="max-w-[400px]"
     >
-      <SsTypography variant="muted" className="mb-6">
-        This action cannot be undone.
+      <SsTypography variant="muted" className="mb-5">
+        This removes the streak and its full history. There is no undo.
       </SsTypography>
-      <div className="flex gap-3">
+      <div className="flex gap-2.5">
         <SsButton
           type="button"
-          variant="secondary"
+          variant="outline"
+          mono
           block
           disabled={isDeleting}
           onClick={onClose}
@@ -55,8 +58,9 @@ export function DeleteStreakDialog({
         <SsButton
           type="button"
           variant="danger"
+          mono
           block
-          disabled={isDeleting}
+          loading={isDeleting}
           onClick={onConfirmDelete}
         >
           Delete

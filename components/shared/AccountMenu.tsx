@@ -25,20 +25,20 @@ function Avatar({
   const letter = initial(name, email);
 
   return (
-    <span className="border-border bg-muted text-muted-foreground relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border text-sm font-semibold">
+    <span className="border-border-strong bg-hair text-soft relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border font-mono text-[11px] font-bold">
       {image ? (
         <Image
           src={image}
           alt=""
-          width={32}
-          height={32}
+          width={28}
+          height={28}
           className="h-full w-full object-cover"
           // Google serves these from lh3.googleusercontent.com; skipping the
           // optimizer keeps this working without a next.config remotePatterns entry.
           unoptimized
         />
       ) : (
-        (letter ?? <User size={16} />)
+        (letter ?? <User size={14} />)
       )}
     </span>
   );
@@ -58,15 +58,31 @@ export function AccountMenu() {
         trigger={
           <Avatar image={user?.image} name={user?.name} email={user?.email} />
         }
+        header={
+          user?.name || user?.email ? (
+            <>
+              {user?.name && (
+                <div className="text-foreground truncate text-[13px] font-semibold">
+                  {user.name}
+                </div>
+              )}
+              {user?.email && (
+                <div className="text-faint truncate font-mono text-[10px]">
+                  {user.email}
+                </div>
+              )}
+            </>
+          ) : undefined
+        }
         items={[
           {
             label: "Settings",
-            icon: <Settings size={16} />,
+            icon: <Settings size={14} />,
             onSelect: () => setSettingsOpen(true),
           },
           {
             label: "Sign out",
-            icon: <LogOut size={16} />,
+            icon: <LogOut size={14} />,
             danger: true,
             onSelect: () => void signOut(),
           },

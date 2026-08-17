@@ -1,8 +1,8 @@
 "use client";
-import { Streak } from "@/types/streak";
-import { Check } from "lucide-react";
 import { useState } from "react";
-import { isCompletedToday } from "@/lib/util";
+import { Check } from "lucide-react";
+import { Streak } from "@/types/streak";
+import { completedOffsets, currentRun, isDoneToday } from "@/lib/stats";
 import { createStreakEntry } from "@/app/actions/streak-entry";
 import { SsButton } from "@/components/ui/SsButton";
 import { SsTextarea } from "@/components/ui/SsInput";
@@ -47,36 +47,37 @@ export function EntrySubmissionDialog({
       <SsDialog
         open={isOpen}
         onClose={onClose}
-        title="Daily Note"
-        subtitle={streak.name}
+        eyebrow="CHECK-IN"
+        title={streak.name}
         disableClose={isSubmitting}
       >
         <form onSubmit={handleSubmit}>
-          <div className="mb-6">
+          <div className="mb-5">
             <SsTextarea
               id="daily-note"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               label="How did it go today?"
-              placeholder="Add your notes here..."
-              rows={6}
+              placeholder="Optional note…"
+              rows={5}
               autoFocus
               disabled={isSubmitting}
             />
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-2.5">
             <SsButton
               type="button"
               onClick={onClose}
-              variant="secondary"
+              variant="outline"
+              mono
               block
               disabled={isSubmitting}
             >
               Cancel
             </SsButton>
-            <SsButton type="submit" block disabled={isSubmitting}>
-              Save Note
+            <SsButton type="submit" mono block disabled={isSubmitting}>
+              Complete day
             </SsButton>
           </div>
         </form>
@@ -87,13 +88,27 @@ export function EntrySubmissionDialog({
 
 interface MarkAsCompletedProps {
   streak: Streak;
-  label: string;
 }
 
-export function MarkAsCompleted({ streak, label }: MarkAsCompletedProps) {
+/**
+ * One streak's check-in row: state, run length, and the single tap that closes
+ * the day.
+ *
+ * A completed card dims rather than disappearing — the point of the grid is
+ * seeing the whole day at once, and a list that shrinks as you work through it
+ * loses the "how much is left" reading it exists to give.
+ */
+export function MarkAsCompleted({ streak }: MarkAsCompletedProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const streakId = streak.id;
-  const isCompleted = isCompletedToday(streak);
+
+  const offsets = completedOffsets(streak);
+  const completed = isDoneToday(offsets);
+  const meta = [
+    `${currentRun(offsets)}D RUN`,
+    streak.reminderEnabled && streak.reminderTime ? streak.reminderTime : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <>
@@ -102,20 +117,43 @@ export function MarkAsCompleted({ streak, label }: MarkAsCompletedProps) {
         onClose={() => setIsDialogOpen(false)}
         streak={streak}
       />
-      <SsButton
-        key={streakId}
-        onClick={() => setIsDialogOpen(true)}
-        disabled={isCompleted}
-        variant={isCompleted ? "secondary" : "primary"}
-        className="whitespace-nowrap"
-        leftIcon={
-          isCompleted ? (
-            <Check size={16} className="ss-animate-scale-in text-success" />
-          ) : undefined
-        }
+
+      <div
+        className={`border-border bg-panel flex items-center justify-between gap-3 rounded-[10px] border px-4 py-3 transition-colors duration-150 ${
+          completed ? "opacity-65" : ""
+        }`}
       >
-        {label}
-      </SsButton>
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span
+            className={`h-[7px] w-[7px] shrink-0 rounded-full ${
+              completed ? "bg-ok" : "border-faint border"
+            }`}
+          />
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold" title={streak.name}>
+              {streak.name}
+            </div>
+            <div className="text-faint font-mono text-[10px]">{meta}</div>
+          </div>
+        </div>
+
+        {completed ? (
+          <span className="text-ok inline-flex shrink-0 items-center gap-1.5 font-mono text-[10px] font-bold tracking-[0.08em]">
+            <Check size={12} strokeWidth={3} className="ss-animate-scale-in" />
+            DONE
+          </span>
+        ) : (
+          <SsButton
+            mono
+            size="sm"
+            variant="outline"
+            onClick={() => setIsDialogOpen(true)}
+            className="hover:bg-foreground hover:text-background hover:border-foreground shrink-0 text-[color:var(--fg)]"
+          >
+            Mark
+          </SsButton>
+        )}
+      </div>
     </>
   );
 }

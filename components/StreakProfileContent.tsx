@@ -1,15 +1,25 @@
 "use client";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { Check } from "lucide-react";
 import { Streak } from "@/types/streak";
-import { StreakCalendar } from "@/components/streak-profile/StreakCalendar";
 import { StreakEntryHistory } from "@/components/streak-profile/StreakEntryHistory";
-import { calculateCurrentStreak, getCompletedDates } from "@/lib/util";
+import { StreakMilestones } from "@/components/streak-profile/StreakMilestones";
+import { ActivityHeatmap } from "@/components/shared/ActivityHeatmap";
 import { deleteStreak } from "@/app/actions/streak";
-import { SsCard } from "@/components/ui/SsCard";
-import { SsTypography } from "@/components/ui/SsTypography";
 import { PageHeader, PageShell } from "@/components/shared/PageShell";
 import { useStreakActions } from "@/components/streaks/StreakActions";
-import { StreakChips } from "@/components/streaks/StreakChips";
+import { ReminderTag } from "@/components/streaks/StreakStatusChip";
+import { MonoStat } from "@/components/ui/SsMono";
+import { SsButton } from "@/components/ui/SsButton";
+import {
+  completedOffsets,
+  consistency,
+  currentRun,
+  isDoneToday,
+  longestRun,
+  soloTotals,
+} from "@/lib/stats";
 
 interface StreakProfileContentProps {
   streak: Streak;
@@ -17,6 +27,7 @@ interface StreakProfileContentProps {
 
 export function StreakProfileContent({ streak }: StreakProfileContentProps) {
   const router = useRouter();
+
   const handleBack = () => {
     // Fall back to the list when the page was opened directly (no history to pop).
     if (window.history.length > 1) router.back();
@@ -26,7 +37,7 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
   const handleDelete = async (streakId: string) => {
     try {
       await deleteStreak(streakId);
-      router.push("/dashboard");
+      router.push("/streaks");
     } catch (e) {
       console.error("Failed to delete streak:", e);
     }
@@ -35,80 +46,74 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
   const { menu, dialogs, markComplete } = useStreakActions({
     streak,
     onDelete: handleDelete,
+    placement: "header",
   });
 
-  const completedDates = getCompletedDates(streak);
-
-  const completedDatesSet = new Set(completedDates.map((d) => d.getTime()));
-
-  const calculateLongestStreak = () => {
-    if (completedDatesSet.size === 0) return 0;
-    let maxStreak = 1;
-    let currentStreak = 1;
-    const sortedDates = [...completedDatesSet].sort();
-    for (let i = 1; i < sortedDates.length; i++) {
-      const diffTime = sortedDates[i] - sortedDates[i - 1];
-      const diffDays = diffTime / (1000 * 60 * 60 * 24);
-      if (diffDays === 1) {
-        currentStreak++;
-        maxStreak = Math.max(maxStreak, currentStreak);
-      } else {
-        currentStreak = 1;
-      }
-    }
-    return maxStreak;
-  };
-
-  const currentStreak = calculateCurrentStreak(completedDates);
-  const longestStreak = calculateLongestStreak();
-  const totalScore = completedDatesSet.size;
+  const stats = useMemo(() => {
+    const offsets = completedOffsets(streak);
+    return {
+      offsets,
+      current: currentRun(offsets),
+      longest: longestRun(offsets),
+      total: offsets.size,
+      consistency30: consistency(offsets, 30),
+      done: isDoneToday(offsets),
+      totals: soloTotals(offsets),
+    };
+  }, [streak]);
 
   return (
     <PageShell width="wide">
       <PageHeader
         onBack={handleBack}
         backLabel="Back to streaks"
+        eyebrow={`STREAK / ${streak.id.slice(0, 8).toUpperCase()}`}
         title={streak.name}
         subtitle={streak.description || undefined}
-        actions={menu}
+        align="start"
+        actions={
+          <>
+            {stats.done ? (
+              /* A finished day gets a static badge, not a disabled button —
+                 a greyed-out control invites a click that can't succeed. */
+              <span className="border-ok-soft text-ok inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border px-3.5 font-mono text-[11px] font-bold tracking-[0.08em] uppercase">
+                <Check size={12} strokeWidth={3} />
+                Done today
+              </span>
+            ) : (
+              <SsButton mono onClick={markComplete} className="shrink-0">
+                Mark today
+              </SsButton>
+            )}
+            {menu}
+          </>
+        }
       >
-        {/* Own row rather than trailing the title, so the chips share a left
-            edge with the name and description instead of shifting with it. */}
-        <StreakChips streak={streak} className="mt-2" />
+        {streak.reminderEnabled && streak.reminderTime && (
+          <ReminderTag time={streak.reminderTime} className="mt-2 self-start" />
+        )}
       </PageHeader>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <SsCard>
-          <SsTypography variant="muted" className="mb-1">
-            Current Streak
-          </SsTypography>
-          <SsTypography as="p" className="text-3xl">
-            {currentStreak}
-          </SsTypography>
-        </SsCard>
-        <SsCard>
-          <SsTypography variant="muted" className="mb-1">
-            Longest Streak
-          </SsTypography>
-          <SsTypography as="p" className="text-3xl">
-            {longestStreak}
-          </SsTypography>
-        </SsCard>
-        <SsCard>
-          <SsTypography variant="muted" className="mb-1">
-            Total Score
-          </SsTypography>
-          <SsTypography as="p" className="text-3xl">
-            {totalScore}
-          </SsTypography>
-        </SsCard>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3.5">
+        <MonoStat label="Current" value={stats.current} unit="days" />
+        <MonoStat label="Longest" value={stats.longest} unit="days" />
+        <MonoStat label="Total" value={stats.total} unit="days" />
+        <MonoStat
+          label="Consistency"
+          value={`${stats.consistency30}%`}
+          unit="/ 30d"
+        />
       </div>
 
-      {/* Calendar */}
-      <StreakCalendar completedDates={completedDates} />
+      <StreakMilestones run={stats.current} />
 
-      {/* Entry history — newest first */}
+      <ActivityHeatmap
+        label="ACTIVITY / 365 DAYS"
+        totals={stats.totals}
+        scale="binary"
+        legend
+      />
+
       <StreakEntryHistory entries={streak.entries} onAddEntry={markComplete} />
 
       {dialogs}

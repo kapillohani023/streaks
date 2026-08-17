@@ -1,172 +1,225 @@
 @import "tailwindcss";
 
+/*
+  Two palettes, one vocabulary.
+
+  Surfaces run from --bg (the page) up through --panel / --panel-2 (cards and
+  their raised inner rows) to --sunken (pressed/hover fills). Lines run from
+  --hair (structural, near-invisible) through --divider (inside a card) to
+  --border and --border-strong (deliberate edges). Text runs from --fg down
+  through --fg-soft, --soft, --dim, --faint to --mid, which is a shape colour
+  rather than a reading colour.
+
+  Each rung is a real step in both themes, so a component picks a rung once and
+  reads correctly in light and dark without per-theme overrides.
+*/
 :root {
-  --background: #fafafa;
-  --foreground: #18181b;
+  --bg: #fafafa;
+  --panel: #ffffff;
+  --panel-2: #f4f4f5;
+  --input-bg: #ffffff;
 
-  --card: #ffffff;
-  --card-foreground: #18181b;
-
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-
+  --hair: #e4e4e7;
+  --divider: #ececee;
+  --sunken: #e9e9ec;
   --border: #e4e4e7;
-  --input-border: #d4d4d8;
+  --border-strong: #d4d4d8;
 
-  --primary: #18181b;
-  --primary-foreground: #fafafa;
+  --mid: #c4c4c9;
+  --faint: #a1a1aa;
+  --dim: #71717a;
+  --soft: #52525b;
+  --heat-2: #8a8a93;
 
-  --secondary: #f4f4f5;
-  --secondary-foreground: #18181b;
+  --fg-soft: #27272a;
+  --fg: #18181b;
 
-  --success: #059669;
-  --destructive: #dc2626;
-  --destructive-foreground: #fafafa;
+  --ok: #059669;
+  --bad: #dc2626;
 
-  --ring: #18181b;
+  /* Glows are the foreground at low alpha, so "lit" reads as the same ink. */
+  --glow-35: rgba(24, 24, 27, 0.22);
+  --glow-30: rgba(24, 24, 27, 0.18);
+  --glow-25: rgba(24, 24, 27, 0.14);
+  --glow-20: rgba(24, 24, 27, 0.1);
+  --glow-0: rgba(24, 24, 27, 0);
+  --grid: rgba(24, 24, 27, 0.035);
 
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
+  --bad-soft: rgba(220, 38, 38, 0.08);
+  --ok-soft: rgba(5, 150, 105, 0.35);
 
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md:
-    0 4px 12px -2px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.04);
-  --shadow-lg:
-    0 12px 24px -6px rgb(0 0 0 / 0.12), 0 4px 8px -4px rgb(0 0 0 / 0.06);
+  --bg-blur: rgba(250, 250, 250, 0.85);
+  --panel-blur: rgba(255, 255, 255, 0.9);
+
+  --scrim: rgba(0, 0, 0, 0.45);
+  --shadow-menu: 0 16px 32px -8px rgb(0 0 0 / 0.14);
+  --shadow-dialog: 0 24px 48px -12px rgb(0 0 0 / 0.18);
+  --shadow-dock: 0 12px 32px -8px rgb(0 0 0 / 0.12);
+
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-
-  --color-border: var(--border);
-  --color-input-border: var(--input-border);
-
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-
-  --color-success: var(--success);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-
-  --color-ring: var(--ring);
-
-  --radius-sm: var(--radius-sm);
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
-  --radius-xl: var(--radius-xl);
-
-  --font-sans: var(--font-plus-jakarta-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/*
+  `.dark` / `.light` are stamped on <html> by the inline theme script before
+  paint; the media query only covers the "no explicit choice yet" case, which is
+  why it has to exclude both classes rather than just `.light`.
+*/
 @media (prefers-color-scheme: dark) {
   :root:not(.light):not(.dark) {
-    --background: #0a0a0b;
-    --foreground: #f4f4f5;
+    --bg: #09090b;
+    --panel: #101012;
+    --panel-2: #141417;
+    --input-bg: #0c0c0e;
 
-    --card: #18181b;
-    --card-foreground: #f4f4f5;
+    --hair: #18181c;
+    --divider: #1b1b1f;
+    --sunken: #1e1e22;
+    --border: #232329;
+    --border-strong: #313136;
 
-    --muted: #27272a;
-    --muted-foreground: #a1a1aa;
+    --mid: #3f3f46;
+    --faint: #52525b;
+    --dim: #71717a;
+    --soft: #a1a1aa;
+    --heat-2: #8a8a93;
 
-    --border: #27272a;
-    --input-border: #3f3f46;
+    --fg-soft: #e4e4e7;
+    --fg: #f4f4f5;
 
-    --primary: #f4f4f5;
-    --primary-foreground: #18181b;
+    --ok: #10b981;
+    --bad: #f87171;
 
-    --secondary: #27272a;
-    --secondary-foreground: #f4f4f5;
+    --glow-35: rgba(244, 244, 245, 0.35);
+    --glow-30: rgba(244, 244, 245, 0.3);
+    --glow-25: rgba(244, 244, 245, 0.25);
+    --glow-20: rgba(244, 244, 245, 0.2);
+    --glow-0: rgba(244, 244, 245, 0);
+    --grid: rgba(244, 244, 245, 0.025);
 
-    --success: #10b981;
-    --destructive: #f87171;
-    --destructive-foreground: #18181b;
+    --bad-soft: rgba(248, 113, 113, 0.1);
+    --ok-soft: rgba(16, 185, 129, 0.35);
 
-    --ring: #f4f4f5;
+    --bg-blur: rgba(9, 9, 11, 0.85);
+    --panel-blur: rgba(16, 16, 18, 0.9);
 
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow-md:
-      0 4px 12px -2px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-    --shadow-lg:
-      0 12px 24px -6px rgb(0 0 0 / 0.5), 0 4px 8px -4px rgb(0 0 0 / 0.35);
+    --scrim: rgba(0, 0, 0, 0.7);
+    --shadow-menu: 0 16px 32px -8px rgb(0 0 0 / 0.8);
+    --shadow-dialog: 0 24px 48px -12px rgb(0 0 0 / 0.8);
+    --shadow-dock: 0 12px 32px -8px rgb(0 0 0 / 0.7);
+
+    color-scheme: dark;
   }
 }
 
 :root.dark {
-  --background: #0a0a0b;
-  --foreground: #f4f4f5;
+  --bg: #09090b;
+  --panel: #101012;
+  --panel-2: #141417;
+  --input-bg: #0c0c0e;
 
-  --card: #1c1c1f;
-  --card-foreground: #f4f4f5;
+  --hair: #18181c;
+  --divider: #1b1b1f;
+  --sunken: #1e1e22;
+  --border: #232329;
+  --border-strong: #313136;
 
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
+  --mid: #3f3f46;
+  --faint: #52525b;
+  --dim: #71717a;
+  --soft: #a1a1aa;
+  --heat-2: #8a8a93;
 
-  --border: #313136;
-  --input-border: #3f3f46;
+  --fg-soft: #e4e4e7;
+  --fg: #f4f4f5;
 
-  --primary: #f4f4f5;
-  --primary-foreground: #18181b;
+  --ok: #10b981;
+  --bad: #f87171;
 
-  --secondary: #27272a;
-  --secondary-foreground: #f4f4f5;
+  --glow-35: rgba(244, 244, 245, 0.35);
+  --glow-30: rgba(244, 244, 245, 0.3);
+  --glow-25: rgba(244, 244, 245, 0.25);
+  --glow-20: rgba(244, 244, 245, 0.2);
+  --glow-0: rgba(244, 244, 245, 0);
+  --grid: rgba(244, 244, 245, 0.025);
 
-  --success: #10b981;
-  --destructive: #f87171;
-  --destructive-foreground: #18181b;
+  --bad-soft: rgba(248, 113, 113, 0.1);
+  --ok-soft: rgba(16, 185, 129, 0.35);
 
-  --ring: #f4f4f5;
+  --bg-blur: rgba(9, 9, 11, 0.85);
+  --panel-blur: rgba(16, 16, 18, 0.9);
 
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --shadow-md:
-    0 4px 12px -2px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-  --shadow-lg:
-    0 12px 24px -6px rgb(0 0 0 / 0.5), 0 4px 8px -4px rgb(0 0 0 / 0.35);
+  --scrim: rgba(0, 0, 0, 0.7);
+  --shadow-menu: 0 16px 32px -8px rgb(0 0 0 / 0.8);
+  --shadow-dialog: 0 24px 48px -12px rgb(0 0 0 / 0.8);
+  --shadow-dock: 0 12px 32px -8px rgb(0 0 0 / 0.7);
+
+  color-scheme: dark;
 }
 
-:root.light {
-  --background: #fafafa;
-  --foreground: #18181b;
+/*
+  Legacy semantic names, kept as aliases so surfaces that haven't been rebuilt
+  on the ladder above still land on the same colours as the ones that have.
+*/
+:root {
+  --background: var(--bg);
+  --foreground: var(--fg);
+  --card: var(--panel);
+  --card-foreground: var(--fg);
+  --muted: var(--sunken);
+  --muted-foreground: var(--dim);
+  --input-border: var(--border-strong);
+  --primary: var(--fg);
+  --primary-foreground: var(--bg);
+  --secondary: var(--panel-2);
+  --secondary-foreground: var(--fg);
+  --success: var(--ok);
+  --destructive: var(--bad);
+  --destructive-foreground: var(--bg);
+  --ring: var(--fg);
+}
 
-  --card: #ffffff;
-  --card-foreground: #18181b;
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-fg-soft: var(--fg-soft);
 
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-input-bg: var(--input-bg);
+  --color-sunken: var(--sunken);
 
-  --border: #e4e4e7;
-  --input-border: #d4d4d8;
+  --color-hair: var(--hair);
+  --color-divider: var(--divider);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
 
-  --primary: #18181b;
-  --primary-foreground: #fafafa;
+  --color-mid: var(--mid);
+  --color-faint: var(--faint);
+  --color-dim: var(--dim);
+  --color-soft: var(--soft);
+  --color-heat-2: var(--heat-2);
 
-  --secondary: #f4f4f5;
-  --secondary-foreground: #18181b;
+  --color-ok: var(--ok);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-ok-soft: var(--ok-soft);
 
-  --success: #059669;
-  --destructive: #dc2626;
-  --destructive-foreground: #fafafa;
+  --color-card: var(--panel);
+  --color-card-foreground: var(--fg);
+  --color-muted: var(--sunken);
+  --color-muted-foreground: var(--dim);
+  --color-input-border: var(--border-strong);
+  --color-primary: var(--fg);
+  --color-primary-foreground: var(--bg);
+  --color-secondary: var(--panel-2);
+  --color-secondary-foreground: var(--fg);
+  --color-success: var(--ok);
+  --color-destructive: var(--bad);
+  --color-destructive-foreground: var(--bg);
+  --color-ring: var(--fg);
 
-  --ring: #18181b;
-
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md:
-    0 4px 12px -2px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.04);
-  --shadow-lg:
-    0 12px 24px -6px rgb(0 0 0 / 0.12), 0 4px 8px -4px rgb(0 0 0 / 0.06);
+  --font-sans: var(--font-plus-jakarta-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 html,
@@ -177,12 +230,27 @@ body {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg);
+  color: var(--fg);
   font-family: var(--font-sans), Helvetica, Arial, sans-serif;
+  /* 15px: the mono labels sit at 10-11px, and 16px body left them looking
+     detached from the text they annotate. */
+  font-size: 15px;
+  line-height: 1.5;
   transition:
     background-color 200ms ease,
     color 200ms ease;
+}
+
+/*
+  Blueprint grid behind the whole app. Two hairline gradients rather than an
+  image so it re-tints with the theme and costs nothing to repaint.
+*/
+.ss-grid-bg {
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
 @keyframes ss-fade-in {
@@ -205,12 +273,79 @@ body {
   }
 }
 
+@keyframes ss-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ss-bar-up {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes ss-pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--glow-35);
+  }
+  50% {
+    box-shadow: 0 0 0 5px var(--glow-0);
+  }
+}
+
+@keyframes ss-ring-in {
+  from {
+    stroke-dashoffset: 289;
+  }
+}
+
+@keyframes ss-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
 .ss-animate-fade-in {
   animation: ss-fade-in 180ms ease-out;
 }
 
 .ss-animate-scale-in {
   animation: ss-scale-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ss-animate-page-in {
+  animation: ss-page-in 300ms ease-out;
+}
+
+.ss-animate-bar-up {
+  transform-origin: bottom;
+  animation: ss-bar-up 500ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.ss-animate-pulse-dot {
+  animation: ss-pulse-dot 2s infinite;
+}
+
+.ss-animate-ring-in {
+  animation: ss-ring-in 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ss-animate-bounce {
+  animation: ss-bounce 1s infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -237,17 +372,17 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--muted-foreground) 35%, transparent);
+  background: color-mix(in srgb, var(--faint) 55%, transparent);
   border-radius: 999px;
   transition: background-color 150ms ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in srgb, var(--muted-foreground) 65%, transparent);
+  background: color-mix(in srgb, var(--faint) 85%, transparent);
 }
 
 ::-webkit-scrollbar-thumb:active {
-  background: var(--muted-foreground);
+  background: var(--dim);
 }
 
 /* Kill the arrow/stepper buttons at both ends */
@@ -262,6 +397,5 @@ body {
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--muted-foreground) 35%, transparent)
-    transparent;
+  scrollbar-color: color-mix(in srgb, var(--faint) 55%, transparent) transparent;
 }

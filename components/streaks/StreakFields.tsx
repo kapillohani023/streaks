@@ -48,14 +48,14 @@ export function StreakFields({
   idPrefix = "streak",
 }: StreakFieldsProps) {
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-3.5">
       <SsInput
         id={`${idPrefix}-name`}
         type="text"
         value={name}
         onChange={(e) => onNameChange(e.target.value)}
-        label="Streak Name"
-        placeholder="e.g., Daily Exercise, Read Books..."
+        label="Name"
+        placeholder="e.g. Morning run"
         autoFocus={autoFocusName}
         disabled={disabled}
       />
@@ -64,13 +64,13 @@ export function StreakFields({
         id={`${idPrefix}-description`}
         value={description}
         onChange={(e) => onDescriptionChange(e.target.value)}
-        label="Description (optional)"
-        placeholder="Add a description..."
+        label="Description / optional"
+        placeholder="What counts as done?"
         rows={3}
         disabled={disabled}
       />
 
-      <div className="border-border border-t pt-5">
+      <div className="border-divider border-t pt-3.5">
         <ReminderFields
           enabled={reminderEnabled}
           time={reminderTime}

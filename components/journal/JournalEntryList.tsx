@@ -5,9 +5,11 @@ import { Trash2 } from "lucide-react";
 import { JournalEntry } from "@/types/journal-entry";
 import { deleteJournalEntry } from "@/app/actions/journal";
 import { SsMenu } from "@/components/ui/SsMenu";
+import { MonoLabel } from "@/components/ui/SsMono";
 import { SsTypography } from "@/components/ui/SsTypography";
 import { DeleteJournalEntryDialog } from "@/components/journal/DeleteJournalEntryDialog";
 import { JournalSearchBar } from "@/components/journal/JournalSearchBar";
+import { formatClock, formatMonthLabel } from "@/lib/util";
 
 interface JournalEntryListProps {
   entries: JournalEntry[];
@@ -21,9 +23,6 @@ const preview = (text: string) => {
     ? `${flat.slice(0, PREVIEW_LENGTH)}…`
     : flat;
 };
-
-const monthLabel = (date: Date) =>
-  date.toLocaleDateString(undefined, { month: "long", year: "numeric" });
 
 export function JournalEntryList({ entries }: JournalEntryListProps) {
   const [pendingDelete, setPendingDelete] = useState<JournalEntry | null>(null);
@@ -44,7 +43,7 @@ export function JournalEntryList({ entries }: JournalEntryListProps) {
   const months = useMemo(() => {
     const groups: Array<{ label: string; entries: JournalEntry[] }> = [];
     for (const entry of filtered) {
-      const label = monthLabel(entry.createdAt);
+      const label = formatMonthLabel(entry.createdAt);
       const current = groups[groups.length - 1];
       if (current?.label === label) current.entries.push(entry);
       else groups.push({ label, entries: [entry] });
@@ -54,7 +53,7 @@ export function JournalEntryList({ entries }: JournalEntryListProps) {
 
   if (entries.length === 0) {
     return (
-      <div className="border-border rounded-2xl border border-dashed px-6 py-10 text-center">
+      <div className="border-border rounded-xl border border-dashed px-6 py-10 text-center">
         <SsTypography variant="muted">
           No entries yet. Whatever you write above shows up here.
         </SsTypography>
@@ -66,21 +65,20 @@ export function JournalEntryList({ entries }: JournalEntryListProps) {
 
   return (
     <>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3.5">
         <div className="flex flex-col gap-2">
           <JournalSearchBar value={query} onChange={setQuery} />
           {isFiltering && (
-            <SsTypography variant="caption" className="px-1">
-              {filtered.length}{" "}
-              {filtered.length === 1 ? "entry matches" : "entries match"}{" "}
-              &ldquo;
+            <MonoLabel as="span" size="tile" className="px-1 tracking-[0.08em]">
+              {filtered.length} {filtered.length === 1 ? "MATCH" : "MATCHES"}{" "}
+              FOR &ldquo;
               {query.trim()}&rdquo;
-            </SsTypography>
+            </MonoLabel>
           )}
         </div>
 
         {filtered.length === 0 && (
-          <div className="border-border rounded-2xl border border-dashed px-6 py-10 text-center">
+          <div className="border-border rounded-xl border border-dashed px-6 py-10 text-center">
             <SsTypography variant="muted">
               No entries match your search.
             </SsTypography>
@@ -89,42 +87,35 @@ export function JournalEntryList({ entries }: JournalEntryListProps) {
 
         {months.map((month) => (
           <section key={month.label} className="flex flex-col gap-2">
-            <SsTypography
-              as="h3"
-              variant="label"
-              className="px-1 text-xs tracking-widest uppercase"
-            >
+            <MonoLabel as="h3" className="px-1 font-bold">
               {month.label}
-            </SsTypography>
+            </MonoLabel>
             {/* No overflow-hidden here: it would clip each row's actions menu. */}
-            <ul className="border-border bg-card rounded-2xl border">
+            <ul className="border-border bg-panel m-0 list-none rounded-xl border p-0">
               {month.entries.map((entry, index) => (
                 <li
                   key={entry.id}
                   className={[
-                    "hover:bg-muted/60 flex items-center gap-2 pr-2 transition-colors duration-150",
-                    index > 0 ? "border-border border-t" : "rounded-t-2xl",
-                    index === month.entries.length - 1 ? "rounded-b-2xl" : "",
+                    "hover:bg-panel-2 flex items-center gap-2 pr-2 transition-colors duration-150",
+                    index > 0 ? "border-divider border-t" : "rounded-t-xl",
+                    index === month.entries.length - 1 ? "rounded-b-xl" : "",
                   ]
                     .filter(Boolean)
                     .join(" ")}
                 >
                   <Link
                     href={`/journal/${entry.id}`}
-                    className="focus-visible:ring-ring flex min-w-0 flex-1 flex-col gap-1 rounded-l-2xl px-4 py-3 focus-visible:ring-2 focus-visible:outline-none"
+                    className="focus-visible:ring-ring flex min-w-0 flex-1 flex-col gap-0.5 rounded-l-xl px-4 py-3 focus-visible:ring-2 focus-visible:outline-none"
                   >
-                    <span className="flex items-baseline gap-2">
-                      <span className="text-card-foreground font-mono text-sm font-semibold tracking-tight">
+                    <span className="flex items-baseline gap-2.5">
+                      <span className="text-foreground font-mono text-xs font-bold">
                         {entry.title}
                       </span>
-                      <span className="text-muted-foreground text-xs">
-                        {entry.createdAt.toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                      <span className="text-faint font-mono text-[10px]">
+                        {formatClock(entry.createdAt)}
                       </span>
                     </span>
-                    <span className="text-muted-foreground truncate text-sm">
+                    <span className="text-dim truncate text-[13px]">
                       {preview(entry.entry)}
                     </span>
                   </Link>
@@ -133,7 +124,7 @@ export function JournalEntryList({ entries }: JournalEntryListProps) {
                     items={[
                       {
                         label: "Delete",
-                        icon: <Trash2 size={16} />,
+                        icon: <Trash2 size={14} />,
                         danger: true,
                         onSelect: () => setPendingDelete(entry),
                       },

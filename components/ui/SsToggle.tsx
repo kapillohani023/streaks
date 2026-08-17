@@ -9,6 +9,11 @@ interface SsToggleProps {
   id?: string;
 }
 
+/**
+ * Borderless track, foreground when on. The knob inverts with it — dark on a
+ * lit track, mid-grey on an unlit one — so the state is legible from the fill
+ * alone, without relying on knob position.
+ */
 export function SsToggle({
   checked,
   onChange,
@@ -26,18 +31,16 @@ export function SsToggle({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={[
-        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border transition-colors duration-200 ease-out",
+        "relative h-[22px] w-[38px] shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-out",
         "focus-visible:ring-ring focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        checked ? "border-primary bg-primary" : "border-border bg-muted",
+        checked ? "bg-foreground" : "bg-border-strong",
       ].join(" ")}
     >
       <span
         className={[
-          "inline-block h-4 w-4 rounded-full shadow-sm transition-transform duration-200 ease-out",
-          checked
-            ? "bg-primary-foreground translate-x-6"
-            : "bg-card translate-x-1",
+          "absolute top-[3px] h-4 w-4 rounded-full transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          checked ? "bg-background left-[19px]" : "bg-dim left-[3px]",
         ].join(" ")}
       />
     </button>

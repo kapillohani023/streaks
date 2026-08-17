@@ -5,6 +5,7 @@ import { Bell, BellOff } from "lucide-react";
 import { SsInput } from "@/components/ui/SsInput";
 import { SsToggle } from "@/components/ui/SsToggle";
 import { SsTypography } from "@/components/ui/SsTypography";
+import { MonoLabel } from "@/components/ui/SsMono";
 import {
   enablePushOnThisDevice,
   isPushBlocked,
@@ -76,17 +77,17 @@ export function ReminderFields({
   const isBusy = disabled || isSubscribing;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
         <span className="flex items-center gap-2">
           {enabled ? (
-            <Bell size={16} className="text-primary" />
+            <Bell size={14} className="text-foreground" />
           ) : (
-            <BellOff size={16} className="text-muted-foreground" />
+            <BellOff size={14} className="text-faint" />
           )}
-          <SsTypography as="span" className="text-sm font-medium">
+          <MonoLabel as="span" size="readout" tone="soft" className="uppercase">
             Daily reminder
-          </SsTypography>
+          </MonoLabel>
         </span>
         <SsToggle
           label="Daily reminder"
@@ -101,19 +102,20 @@ export function ReminderFields({
           id="reminder-time"
           type="time"
           label="Remind me at"
+          mono
           value={time}
           disabled={isBusy}
           onChange={(event) => onTimeChange(event.target.value)}
           hint={
             isPushGranted() && !notice
-              ? "Uses your device's timezone."
+              ? "Uses your device's timezone"
               : undefined
           }
         />
       )}
 
       {isSubscribing && (
-        <SsTypography variant="muted" className="text-xs">
+        <SsTypography variant="caption">
           Setting up notifications on this device...
         </SsTypography>
       )}
@@ -121,11 +123,7 @@ export function ReminderFields({
       {notice && (
         <SsTypography
           as="p"
-          className={`text-xs ${
-            notice.tone === "warning"
-              ? "text-destructive"
-              : "text-muted-foreground"
-          }`}
+          className={`text-xs ${notice.tone === "warning" ? "text-bad" : "text-dim"}`}
         >
           {notice.message}
         </SsTypography>

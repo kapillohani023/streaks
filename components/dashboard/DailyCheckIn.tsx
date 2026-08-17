@@ -1,30 +1,22 @@
 import { Streak } from "@/types/streak";
 import { MarkAsCompleted } from "@/components/streak-profile/MarkAsCompleted";
-import { SsTypography } from "@/components/ui/SsTypography";
+import { MonoLabel } from "@/components/ui/SsMono";
 
 interface DailyCheckInProps {
   streaks: Streak[];
 }
 
 export function DailyCheckIn({ streaks }: DailyCheckInProps) {
+  if (streaks.length === 0) return null;
+
   return (
-    <>
-      {streaks.length > 0 && (
-        <div>
-          <SsTypography as="h2" variant="label" className="mb-4">
-            DAILY CHECK-IN
-          </SsTypography>
-          <div className="flex flex-wrap gap-3 pb-2">
-            {streaks.map((streak) => {
-              return (
-                <div key={streak.id}>
-                  <MarkAsCompleted streak={streak} label={streak.name} />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </>
+    <div className="flex flex-col gap-2.5">
+      <MonoLabel as="h2">DAILY CHECK-IN</MonoLabel>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-2.5">
+        {streaks.map((streak) => (
+          <MarkAsCompleted key={streak.id} streak={streak} />
+        ))}
+      </div>
+    </div>
   );
 }

@@ -76,7 +76,7 @@ export function SsGrowTextarea({
       }}
       value={value}
       className={[
-        "border-input-border bg-card text-card-foreground placeholder:text-muted-foreground focus:ring-ring w-full rounded-xl border px-4 py-3 text-base leading-relaxed transition-colors duration-200 focus:border-transparent focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60",
+        "border-border bg-input-bg text-foreground placeholder:text-faint focus:border-foreground w-full rounded-lg border px-3.5 py-3 text-sm leading-relaxed transition-colors duration-150 outline-none disabled:cursor-not-allowed disabled:opacity-60",
         resizable ? "resize-y" : "resize-none",
         className,
       ]

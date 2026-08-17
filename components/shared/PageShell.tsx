@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 import { SsButton } from "@/components/ui/SsButton";
+import { MonoLabel } from "@/components/ui/SsMono";
 import { SsTypography } from "@/components/ui/SsTypography";
 
 /**
@@ -9,8 +10,8 @@ import { SsTypography } from "@/components/ui/SsTypography";
  * outside this pair makes the content edge jump when you switch tabs.
  */
 export const PAGE_WIDTH = {
-  narrow: "max-w-3xl",
-  wide: "max-w-5xl",
+  narrow: "max-w-[760px]",
+  wide: "max-w-[1080px]",
 } as const;
 
 export type PageWidth = keyof typeof PAGE_WIDTH;
@@ -36,14 +37,14 @@ export interface PageShellProps {
  */
 export function PageShell({
   width = "wide",
-  layoutClassName = "flex flex-col gap-6",
+  layoutClassName = "flex flex-col gap-5",
   children,
 }: PageShellProps) {
   return (
-    <div className="bg-background text-foreground h-full min-h-0 w-full overflow-y-auto overscroll-contain">
+    <div className="text-foreground h-full min-h-0 w-full overflow-y-auto overscroll-contain">
       <div
         className={[
-          "mx-auto w-full px-4 pt-4 pb-10",
+          "ss-animate-page-in mx-auto w-full px-5 pt-6 pb-12",
           PAGE_WIDTH[width],
           layoutClassName,
         ]
@@ -57,14 +58,29 @@ export function PageShell({
 }
 
 export interface PageHeaderProps {
+  /**
+   * Mono kicker above the title. Every screen names its own region — OVERVIEW,
+   * REGISTRY, LOGBOOK, COPILOT — which is what makes the tabs feel like parts
+   * of one instrument rather than four separate apps.
+   */
+  eyebrow?: string;
   title: string;
   subtitle?: ReactNode;
-  /** Leading glyph, shown in a muted circle. Ignored when `onBack` is set. */
-  icon?: ReactNode;
-  /** Swaps the icon for a back button — the detail-page variant of the header. */
+  /** Swaps in a back button ahead of the title — the detail-page variant. */
   onBack?: () => void;
   backLabel?: string;
   actions?: ReactNode;
+  /** Trailing readout, e.g. "DAY 229 / 365". */
+  meta?: ReactNode;
+  /**
+   * Where the trailing group sits against a multi-line title block.
+   *
+   * `end` (the default) hangs a primary button off the title's baseline, which
+   * is what a one-line header wants. `start` lifts it level with the eyebrow —
+   * the right answer once a description pushes the block to three lines and a
+   * bottom-aligned button would float away from the heading it belongs to.
+   */
+  align?: "start" | "end";
   titleClassName?: string;
   className?: string;
   /** Extra rows under the subtitle, kept inside the title column so they share its left edge. */
@@ -72,52 +88,65 @@ export interface PageHeaderProps {
 }
 
 export function PageHeader({
+  eyebrow,
   title,
   subtitle,
-  icon,
   onBack,
   backLabel = "Go back",
   actions,
+  meta,
+  align = "end",
   titleClassName = "",
   className = "",
   children,
 }: PageHeaderProps) {
   return (
     <header
-      className={["flex items-start gap-3", className]
+      className={[
+        "flex flex-wrap justify-between gap-x-3 gap-y-2",
+        align === "start" ? "items-start" : "items-end",
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
     >
-      {onBack ? (
-        <SsButton
-          onClick={onBack}
-          variant="ghost"
-          size="icon"
-          aria-label={backLabel}
-          className="text-muted-foreground hover:text-foreground shrink-0 rounded-full"
-        >
-          <ArrowLeft size={20} />
-        </SsButton>
-      ) : icon ? (
-        <div className="bg-muted text-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
-          {icon}
-        </div>
-      ) : null}
-
-      <div className="flex min-w-0 flex-1 flex-col">
-        <SsTypography as="h1" variant="h3" className={titleClassName}>
-          {title}
-        </SsTypography>
-        {subtitle && (
-          <SsTypography as="p" variant="caption">
-            {subtitle}
-          </SsTypography>
+      <div className="flex min-w-0 flex-1 items-start gap-3.5">
+        {/*
+          Flush to the top of the header, with no nudge of its own — the
+          trailing actions sit at the container top too, and any offset here
+          alone would leave the two ends of the same row out of line.
+        */}
+        {onBack && (
+          <SsButton
+            onClick={onBack}
+            variant="icon"
+            size="icon"
+            aria-label={backLabel}
+            className="shrink-0"
+          >
+            <ArrowLeft size={18} />
+          </SsButton>
         )}
-        {children}
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          {eyebrow && <MonoLabel className="mb-1">{eyebrow}</MonoLabel>}
+          <SsTypography as="h1" variant="h2" className={titleClassName}>
+            {title}
+          </SsTypography>
+          {subtitle && (
+            <SsTypography as="p" variant="muted" className="mt-0.5">
+              {subtitle}
+            </SsTypography>
+          )}
+          {children}
+        </div>
       </div>
 
-      {actions && (
-        <div className="flex shrink-0 items-center gap-1">{actions}</div>
+      {(actions || meta) && (
+        <div className="flex shrink-0 items-center gap-2.5">
+          {meta}
+          {actions}
+        </div>
       )}
     </header>
   );

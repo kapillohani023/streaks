@@ -12,6 +12,12 @@ interface UseStreakActionsOptions {
   streak: Streak;
   /** Called after the delete is confirmed — callers differ on where to go next. */
   onDelete: (streakId: string) => Promise<void> | void;
+  /**
+   * How the trigger should sit. In a list row it disappears until hovered;
+   * standing alone in a page header it needs the same panel-and-border as the
+   * back button it lines up with.
+   */
+  placement?: "row" | "header";
 }
 
 export interface StreakActions {
@@ -36,6 +42,7 @@ export interface StreakActions {
 export function useStreakActions({
   streak,
   onDelete,
+  placement = "row",
 }: UseStreakActionsOptions): StreakActions {
   const [isEntryDialogOpen, setIsEntryDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -46,21 +53,23 @@ export function useStreakActions({
   const menu = (
     <SsMenu
       label={`Actions for ${streak.name}`}
+      triggerVariant={placement === "header" ? "icon" : "ghost"}
+      triggerSize={placement === "header" ? "icon" : "icon-sm"}
       items={[
         {
           label: completedToday ? "Completed today" : "Mark complete",
-          icon: <Check size={16} />,
+          icon: <Check size={14} />,
           disabled: completedToday,
           onSelect: () => setIsEntryDialogOpen(true),
         },
         {
           label: "Edit",
-          icon: <Pencil size={16} />,
+          icon: <Pencil size={14} />,
           onSelect: () => setIsEditDialogOpen(true),
         },
         {
           label: "Delete",
-          icon: <Trash2 size={16} />,
+          icon: <Trash2 size={14} />,
           danger: true,
           onSelect: () => setIsDeleteDialogOpen(true),
         },

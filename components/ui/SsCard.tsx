@@ -7,29 +7,36 @@ export interface SsCardProps extends HTMLAttributes<HTMLDivElement> {
   padding?: "none" | "sm" | "md" | "lg";
 }
 
+/*
+  Panels are defined by their edge, not by a shadow. Everything sits on the same
+  plane as the grid behind it, so depth comes from the border stepping up
+  (--border → --border-strong) and from the fill stepping up (--panel →
+  --panel-2). `elevated` is reserved for things that genuinely float — dialogs.
+*/
+const variantClass: Record<CardVariant, string> = {
+  default: "border-border bg-panel border",
+  subtle: "border-divider bg-panel border",
+  elevated:
+    "border-border-strong bg-panel border shadow-[var(--shadow-dialog)]",
+};
+
+const paddingClass: Record<NonNullable<SsCardProps["padding"]>, string> = {
+  none: "",
+  sm: "p-3",
+  md: "p-4",
+  lg: "p-5",
+};
+
 export function SsCard({
   variant = "default",
   padding = "md",
   className = "",
   ...props
 }: SsCardProps) {
-  const variantClass: Record<CardVariant, string> = {
-    default: "border border-border bg-card text-card-foreground shadow-sm",
-    subtle: "border border-border/60 bg-card text-card-foreground",
-    elevated: "border border-border bg-card text-card-foreground shadow-md",
-  };
-
-  const paddingClass: Record<NonNullable<SsCardProps["padding"]>, string> = {
-    none: "",
-    sm: "p-3",
-    md: "p-4",
-    lg: "p-6",
-  };
-
   return (
     <div
       className={[
-        "rounded-2xl transition-shadow duration-200",
+        "text-foreground rounded-xl",
         variantClass[variant],
         paddingClass[padding],
         className,
@@ -57,7 +64,7 @@ export function SsCardTitle({
 }: HTMLAttributes<HTMLHeadingElement> & { children: ReactNode }) {
   return (
     <h3
-      className={["text-card-foreground text-xl font-semibold", className]
+      className={["text-foreground text-[19px] font-bold", className]
         .filter(Boolean)
         .join(" ")}
       {...props}
@@ -73,9 +80,7 @@ export function SsCardDescription({
 }: HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={["text-muted-foreground text-sm", className]
-        .filter(Boolean)
-        .join(" ")}
+      className={["text-dim text-[13px]", className].filter(Boolean).join(" ")}
       {...props}
     />
   );

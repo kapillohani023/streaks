@@ -1,16 +1,15 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { JournalEntry } from "@/types/journal-entry";
 import { deleteJournalEntry } from "@/app/actions/journal";
-import { SsButton } from "@/components/ui/SsButton";
-import { SsCard } from "@/components/ui/SsCard";
 import { SsMenu } from "@/components/ui/SsMenu";
-import { SsTypography } from "@/components/ui/SsTypography";
+import { MonoLabel } from "@/components/ui/SsMono";
 import { PageHeader, PageShell } from "@/components/shared/PageShell";
 import { DeleteJournalEntryDialog } from "@/components/journal/DeleteJournalEntryDialog";
-import { countWords } from "@/lib/util";
+import { JournalEntryNav } from "@/components/journal/JournalEntryNav";
+import { countWords, formatClock, formatWeekday } from "@/lib/util";
 
 interface JournalEntryViewProps {
   entry: JournalEntry;
@@ -63,66 +62,58 @@ export function JournalEntryView({
 
   return (
     <PageShell width="narrow">
+      {/*
+        The title is the date, so the meta line underneath deliberately does not
+        repeat it — weekday, clock and length are the facts it doesn't already
+        state. Only the kebab rides in the header, matching the streak detail
+        page; stepping between entries lives at the foot, where it can be
+        labelled with the dates it actually goes to.
+      */}
       <PageHeader
         onBack={() => router.push("/journal")}
         backLabel="Back to journal"
+        eyebrow="LOGBOOK / ENTRY"
         title={entry.title}
+        align="start"
         titleClassName="font-mono tracking-tight"
-        subtitle={`${entry.createdAt.toLocaleString([], {
-          dateStyle: "medium",
-          timeStyle: "short",
-        })} · ${words} ${words === 1 ? "word" : "words"}`}
+        subtitle={
+          <MonoLabel as="span" size="tile" className="tracking-[0.08em]">
+            {formatWeekday(entry.createdAt)} · {formatClock(entry.createdAt)} ·{" "}
+            {words} {words === 1 ? "WORD" : "WORDS"}
+          </MonoLabel>
+        }
         actions={
-          <>
-            <SsButton
-              variant="ghost"
-              size="icon"
-              onClick={() => goTo(newer)}
-              disabled={!newer}
-              aria-label={
-                newer ? `Newer entry: ${newer.title}` : "No newer entry"
-              }
-              title={newer?.title}
-              className="text-muted-foreground hover:text-foreground rounded-full"
-            >
-              <ChevronLeft size={20} />
-            </SsButton>
-            <SsButton
-              variant="ghost"
-              size="icon"
-              onClick={() => goTo(older)}
-              disabled={!older}
-              aria-label={
-                older ? `Older entry: ${older.title}` : "No older entry"
-              }
-              title={older?.title}
-              className="text-muted-foreground hover:text-foreground rounded-full"
-            >
-              <ChevronRight size={20} />
-            </SsButton>
-            <SsMenu
-              label={`Actions for ${entry.title}`}
-              items={[
-                {
-                  label: "Delete",
-                  icon: <Trash2 size={16} />,
-                  danger: true,
-                  onSelect: () => setDeleteOpen(true),
-                },
-              ]}
-            />
-          </>
+          <SsMenu
+            label={`Actions for ${entry.title}`}
+            triggerVariant="icon"
+            triggerSize="icon"
+            items={[
+              {
+                label: "Delete",
+                icon: <Trash2 size={14} />,
+                danger: true,
+                onSelect: () => setDeleteOpen(true),
+              },
+            ]}
+          />
         }
       />
 
-      <SsCard variant="default" padding="lg">
-        <SsTypography
-          variant="body"
-          className="leading-relaxed whitespace-pre-wrap"
-        >
+      <article className="border-border bg-panel overflow-hidden rounded-xl border">
+        <div className="border-divider border-b px-6 py-3">
+          <MonoLabel as="h2">ENTRY</MonoLabel>
+        </div>
+        {/*
+          16px on a 1.75 rhythm — a step up from the 15px used everywhere else
+          in the app. This is the one surface in Streaks meant to be *read*
+          rather than scanned, and it gets reading type to say so.
+        */}
+        <p className="text-fg-soft m-0 px-6 py-6 text-base leading-[1.75] whitespace-pre-wrap">
           {entry.entry}
-        </SsTypography>
-      </SsCard>
+        </p>
+      </article>
+
+      <JournalEntryNav newer={newer} older={older} onNavigate={goTo} />
 
       <DeleteJournalEntryDialog
         open={deleteOpen}

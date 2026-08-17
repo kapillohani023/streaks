@@ -30,30 +30,30 @@ function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim()) {
-      setIsSubmitting(true);
+    if (!name.trim()) return;
 
-      const formData = new FormData();
-      formData.set("name", name.trim());
-      formData.set("description", description.trim());
-      formData.set("startDate", new Date().toISOString());
-      // A denied notification permission must never block creating the streak:
-      // the preference is saved either way and the warning already showed
-      // inline while they were toggling.
-      if (reminderEnabled && reminderTime) {
-        formData.set("reminderTime", reminderTime);
-      }
+    setIsSubmitting(true);
 
-      await addStreak(formData);
-
-      setName("");
-      setDescription("");
-      setReminderEnabled(false);
-      setReminderTime(DEFAULT_REMINDER_TIME);
-      setReminderNotice(null);
-      setIsSubmitting(false);
-      onClose();
+    const formData = new FormData();
+    formData.set("name", name.trim());
+    formData.set("description", description.trim());
+    formData.set("startDate", new Date().toISOString());
+    // A denied notification permission must never block creating the streak:
+    // the preference is saved either way and the warning already showed
+    // inline while they were toggling.
+    if (reminderEnabled && reminderTime) {
+      formData.set("reminderTime", reminderTime);
     }
+
+    await addStreak(formData);
+
+    setName("");
+    setDescription("");
+    setReminderEnabled(false);
+    setReminderTime(DEFAULT_REMINDER_TIME);
+    setReminderNotice(null);
+    setIsSubmitting(false);
+    onClose();
   };
 
   return (
@@ -62,11 +62,12 @@ function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
       <SsDialog
         open={isOpen}
         onClose={onClose}
-        title="Create New Streak"
+        eyebrow="REGISTRY / NEW"
+        title="Create Streak"
         disableClose={isSubmitting}
       >
         <form onSubmit={handleSubmit}>
-          <div className="mb-6">
+          <div className="mb-5">
             <StreakFields
               name={name}
               description={description}
@@ -84,11 +85,12 @@ function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
             />
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-2.5">
             <SsButton
               type="button"
               onClick={onClose}
-              variant="secondary"
+              variant="outline"
+              mono
               block
               disabled={isSubmitting}
             >
@@ -96,10 +98,11 @@ function CreateStreakDialog({ isOpen, onClose }: CreateStreakDialogProps) {
             </SsButton>
             <SsButton
               type="submit"
+              mono
               block
               disabled={!name.trim() || isSubmitting}
             >
-              Create Streak
+              Create
             </SsButton>
           </div>
         </form>
@@ -113,14 +116,11 @@ export function AddNewStreak() {
   return (
     <>
       <SsButton
+        mono
         onClick={() => setIsDialogOpen(true)}
-        size="icon"
-        variant="ghost"
-        aria-label="New streak"
-        title="New streak"
-        className="rounded-full"
+        leftIcon={<Plus size={14} strokeWidth={2.5} />}
       >
-        <Plus size={20} />
+        New streak
       </SsButton>
       <CreateStreakDialog
         isOpen={isDialogOpen}

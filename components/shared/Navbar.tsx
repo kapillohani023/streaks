@@ -10,12 +10,32 @@ enum NavbarLabel {
 }
 
 const NAV_ITEMS = [
-  { label: NavbarLabel.Dashboard, icon: LayoutDashboard, name: "Dashboard" },
-  { label: NavbarLabel.Streaks, icon: ListChecks, name: "Streaks" },
-  { label: NavbarLabel.AI, icon: Sparkles, name: "AI" },
-  { label: NavbarLabel.Journal, icon: Notebook, name: "Journal" },
+  {
+    href: NavbarLabel.Dashboard,
+    icon: LayoutDashboard,
+    name: "Dashboard",
+    short: "DASHBOARD",
+  },
+  {
+    href: NavbarLabel.Streaks,
+    icon: ListChecks,
+    name: "Streaks",
+    short: "STREAKS",
+  },
+  { href: NavbarLabel.AI, icon: Sparkles, name: "AI", short: "ASSISTANT" },
+  {
+    href: NavbarLabel.Journal,
+    icon: Notebook,
+    name: "Journal",
+    short: "JOURNAL",
+  },
 ];
 
+/**
+ * The dock. Labelled rather than icon-only: four glyphs that all mean
+ * "progress" are hard to tell apart at 17px, and the mono caption doubles as
+ * the app's typographic signature at the bottom of every screen.
+ */
 export function Navbar() {
   const path = usePathname() ?? "";
   const router = useRouter();
@@ -24,33 +44,28 @@ export function Navbar() {
   }
 
   return (
-    <div className="flex justify-center px-4 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))]">
-      <div className="border-border bg-card flex items-center gap-1 rounded-full border px-2 py-2 shadow-lg">
-        {NAV_ITEMS.map(({ label, icon: Icon, name }) => {
-          const isActive = path.startsWith(label);
+    <div className="flex justify-center px-4 pt-2.5 pb-[max(1.125rem,env(safe-area-inset-bottom))]">
+      <div className="border-border flex items-center gap-0.5 rounded-xl border bg-[var(--panel-blur)] p-1 shadow-[var(--shadow-dock)] backdrop-blur-xl">
+        {NAV_ITEMS.map(({ href, icon: Icon, name, short }) => {
+          const isActive = path.startsWith(href);
           return (
             <button
-              key={label}
+              key={href}
               type="button"
               aria-label={name}
               aria-current={isActive ? "page" : undefined}
-              onClick={() => router.push(label)}
-              style={
-                isActive
-                  ? {
-                      backgroundColor: "var(--primary)",
-                      color: "var(--primary-foreground)",
-                    }
-                  : undefined
-              }
+              onClick={() => router.push(href)}
               className={[
-                "flex h-12 w-16 cursor-pointer items-center justify-center rounded-full transition-all duration-200 ease-out active:scale-95",
+                "flex h-13 w-19 cursor-pointer flex-col items-center justify-center gap-[3px] rounded-[9px] transition-all duration-200 ease-out active:scale-95",
                 isActive
-                  ? "shadow-sm"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  ? "bg-foreground text-background shadow-[0_0_18px_var(--glow-25)]"
+                  : "text-dim hover:bg-sunken hover:text-foreground",
               ].join(" ")}
             >
-              <Icon size={24} />
+              <Icon size={17} />
+              <span className="font-mono text-[9px] font-bold tracking-[0.12em]">
+                {short}
+              </span>
             </button>
           );
         })}

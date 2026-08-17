@@ -31,13 +31,16 @@ export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
     <SsDialog
       open={open}
       onClose={onClose}
+      eyebrow="ACCOUNT"
       title="Settings"
+      divided
+      showCloseButton
       disableClose={busy}
       closeOnBackdrop={!busy}
       contentClassName="p-0"
     >
       <SnoozeSetting disabled={busy} />
-      <div className="border-border border-t">
+      <div className="border-divider border-t">
         <DeleteAccountSetting busy={busy} onBusyChange={setBusy} />
       </div>
     </SsDialog>
@@ -83,20 +86,20 @@ function SnoozeSetting({ disabled }: { disabled: boolean }) {
   };
 
   return (
-    <div className="p-6">
+    <div className="px-6 py-5">
       <div className="flex items-start justify-between gap-4">
-        <span className="flex items-start gap-2">
+        <span className="flex items-start gap-2.5">
           <BellOff
-            size={16}
+            size={15}
             className={`mt-0.5 shrink-0 ${
-              snoozed ? "text-primary" : "text-muted-foreground"
+              snoozed ? "text-foreground" : "text-faint"
             }`}
           />
-          <span className="flex flex-col gap-1">
-            <SsTypography as="span" className="text-sm font-medium">
+          <span className="flex flex-col gap-0.5">
+            <SsTypography as="span" className="text-sm font-semibold">
               Snooze all reminders
             </SsTypography>
-            <SsTypography variant="caption">
+            <SsTypography variant="muted" className="text-xs">
               Mutes every streak reminder without changing their individual
               settings.
             </SsTypography>
@@ -110,7 +113,7 @@ function SnoozeSetting({ disabled }: { disabled: boolean }) {
         />
       </div>
       {error && (
-        <SsTypography variant="caption" className="text-destructive mt-2 block">
+        <SsTypography variant="caption" className="text-bad mt-2 block">
           {error}
         </SsTypography>
       )}
@@ -152,12 +155,12 @@ function DeleteAccountSetting({
   };
 
   return (
-    <div className="flex flex-col gap-3 p-6">
-      <div className="flex flex-col gap-1">
-        <SsTypography as="span" className="text-sm font-medium">
+    <div className="flex flex-col gap-3 px-6 py-5">
+      <div className="flex flex-col gap-0.5">
+        <SsTypography as="span" className="text-sm font-semibold">
           Delete my account
         </SsTypography>
-        <SsTypography variant="caption">
+        <SsTypography variant="muted" className="text-xs">
           Permanently deletes your account and everything in it — streaks,
           check-ins, and journal entries. This cannot be undone.
         </SsTypography>
@@ -166,6 +169,7 @@ function DeleteAccountSetting({
       <SsInput
         id="settings-delete-confirm"
         size="sm"
+        mono
         value={value}
         disabled={busy}
         autoComplete="off"
@@ -175,14 +179,15 @@ function DeleteAccountSetting({
           setValue(event.target.value);
           setError(null);
         }}
-        hint={`Type "${DELETE_CONFIRMATION}" to enable this button.`}
+        hint={`Type "${DELETE_CONFIRMATION}" to enable this button`}
         error={error ?? undefined}
       />
 
       <SsButton
         type="button"
         variant="danger"
-        size="sm"
+        mono
+        size="md"
         block
         loading={running}
         disabled={!matches || busy}

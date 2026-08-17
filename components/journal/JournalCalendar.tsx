@@ -1,12 +1,11 @@
 "use client";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { JournalDay } from "@/types/journal-entry";
 import { SsButton } from "@/components/ui/SsButton";
-import { SsCard } from "@/components/ui/SsCard";
-import { SsTypography } from "@/components/ui/SsTypography";
-import { toDateKey } from "@/lib/util";
+import { MonoLabel } from "@/components/ui/SsMono";
+import { formatMonthLabel, toDateKey } from "@/lib/util";
 
 interface JournalCalendarProps {
   days: JournalDay[];
@@ -65,53 +64,50 @@ export function JournalCalendar({ days }: JournalCalendarProps) {
     (date) => date && entriesByDay.has(toDateKey(date))
   ).length;
 
+  const monthLabel = formatMonthLabel(month);
+
   return (
-    <SsCard padding="md" variant="elevated" className="flex flex-col gap-3">
+    <div className="border-border bg-panel flex flex-col gap-2.5 rounded-xl border p-4">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2">
-          <CalendarDays size={16} className="text-muted-foreground shrink-0" />
-          <SsTypography as="h2" variant="label" className="truncate">
-            {month.toLocaleDateString(undefined, {
-              month: "long",
-              year: "numeric",
-            })}
-          </SsTypography>
-        </div>
-        <div className="flex items-center gap-0.5">
+        <MonoLabel as="h2" size="tile" className="truncate">
+          {monthLabel}
+        </MonoLabel>
+        <div className="flex gap-0.5">
           <SsButton
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
+            variant="outline"
+            size="icon-sm"
+            className="border-border h-6.5 w-6.5"
             onClick={() => setMonth((current) => shiftMonth(current, -1))}
             aria-label="Previous month"
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={13} />
           </SsButton>
           <SsButton
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
+            variant="outline"
+            size="icon-sm"
+            className="border-border h-6.5 w-6.5"
             onClick={() => setMonth((current) => shiftMonth(current, 1))}
             aria-label="Next month"
           >
-            <ChevronRight size={16} />
+            <ChevronRight size={13} />
           </SsButton>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-[3px]">
         {WEEKDAYS.map((label, index) => (
           <div
             key={`${label}-${index}`}
             aria-hidden
-            className="text-muted-foreground pb-1 text-center text-[11px] font-medium"
+            className="text-faint pb-0.5 text-center font-mono text-[9px]"
           >
             {label}
           </div>
         ))}
 
         {cells.map((date, index) => {
-          if (!date) return <div key={`pad-${index}`} />;
+          if (!date)
+            return <div key={`pad-${index}`} className="aspect-square" />;
 
           const key = toDateKey(date);
           const entry = entriesByDay.get(key);
@@ -119,7 +115,7 @@ export function JournalCalendar({ days }: JournalCalendarProps) {
           const isFuture = date > today && !isToday;
 
           const base =
-            "flex aspect-square min-h-9 w-full items-center justify-center rounded-lg text-sm transition-colors duration-150";
+            "flex aspect-square items-center justify-center rounded-md font-mono text-[11px] transition-colors duration-150";
 
           if (!entry) {
             return (
@@ -127,11 +123,14 @@ export function JournalCalendar({ days }: JournalCalendarProps) {
                 key={key}
                 className={[
                   base,
+                  // An inset ring rather than an outline: today has to be
+                  // marked without changing the cell's footprint, or the whole
+                  // grid shifts by a pixel on the current day.
                   isToday
-                    ? "ring-ring text-foreground font-semibold ring-2"
+                    ? "text-foreground font-bold shadow-[inset_0_0_0_1px_var(--fg)]"
                     : isFuture
-                      ? "text-muted-foreground/40"
-                      : "text-muted-foreground",
+                      ? "text-mid"
+                      : "text-dim",
                 ].join(" ")}
               >
                 {date.getDate()}
@@ -147,13 +146,8 @@ export function JournalCalendar({ days }: JournalCalendarProps) {
               aria-label={`Journal entry for ${entry.title}`}
               className={[
                 base,
-                "bg-primary text-primary-foreground focus-visible:ring-ring cursor-pointer font-semibold hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none active:scale-95",
-                isToday
-                  ? "ring-ring ring-offset-background ring-2 ring-offset-2"
-                  : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
+                "bg-foreground text-background focus-visible:ring-ring cursor-pointer font-bold hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none active:scale-95",
+              ].join(" ")}
             >
               {date.getDate()}
             </button>
@@ -161,21 +155,21 @@ export function JournalCalendar({ days }: JournalCalendarProps) {
         })}
       </div>
 
-      <div className="border-border flex items-center justify-between gap-2 border-t pt-3">
-        <SsTypography variant="caption">
-          {journaledThisMonth} {journaledThisMonth === 1 ? "day" : "days"}{" "}
-          journaled
-        </SsTypography>
+      <div className="border-divider flex items-center justify-between gap-2 border-t pt-2.5">
+        <MonoLabel as="span" size="tile" className="tracking-[0.08em]">
+          {journaledThisMonth} {journaledThisMonth === 1 ? "DAY" : "DAYS"}{" "}
+          JOURNALED
+        </MonoLabel>
         {!isCurrentMonth && (
           <button
             type="button"
             onClick={() => setMonth(startOfMonth(today))}
-            className="text-foreground cursor-pointer text-xs font-medium underline underline-offset-2"
+            className="text-foreground cursor-pointer font-mono text-[10px] underline underline-offset-2"
           >
-            Back to today
+            TODAY
           </button>
         )}
       </div>
-    </SsCard>
+    </div>
   );
 }

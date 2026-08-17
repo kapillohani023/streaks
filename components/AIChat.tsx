@@ -1,16 +1,11 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import {
-  ArrowDown,
-  SendHorizontal,
-  Sparkles,
-  Square,
-  SquarePen,
-} from "lucide-react";
+import { ArrowDown, SendHorizontal, Square, SquarePen } from "lucide-react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import ReactMarkdown from "react-markdown";
 import { SsButton } from "@/components/ui/SsButton";
 import { SsGrowTextarea } from "@/components/ui/SsGrowTextarea";
+import { MonoLabel } from "@/components/ui/SsMono";
 import { PAGE_WIDTH, PageHeader } from "@/components/shared/PageShell";
 
 interface Message {
@@ -30,22 +25,27 @@ const PINNED_THRESHOLD = 80;
 const INITIAL_CHIPS: Chip[] = [
   {
     id: "1",
-    label: "Analyze Performance",
+    label: "ANALYZE PERFORMANCE",
     prompt: "Analyze my streak performance",
   },
   {
     id: "2",
-    label: "Get Motivation",
-    prompt: "Give me some motivation to keep my streak",
+    label: "WEEKLY REVIEW",
+    prompt: "Give me a weekly review",
   },
   {
     id: "3",
-    label: "Suggest Goals",
+    label: "SUGGEST GOALS",
     prompt: "Suggest some new habit goals for me",
   },
 ];
 
-export default function AIChat() {
+interface AIChatProps {
+  /** What the assistant can see, e.g. "4 STREAKS / 234 ENTRIES". */
+  contextLabel?: string;
+}
+
+export default function AIChat({ contextLabel }: AIChatProps) {
   const currentUser = useCurrentUser();
   const currentUserFirstName = currentUser?.name?.split(" ")[0];
   const [messages, setMessages] = useState<Message[]>([]);
@@ -210,27 +210,27 @@ export default function AIChat() {
     }
   };
 
+  const isEmpty = messages.length === 0;
+
   return (
-    <div className="bg-background text-foreground flex h-full min-h-0 w-full flex-col">
+    <div className="text-foreground flex h-full min-h-0 w-full flex-col">
       {/* The composer has to stay pinned, so this page owns its own scroll
           shell rather than PageShell's — but it borrows the same track. */}
-      <div className="border-border shrink-0 border-b">
-        <div className={`mx-auto w-full px-4 pt-4 pb-3 ${PAGE_WIDTH.wide}`}>
+      <div className="border-hair shrink-0 border-b">
+        <div className={`mx-auto w-full px-5 pt-5 pb-3.5 ${PAGE_WIDTH.wide}`}>
           <PageHeader
-            icon={<Sparkles size={20} />}
+            eyebrow="COPILOT"
             title="Assistant"
-            subtitle="Ask about your streaks, habits and progress"
             actions={
               <SsButton
                 onClick={handleNewChat}
-                disabled={messages.length === 0}
-                size="icon"
-                variant="ghost"
-                aria-label="New chat"
-                title="New chat"
-                className="rounded-full"
+                disabled={isEmpty}
+                variant="outline"
+                mono
+                size="sm"
+                leftIcon={<SquarePen size={13} />}
               >
-                <SquarePen className="h-5 w-5" />
+                New chat
               </SsButton>
             }
           />
@@ -247,11 +247,19 @@ export default function AIChat() {
             role="log"
             aria-live="polite"
             aria-relevant="additions text"
-            className={`mx-auto w-full space-y-4 px-4 py-6 ${PAGE_WIDTH.narrow}`}
+            className={`mx-auto flex w-full flex-col gap-3.5 px-5 py-6 ${PAGE_WIDTH.narrow}`}
           >
-            {messages.length === 0 && (
-              <div className="text-muted-foreground mt-10 text-center">
-                Hey, {currentUserFirstName}. What&apos;s on the agenda today?
+            {isEmpty && (
+              <div className="mt-12 flex flex-col items-center gap-2 text-center">
+                <span className="bg-foreground ss-animate-pulse-dot h-2 w-2 rounded-full" />
+                <MonoLabel as="span" size="readout" tone="soft">
+                  READY{contextLabel ? ` · CONTEXT: ${contextLabel}` : ""}
+                </MonoLabel>
+                <span className="text-dim text-sm">
+                  {currentUserFirstName
+                    ? `Hey, ${currentUserFirstName}. What's on the agenda today?`
+                    : "What's on the agenda today?"}
+                </span>
               </div>
             )}
             {messages.map((msg, index) => (
@@ -260,10 +268,10 @@ export default function AIChat() {
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`ss-animate-scale-in max-w-[80%] rounded-2xl px-4 py-2 ${
+                  className={`ss-animate-scale-in max-w-[82%] rounded-[10px] px-3.5 py-2.5 text-sm leading-relaxed ${
                     msg.role === "user"
-                      ? "bg-primary text-primary-foreground rounded-br-none"
-                      : "bg-muted text-foreground rounded-bl-none"
+                      ? "bg-foreground text-background"
+                      : "border-border bg-panel text-fg-soft border"
                   }`}
                 >
                   {msg.role === "model" ? (
@@ -272,9 +280,9 @@ export default function AIChat() {
                         className="flex items-center gap-1 py-1"
                         aria-label="Assistant is typing"
                       >
-                        <span className="bg-muted-foreground h-2 w-2 animate-bounce rounded-full [animation-delay:-0.3s]" />
-                        <span className="bg-muted-foreground h-2 w-2 animate-bounce rounded-full [animation-delay:-0.15s]" />
-                        <span className="bg-muted-foreground h-2 w-2 animate-bounce rounded-full" />
+                        <span className="bg-soft ss-animate-bounce h-1.5 w-1.5 rounded-full [animation-delay:-0.3s]" />
+                        <span className="bg-soft ss-animate-bounce h-1.5 w-1.5 rounded-full [animation-delay:-0.15s]" />
+                        <span className="bg-soft ss-animate-bounce h-1.5 w-1.5 rounded-full" />
                       </div>
                     ) : (
                       <ReactMarkdown
@@ -292,7 +300,16 @@ export default function AIChat() {
                             <p className="mb-2 last:mb-0" {...props} />
                           ),
                           strong: ({ ...props }) => (
-                            <strong className="font-semibold" {...props} />
+                            <strong
+                              className="text-foreground font-semibold"
+                              {...props}
+                            />
+                          ),
+                          code: ({ ...props }) => (
+                            <code
+                              className="bg-sunken rounded px-1 py-0.5 font-mono text-[13px]"
+                              {...props}
+                            />
                           ),
                         }}
                       >
@@ -316,37 +333,35 @@ export default function AIChat() {
               scrollToBottom(true);
             }}
             size="icon"
-            variant="secondary"
+            variant="icon"
             aria-label="Scroll to latest message"
             title="Scroll to latest message"
-            className="ss-animate-fade-in absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full shadow-lg"
+            className="ss-animate-fade-in absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full shadow-[var(--shadow-menu)]"
           >
-            <ArrowDown className="h-5 w-5" />
+            <ArrowDown size={17} />
           </SsButton>
         )}
       </div>
 
-      <div className="border-border bg-background/80 shrink-0 border-t backdrop-blur-xl">
+      <div className="border-hair shrink-0 border-t bg-[var(--bg-blur)] backdrop-blur-xl">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             handleSend(input);
           }}
-          className={`mx-auto w-full px-4 py-3 ${PAGE_WIDTH.narrow}`}
+          className={`mx-auto w-full px-5 py-3.5 ${PAGE_WIDTH.narrow}`}
         >
-          {chips.length > 0 && messages.length === 0 && (
+          {chips.length > 0 && isEmpty && (
             <div className="mb-3 flex flex-wrap justify-center gap-2">
               {chips.map((chip) => (
-                <SsButton
+                <button
                   key={chip.id}
                   type="button"
                   onClick={() => onChipClick(chip.id)}
-                  variant="secondary"
-                  size="sm"
-                  className="border-border hover:border-foreground rounded-full border px-3 py-1 text-sm"
+                  className="border-border bg-panel text-soft hover:border-foreground hover:text-foreground cursor-pointer rounded-md border px-3 py-1.5 font-mono text-[10px] font-semibold tracking-[0.08em] transition-colors duration-150"
                 >
                   {chip.label}
-                </SsButton>
+                </button>
               ))}
             </div>
           )}
@@ -368,9 +383,9 @@ export default function AIChat() {
                 e.preventDefault();
                 handleSend(input);
               }}
-              placeholder="Type a message..."
+              placeholder="Ask about your streaks…"
               rows={1}
-              minHeight={50}
+              minHeight={46}
               maxHeight={200}
               resizable={false}
               className="min-w-0 flex-1"
@@ -382,9 +397,9 @@ export default function AIChat() {
                 size="icon"
                 aria-label="Stop generating"
                 title="Stop generating"
-                className="shrink-0 rounded-full"
+                className="h-[46px] w-[46px] shrink-0"
               >
-                <Square className="h-4 w-4 fill-current" />
+                <Square size={15} className="fill-current" />
               </SsButton>
             ) : (
               <SsButton
@@ -393,9 +408,9 @@ export default function AIChat() {
                 size="icon"
                 aria-label="Send message"
                 title="Send message"
-                className="shrink-0 rounded-full"
+                className="h-[46px] w-[46px] shrink-0"
               >
-                <SendHorizontal className="h-5 w-5" />
+                <SendHorizontal size={18} />
               </SsButton>
             )}
           </div>

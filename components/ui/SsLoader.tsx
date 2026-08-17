@@ -32,9 +32,9 @@ export function SsLoaderOverlay({
       role="status"
     >
       <div className="flex items-center">
-        <span className="bar bg-primary inline-block h-5 w-[3px] rounded-[10px]"></span>
-        <span className="bar bar-2 bg-primary mx-[5px] inline-block h-[35px] w-[3px] rounded-[10px]"></span>
-        <span className="bar bar-3 bg-primary inline-block h-5 w-[3px] rounded-[10px]"></span>
+        <span className="bar bg-foreground inline-block h-5 w-[3px] rounded-[10px]"></span>
+        <span className="bar bar-2 bg-foreground mx-[5px] inline-block h-[35px] w-[3px] rounded-[10px]"></span>
+        <span className="bar bar-3 bg-foreground inline-block h-5 w-[3px] rounded-[10px]"></span>
       </div>
 
       <style jsx>{`

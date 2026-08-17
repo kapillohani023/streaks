@@ -8,31 +8,6 @@ export const isCompletedToday = (streak: Streak) => {
   );
 };
 
-export const getCompletedDates = (streak: Streak): Date[] =>
-  streak.entries
-    .filter((entry: StreakEntry) => entry.completed)
-    .map((entry: StreakEntry) => entry.date);
-
-/**
- * Number of consecutive completed days ending today (looking back up to a year).
- */
-export const calculateCurrentStreak = (completedDates: Date[]): number => {
-  const completedTimes = new Set(
-    completedDates.map((date) => normalizeToMidnight(date).getTime())
-  );
-
-  const today = normalizeToMidnight(new Date());
-  let count = 0;
-
-  for (let i = 0; i < 365; i++) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    if (!completedTimes.has(date.getTime())) break;
-    count++;
-  }
-  return count;
-};
-
 export const normalizeToMidnight = (date: Date): Date => {
   const normalized = new Date(date);
   normalized.setHours(0, 0, 0, 0);
@@ -54,20 +29,44 @@ const MONTHS = [
   "DEC",
 ];
 
-/** "Aug 01, 2026" — no weekday, unlike Date.toDateString(). */
-export const formatStreakDate = (date: Date): string =>
-  date.toLocaleDateString(undefined, {
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-  });
+const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
+/*
+  Every stamp below is built from fixed tables rather than `toLocaleString`.
+
+  Two reasons. The design specifies these forms exactly — uppercase, mono,
+  zero-padded — and no locale produces them reliably. And `toLocaleString` is
+  resolved by whichever ICU build is running, so Node and Chrome disagree on
+  details like the case of "PM"; rendering one on the server and the other in
+  the browser is a hydration mismatch that throws away the server's HTML.
+*/
+
+/** "02-AUG-2026" */
 export const formatJournalTitle = (date: Date): string => {
   const day = String(date.getDate()).padStart(2, "0");
   const month = MONTHS[date.getMonth()];
   const year = date.getFullYear();
   return `${day}-${month}-${year}`;
 };
+
+/** "22:42" — 24-hour, so it sorts and aligns as well as it reads. */
+export const formatClock = (date: Date): string =>
+  `${String(date.getHours()).padStart(2, "0")}:${String(
+    date.getMinutes()
+  ).padStart(2, "0")}`;
+
+/** "AUG 2026" */
+export const formatMonthLabel = (date: Date): string =>
+  `${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+
+/** "MON" */
+export const formatWeekday = (date: Date): string => WEEKDAYS[date.getDay()];
+
+/** "MON, AUG 17" — the weekday carries the rhythm a bare date hides. */
+export const formatLogDate = (date: Date): string =>
+  `${WEEKDAYS[date.getDay()]}, ${MONTHS[date.getMonth()]} ${String(
+    date.getDate()
+  ).padStart(2, "0")}`;
 
 /** "2026-08-02" in local time — stable key for "which calendar day is this?". */
 export const toDateKey = (date: Date): string => {

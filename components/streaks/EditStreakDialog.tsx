@@ -26,7 +26,9 @@ export function EditStreakDialog({
 }: EditStreakDialogProps) {
   const [name, setName] = useState(streak.name);
   const [description, setDescription] = useState(streak.description);
-  const [reminderEnabled, setReminderEnabled] = useState(streak.reminderEnabled);
+  const [reminderEnabled, setReminderEnabled] = useState(
+    streak.reminderEnabled
+  );
   const [reminderTime, setReminderTime] = useState(
     streak.reminderTime ?? DEFAULT_REMINDER_TIME
   );
@@ -87,8 +89,8 @@ export function EditStreakDialog({
     <SsDialog
       open={open}
       onClose={onClose}
+      eyebrow="REGISTRY / EDIT"
       title="Edit Streak"
-      subtitle={streak.name}
       disableClose={isSaving}
     >
       <div className="flex flex-col gap-5">
@@ -109,15 +111,16 @@ export function EditStreakDialog({
         />
 
         {error && (
-          <SsTypography as="p" className="text-destructive text-xs">
+          <SsTypography as="p" className="text-bad text-xs">
             {error}
           </SsTypography>
         )}
 
-        <div className="flex gap-3">
+        <div className="flex gap-2.5">
           <SsButton
             type="button"
-            variant="secondary"
+            variant="outline"
+            mono
             block
             onClick={onClose}
             disabled={isSaving}
@@ -126,6 +129,7 @@ export function EditStreakDialog({
           </SsButton>
           <SsButton
             type="button"
+            mono
             block
             onClick={handleSave}
             loading={isSaving}

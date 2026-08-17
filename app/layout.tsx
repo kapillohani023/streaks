@@ -52,7 +52,7 @@ export default async function RootLayout({
         className={`${plusJakartaSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionProvider session={session}>
-          <div className="bg-background fixed inset-0 flex flex-col pt-[env(safe-area-inset-top)]">
+          <div className="bg-background ss-grid-bg fixed inset-0 flex flex-col pt-[env(safe-area-inset-top)]">
             <Header />
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
               {children}

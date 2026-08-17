@@ -2,21 +2,22 @@
 
 import { type MouseEvent, type ReactNode, useEffect } from "react";
 import { X } from "lucide-react";
-import { SsButton } from "@/components/ui/SsButton";
-import {
-  SsCard,
-  SsCardContent,
-  SsCardHeader,
-  SsCardTitle,
-} from "@/components/ui/SsCard";
+import { MonoLabel } from "@/components/ui/SsMono";
+import { SsCard, SsCardTitle } from "@/components/ui/SsCard";
 import { SsTypography } from "@/components/ui/SsTypography";
 
 interface SsDialogProps {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
+  /** Mono kicker above the title — says which part of the app this belongs to. */
+  eyebrow?: string;
+  /** Red kicker for dialogs that destroy something, before the title is read. */
+  eyebrowTone?: "faint" | "bad";
   title?: ReactNode;
   subtitle?: ReactNode;
+  /** Rules a line under the header. For dialogs whose body is itself sectioned. */
+  divided?: boolean;
   disableClose?: boolean;
   showCloseButton?: boolean;
   closeOnBackdrop?: boolean;
@@ -29,22 +30,23 @@ export function SsDialog({
   open,
   onClose,
   children,
+  eyebrow,
+  eyebrowTone = "faint",
   title,
   subtitle,
+  divided = false,
   disableClose = false,
-  showCloseButton = true,
+  showCloseButton = false,
   closeOnBackdrop = true,
-  maxWidthClassName = "max-w-md",
-  contentClassName = "p-6",
+  maxWidthClassName = "max-w-[440px]",
+  contentClassName = "",
   panelClassName = "",
 }: SsDialogProps) {
   useEffect(() => {
     if (!open || disableClose) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
+      if (event.key === "Escape") onClose();
     };
 
     window.addEventListener("keydown", onKeyDown);
@@ -55,14 +57,14 @@ export function SsDialog({
 
   const handleBackdropMouseDown = (event: MouseEvent<HTMLDivElement>) => {
     if (disableClose || !closeOnBackdrop) return;
-    if (event.currentTarget === event.target) {
-      onClose();
-    }
+    if (event.currentTarget === event.target) onClose();
   };
+
+  const hasHeader = Boolean(eyebrow || title || subtitle || showCloseButton);
 
   return (
     <div
-      className="ss-animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      className="ss-animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4"
       role="dialog"
       aria-modal="true"
       onMouseDown={handleBackdropMouseDown}
@@ -70,31 +72,44 @@ export function SsDialog({
       <SsCard
         variant="elevated"
         padding="none"
-        className={`ss-animate-scale-in w-full ${maxWidthClassName} ${panelClassName}`}
+        className={`ss-animate-scale-in w-full overflow-hidden ${maxWidthClassName} ${panelClassName}`}
       >
-        {(title || subtitle || showCloseButton) && (
-          <SsCardHeader className="border-border mb-0 flex items-center justify-between border-b p-6">
-            <div>
+        {hasHeader && (
+          <div
+            className={[
+              "flex items-start justify-between gap-3",
+              divided ? "border-divider border-b p-5" : "px-6 pt-6 pb-4",
+            ].join(" ")}
+          >
+            <div className="min-w-0">
+              {eyebrow && (
+                <MonoLabel tone={eyebrowTone} className="mb-1">
+                  {eyebrow}
+                </MonoLabel>
+              )}
               {title && <SsCardTitle>{title}</SsCardTitle>}
               {subtitle && (
-                <SsTypography variant="muted">{subtitle}</SsTypography>
+                <SsTypography variant="muted" className="mt-0.5">
+                  {subtitle}
+                </SsTypography>
               )}
             </div>
             {showCloseButton && (
-              <SsButton
+              <button
+                type="button"
                 onClick={onClose}
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground hover:text-foreground"
-                aria-label="Close dialog"
                 disabled={disableClose}
+                aria-label="Close dialog"
+                className="text-faint hover:bg-sunken hover:text-foreground flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <X size={24} />
-              </SsButton>
+                <X size={15} />
+              </button>
             )}
-          </SsCardHeader>
+          </div>
         )}
-        <SsCardContent className={contentClassName}>{children}</SsCardContent>
+        <div className={contentClassName || (hasHeader ? "px-6 pb-6" : "p-6")}>
+          {children}
+        </div>
       </SsCard>
     </div>
   );

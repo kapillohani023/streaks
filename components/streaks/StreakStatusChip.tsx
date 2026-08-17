@@ -1,4 +1,5 @@
-import { Check, Clock } from "lucide-react";
+import { Bell } from "lucide-react";
+import { MonoTag } from "@/components/ui/SsMono";
 
 interface StreakStatusChipProps {
   /** Whether the streak already has an entry for today. */
@@ -7,33 +8,45 @@ interface StreakStatusChipProps {
 }
 
 /**
- * Today's status for a streak. Shared by the list and the profile so the same
- * state never renders two different ways.
+ * Today's status as a mono readout rather than a pill.
+ *
+ * The glyph carries the state as well as the colour does — a filled dot for
+ * closed, a hollow one for open — so the row still parses in a screenshot, in
+ * high contrast, or for a reader who can't separate green from grey.
  */
 export function StreakStatusChip({
   completed,
   className = "",
 }: StreakStatusChipProps) {
-  const base =
-    "inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs font-medium";
+  return (
+    <span
+      className={[
+        "font-mono text-[10px] font-bold tracking-[0.08em] whitespace-nowrap",
+        completed ? "text-ok" : "text-dim",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      {completed ? "● DONE" : "○ PENDING"}
+    </span>
+  );
+}
 
-  return completed ? (
-    <span
-      className={[base, "bg-success/10 text-success", className]
-        .filter(Boolean)
-        .join(" ")}
+interface ReminderTagProps {
+  time: string;
+  className?: string;
+}
+
+/** The daily reminder, shown wherever a streak is named. */
+export function ReminderTag({ time, className = "" }: ReminderTagProps) {
+  return (
+    <MonoTag
+      icon={<Bell size={9} />}
+      title={`Daily reminder at ${time}`}
+      className={className}
     >
-      <Check size={10} />
-      completed
-    </span>
-  ) : (
-    <span
-      className={[base, "bg-muted text-muted-foreground", className]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      <Clock size={10} />
-      pending
-    </span>
+      {time}
+    </MonoTag>
   );
 }

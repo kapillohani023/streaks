@@ -33,17 +33,20 @@ export function DeleteJournalEntryDialog({
     <SsDialog
       open={open}
       onClose={onClose}
-      title="Delete entry?"
-      subtitle={entryTitle}
+      eyebrow="DESTRUCTIVE"
+      eyebrowTone="bad"
+      title={entryTitle ? `Delete ${entryTitle}?` : "Delete entry?"}
       disableClose={isDeleting}
+      maxWidthClassName="max-w-[400px]"
     >
-      <SsTypography variant="muted" className="mb-6">
-        This entry will be permanently removed. This action cannot be undone.
+      <SsTypography variant="muted" className="mb-5">
+        This entry will be permanently removed. There is no undo.
       </SsTypography>
-      <div className="flex gap-3">
+      <div className="flex gap-2.5">
         <SsButton
           type="button"
-          variant="secondary"
+          variant="outline"
+          mono
           block
           disabled={isDeleting}
           onClick={onClose}
@@ -53,8 +56,9 @@ export function DeleteJournalEntryDialog({
         <SsButton
           type="button"
           variant="danger"
+          mono
           block
-          disabled={isDeleting}
+          loading={isDeleting}
           onClick={handleConfirm}
         >
           Delete
