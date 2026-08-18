@@ -36,7 +36,13 @@ export function StreaksList({
   }
 
   return (
-    <div className="border-border bg-panel overflow-hidden rounded-xl border">
+    /*
+      No `overflow-hidden` here: it clipped every row's action menu at the
+      panel edge. The corners the clip used to round are rounded on the rows
+      themselves instead - the top one only below `md`, where the column-header
+      row is hidden and the first streak sits against the panel's top edge.
+    */
+    <div className="border-border bg-panel rounded-xl border [&>*:last-child]:rounded-b-xl [&>*:nth-child(2)]:rounded-t-xl md:[&>*:nth-child(2)]:rounded-t-none">
       {/* The column labels only exist where there are columns; below md the
           rows are self-labelling and a header would just be a stray line. */}
       <div

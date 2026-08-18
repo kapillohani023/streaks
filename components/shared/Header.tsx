@@ -20,7 +20,7 @@ export function Header() {
   if (path.startsWith("/signin")) return null;
 
   return (
-    <div className="border-hair flex items-center justify-between border-b px-5 pt-3.5 pb-2.5">
+    <div className="flex items-center justify-between px-5 pt-3.5 pb-2.5">
       <Link
         href={showActions ? "/dashboard" : "/"}
         className="flex items-center gap-2.5"

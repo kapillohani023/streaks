@@ -51,7 +51,7 @@ export function ActivityHeatmap({
   const today = useIsHydrated() ? new Date() : null;
 
   return (
-    <div className="border-border bg-panel flex flex-col gap-3 rounded-xl border px-5 py-4.5">
+    <div className="border-border bg-panel flex flex-col gap-3 rounded-xl border px-3.5 py-4 sm:px-5 sm:py-4.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <MonoLabel>{label}</MonoLabel>
         {legend && (
@@ -69,48 +69,53 @@ export function ActivityHeatmap({
       </div>
 
       {/*
-        The 53 columns come to ~686px, so on any panel wider than that they
-        would otherwise hug the left edge and leave a lopsided gap. `min-w`
-        still forces the scroll track on narrow screens; `justify-center` only
-        has slack to work with once the panel is wider than the grid.
+        The grid fills whatever width it is given rather than claiming a fixed
+        686px and forcing a scroll track: every column is `flex-1`, so a cell is
+        ~10px on a desktop panel and ~4px on a phone, and all 53 weeks stay on
+        screen either way. `max-w` caps the cells at their intended 10px so a
+        wide panel centres the chart instead of inflating it into blocks.
       */}
-      <div className="overflow-x-auto">
-        <div className="flex min-w-[700px] justify-center gap-[3px]">
-          {today
-            ? buildWeeks(totals, today).map((week, weekIndex) => (
-                <div key={weekIndex} className="flex flex-col gap-[3px]">
-                  {week.map((cell, dayIndex) =>
-                    cell ? (
-                      <div
-                        key={dayIndex}
-                        title={cell.tip}
-                        className={[
-                          "h-[10px] w-[10px] rounded-[2px]",
-                          heatClass(ramp, cell.count),
-                          cell.isToday
-                            ? "outline-foreground outline outline-offset-1"
-                            : "",
-                        ]
-                          .filter(Boolean)
-                          .join(" ")}
-                      />
-                    ) : (
-                      <div key={dayIndex} className="h-[10px] w-[10px]" />
-                    )
-                  )}
-                </div>
-              ))
-            : Array.from({ length: HEATMAP_WEEKS }, (_, weekIndex) => (
-                <div key={weekIndex} className="flex flex-col gap-[3px]">
-                  {Array.from({ length: 7 }, (_, dayIndex) => (
+      <div className="mx-auto flex w-full max-w-[686px] gap-px sm:gap-[3px]">
+        {today
+          ? buildWeeks(totals, today).map((week, weekIndex) => (
+              <div
+                key={weekIndex}
+                className="flex min-w-0 flex-1 flex-col gap-px sm:gap-[3px]"
+              >
+                {week.map((cell, dayIndex) =>
+                  cell ? (
                     <div
                       key={dayIndex}
-                      className="bg-sunken h-[10px] w-[10px] rounded-[2px] opacity-40"
+                      title={cell.tip}
+                      className={[
+                        "aspect-square w-full rounded-[1px] sm:rounded-[2px]",
+                        heatClass(ramp, cell.count),
+                        cell.isToday
+                          ? "outline-foreground outline outline-offset-1"
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                     />
-                  ))}
-                </div>
-              ))}
-        </div>
+                  ) : (
+                    <div key={dayIndex} className="aspect-square w-full" />
+                  )
+                )}
+              </div>
+            ))
+          : Array.from({ length: HEATMAP_WEEKS }, (_, weekIndex) => (
+              <div
+                key={weekIndex}
+                className="flex min-w-0 flex-1 flex-col gap-px sm:gap-[3px]"
+              >
+                {Array.from({ length: 7 }, (_, dayIndex) => (
+                  <div
+                    key={dayIndex}
+                    className="bg-sunken aspect-square w-full rounded-[1px] opacity-40 sm:rounded-[2px]"
+                  />
+                ))}
+              </div>
+            ))}
       </div>
     </div>
   );

@@ -94,8 +94,10 @@ export function StreakListItem({
         </div>
 
         {/* Absolute on mobile so the row keeps two clean bands; back in the
-            grid from md up, where it has a column of its own. */}
-        <div className="absolute top-2.5 right-2.5 md:static md:justify-self-end">
+            grid from md up, where it has a column of its own. Positioned and
+            raised so the open menu paints over the rows below it rather than
+            disappearing behind the next one. */}
+        <div className="absolute top-2.5 right-2.5 z-20 md:relative md:inset-auto md:justify-self-end">
           {menu}
         </div>
       </div>
