@@ -17,13 +17,15 @@ export function JournalContent({ entries }: JournalContentProps) {
 
   return (
     /*
-      A grid rather than two columns: the calendar sits between the form and
-      the list in source order — where it belongs on a phone — and gets moved
-      into its own right-hand column from lg up, without rendering twice.
+      A plain column on a phone, a two-track grid from lg up. The calendar is
+      last in source order, so stacked it falls below the entry list where a
+      reader reaches it after the things they came to do; the explicit
+      `lg:row-start` placements pull it back up beside them in the sidebar
+      once there is a second column, without rendering it twice.
     */
     <PageShell
       width="wide"
-      layoutClassName="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-x-7"
+      layoutClassName="flex flex-col gap-5 lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-x-7"
     >
       <PageHeader
         className="lg:col-start-1 lg:row-start-1"
@@ -51,14 +53,14 @@ export function JournalContent({ entries }: JournalContentProps) {
         <JournalEntryForm />
       </div>
 
+      <div className="min-w-0 lg:col-start-1 lg:row-start-3">
+        <JournalEntryList entries={entries} />
+      </div>
+
       <aside className="flex flex-col gap-3.5 lg:sticky lg:top-5 lg:col-start-2 lg:row-span-3 lg:row-start-1 lg:self-start">
         <JournalCalendar days={entries} />
         <WritingStreak days={entries} />
       </aside>
-
-      <div className="min-w-0 lg:col-start-1 lg:row-start-3">
-        <JournalEntryList entries={entries} />
-      </div>
     </PageShell>
   );
 }
