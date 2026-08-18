@@ -4,11 +4,19 @@ import { cache } from "react";
 import { Streak } from "@/types/streak";
 import { JournalEntry } from "@/types/journal-entry";
 import { getStreaksForUser, getStreakByIdForUser } from "@/lib/streak-service";
+import { Todo } from "@/types/todo";
+import { getTodosForUser } from "@/lib/todo-service";
 
 export const getStreaks = cache(async (): Promise<Streak[]> => {
   const session = await auth();
   if (!session?.user?.id) return [];
   return getStreaksForUser(session.user.id);
+});
+
+export const getTodos = cache(async (): Promise<Todo[]> => {
+  const session = await auth();
+  if (!session?.user?.id) return [];
+  return getTodosForUser(session.user.id);
 });
 
 export const getStreakById = cache(

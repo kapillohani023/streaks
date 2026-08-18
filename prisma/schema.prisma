@@ -19,6 +19,7 @@ model User {
   remindersSnoozed Boolean         @default(false) @map("reminders_snoozed")
   streaks       Streak[]
   journal       JournalEntry[]
+  todos         Todo[]
   subscriptions PushSubscription[]
   createdAt     DateTime           @default(now())
 
@@ -86,4 +87,25 @@ model JournalEntry {
 
   @@index([userId, createdAt])
   @@map("journal_entries")
+}
+
+/// A card on the todo board.
+///
+/// `position` orders the user's *whole* board as one list; a column is that
+/// list filtered by `stage`. Keeping a single ordering (rather than one counter
+/// per column) is what lets a single drag both reorder within a column and move
+/// between columns without two competing sequences to reconcile.
+model Todo {
+  id        String   @id @default(cuid())
+  text      String
+  /// "todo" | "doing" | "done". A string rather than a DB enum so adding a
+  /// column later is a code change instead of a migration.
+  stage     String   @default("todo")
+  position  Int
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, position])
+  @@map("todos")
 }

@@ -9,7 +9,7 @@ import { MonoLabel } from "@/components/ui/SsMono";
 import { useIsHydrated } from "@/hooks/use-hydrated";
 import { formatStamp } from "@/lib/stats";
 
-const APP_ROUTES = ["/dashboard", "/streaks", "/ai", "/journal"];
+const APP_ROUTES = ["/dashboard", "/streaks", "/ai", "/journal", "/todos"];
 
 export function Header() {
   const path = usePathname() ?? "";

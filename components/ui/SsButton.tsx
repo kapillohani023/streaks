@@ -5,6 +5,7 @@ type ButtonVariant =
   | "secondary"
   | "ghost"
   | "danger"
+  | "danger-outline"
   | "outline"
   | "icon";
 type ButtonSize = "xs" | "sm" | "md" | "lg" | "icon" | "icon-sm";
@@ -51,6 +52,14 @@ const variantClass: Record<ButtonVariant, string> = {
   */
   danger:
     "border-bad bg-bad text-background hover:opacity-90 disabled:border-border disabled:bg-panel-2 disabled:text-mid disabled:opacity-100",
+  /*
+    The destructive action of a dialog that also offers a neutral one. A filled
+    red beside a filled neutral makes the dialog read as two primary actions;
+    outlining it keeps "delete" recognisably the secondary path while still
+    being unmistakably red.
+  */
+  "danger-outline":
+    "border-bad bg-transparent text-bad hover:bg-bad-soft disabled:border-border disabled:text-mid disabled:opacity-100",
   outline:
     "border-border-strong bg-transparent text-soft hover:border-foreground hover:text-foreground",
   icon: "border-border bg-panel text-soft hover:border-mid hover:text-foreground",

@@ -9,6 +9,12 @@ import {
   setStreakReminderForUser,
   hasPushSubscription,
 } from "@/lib/streak-service";
+import {
+  getTodosForUser,
+  setTodoStageForUser,
+  deleteTodoForUser,
+} from "@/lib/todo-service";
+import { TodoStageSchema, stageDef } from "@/types/todo";
 
 export const runtime = "nodejs";
 
@@ -236,6 +242,108 @@ const handler = createMcpHandler(
                 ? "Saved, but this user has no device registered for notifications, so the reminder will not be delivered yet."
                 : null,
           });
+        } catch (e) {
+          return fail(e);
+        }
+      }
+    );
+
+    server.tool(
+      "fetch_todos",
+      "List every todo on the user's board, in board order. Each item carries a " +
+        "`stage` of `todo`, `doing` or `done` — shown in the app as TO DO, IN " +
+        "PROGRESS and COMPLETED — plus a ready-to-read `stageLabel`. Call this " +
+        "first to get the `id` for `set_todo_stage` or `delete_todo`; ids are " +
+        "opaque and never guessable from the text.",
+      {
+        userId: z
+          .string()
+          .describe(
+            "The acting user's id. Use the `userId` provided in the request input; never invent it or ask the user."
+          ),
+      },
+      async ({ userId }) => {
+        try {
+          const todos = await getTodosForUser(userId);
+          return ok(
+            todos.map((t) => ({
+              id: t.id,
+              text: t.text,
+              stage: t.stage,
+              stageLabel: stageDef(t.stage).label,
+            }))
+          );
+        } catch (e) {
+          return fail(e);
+        }
+      }
+    );
+
+    server.tool(
+      "set_todo_stage",
+      "Move one todo the user owns to a stage: `doing` when they have started " +
+        "it, `done` when they have finished it, or `todo` to put it back on the " +
+        "pile. This is the tool for 'mark X as in progress' and 'I finished X'. " +
+        "Moving to `done` does NOT delete anything — the item stays on the board " +
+        "in the COMPLETED column, which is what the user expects unless they " +
+        "explicitly ask to remove it. The todo lands at the end of its new " +
+        "column. Safe to call when it is already in that stage; the response's " +
+        "`changed` field says whether anything actually moved.",
+      {
+        userId: z
+          .string()
+          .describe(
+            "The acting user's id. Use the `userId` provided in the request input; never invent it or ask the user."
+          ),
+        todoId: z
+          .string()
+          .describe("The id of the todo to move, from `fetch_todos`"),
+        stage: TodoStageSchema.describe(
+          "`todo` (TO DO), `doing` (IN PROGRESS) or `done` (COMPLETED)"
+        ),
+      },
+      async ({ userId, todoId, stage }) => {
+        try {
+          const { todo, previousStage, changed } = await setTodoStageForUser(
+            userId,
+            { id: todoId, stage }
+          );
+          return ok({
+            id: todo.id,
+            text: todo.text,
+            stage: todo.stage,
+            stageLabel: stageDef(todo.stage).label,
+            previousStage,
+            changed,
+          });
+        } catch (e) {
+          return fail(e);
+        }
+      }
+    );
+
+    server.tool(
+      "delete_todo",
+      "Permanently remove one todo from the user's board. There is no undo and " +
+        "no trash to restore from. If the user has merely finished the task, " +
+        "call `set_todo_stage` with `done` instead — deleting is for items that " +
+        "should never have been on the board. `deleted` comes back false when " +
+        "the id matches nothing the user owns, which usually means it was " +
+        "already removed.",
+      {
+        userId: z
+          .string()
+          .describe(
+            "The acting user's id. Use the `userId` provided in the request input; never invent it or ask the user."
+          ),
+        todoId: z
+          .string()
+          .describe("The id of the todo to delete, from `fetch_todos`"),
+      },
+      async ({ userId, todoId }) => {
+        try {
+          const deleted = await deleteTodoForUser(userId, todoId);
+          return ok({ id: todoId, deleted });
         } catch (e) {
           return fail(e);
         }
