@@ -12,6 +12,8 @@ export interface TodoColumnProps {
   /** The neighbours the bulk arrows push into; null at either end of the board. */
   previous: TodoStageDef | null;
   next: TodoStageDef | null;
+  /** Whether this stage starts expanded on mobile. Ignored from `md` up. */
+  defaultOpen?: boolean;
   dragId: string | null;
   dragOverStage: TodoStage | null;
   dragBeforeId: string | null;
@@ -29,6 +31,7 @@ export function TodoColumn({
   items,
   previous,
   next,
+  defaultOpen = false,
   dragId,
   dragOverStage,
   dragBeforeId,
@@ -41,16 +44,16 @@ export function TodoColumn({
   onFlush,
 }: TodoColumnProps) {
   /*
-    Collapsed to start. Below `md` the three columns are stacked, so an open
-    board would be a metre of scrolling before the third heading; closed, the
-    whole board — every stage and its count — fits above the fold and the user
-    opens the one they came for.
+    Only the first stage starts open, and the rest collapse to their headings.
+    Opening every board would put the third heading a metre down the page;
+    opening none makes the phone's first impression of the board a list of
+    numbers. The one you work out of is the one that greets you.
 
     This state only means anything on mobile: from `md` up the body is shown by
     CSS regardless, so the desktop board is never at the mercy of a toggle the
     user cannot see.
   */
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
 
   const empty = items.length === 0;
   const canEscalate = Boolean(next) && !empty;
@@ -67,9 +70,22 @@ export function TodoColumn({
     onDragOver(def.key, null);
   };
 
+  /*
+    Every drop into this stage expands it.
+
+    A chip dropped on a closed board would otherwise vanish into a heading whose
+    only acknowledgement is a count ticking up. Opening it shows the user where
+    the thing they were just holding actually landed, and leaves them somewhere
+    they can drag it again if it went to the wrong place.
+  */
+  const dropInto = (beforeId: string | null) => {
+    setOpen(true);
+    onDrop(def.key, beforeId);
+  };
+
   const handleZoneDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    onDrop(def.key, null);
+    dropInto(null);
   };
 
   /*
@@ -89,7 +105,7 @@ export function TodoColumn({
 
   const handleHeaderDrop = (event: DragEvent<HTMLElement>) => {
     event.preventDefault();
-    onDrop(def.key, null);
+    dropInto(null);
   };
 
   const heading = (
@@ -205,7 +221,7 @@ export function TodoColumn({
             onOpen={() => onOpenChip(todo.id)}
             onDragStart={() => onDragStart(todo.id)}
             onDragOverChip={() => onDragOver(def.key, todo.id)}
-            onDropOnChip={() => onDrop(def.key, todo.id)}
+            onDropOnChip={() => dropInto(todo.id)}
             onDragEnd={onDragEnd}
           />
         ))}

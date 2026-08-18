@@ -143,6 +143,10 @@ export function TodosContent({ todos }: TodosContentProps) {
             next={
               index < TODO_STAGES.length - 1 ? TODO_STAGES[index + 1] : null
             }
+            // The first stage is the one you work out of, so it is the one the
+            // mobile board opens on. Which stage that is stays a property of
+            // TODO_STAGES rather than a name hard-coded in the column.
+            defaultOpen={index === 0}
             dragId={dragId}
             dragOverStage={dragOverStage}
             dragBeforeId={dragBeforeId}

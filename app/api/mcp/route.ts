@@ -11,10 +11,11 @@ import {
 } from "@/lib/streak-service";
 import {
   getTodosForUser,
+  createTodoForUser,
   setTodoStageForUser,
   deleteTodoForUser,
 } from "@/lib/todo-service";
-import { TodoStageSchema, stageDef } from "@/types/todo";
+import { TODO_TEXT_MAX, TodoStageSchema, stageDef } from "@/types/todo";
 
 export const runtime = "nodejs";
 
@@ -273,6 +274,58 @@ const handler = createMcpHandler(
               stageLabel: stageDef(t.stage).label,
             }))
           );
+        } catch (e) {
+          return fail(e);
+        }
+      }
+    );
+
+    server.tool(
+      "create_todo",
+      "Add a new todo to the user's board. `stage` is optional and defaults to " +
+        "`todo` (TO DO), which is almost always right — only pass `doing` when " +
+        "the user says they have already started it, or `done` when they are " +
+        "recording something they have already finished. One call creates one " +
+        "item: for a list of tasks, call this once per task rather than " +
+        "packing them into a single `text`. The new item goes to the end of " +
+        "its column. Returns the created todo including its `id`.",
+      {
+        userId: z
+          .string()
+          .describe(
+            "The acting user's id. Use the `userId` provided in the request input; never invent it or ask the user."
+          ),
+        text: z
+          .string()
+          .describe(
+            `The task, as the user would read it on a card. At most ${TODO_TEXT_MAX} characters.`
+          ),
+        stage: TodoStageSchema.optional().describe(
+          "`todo` (TO DO, the default), `doing` (IN PROGRESS) or `done` (COMPLETED)"
+        ),
+      },
+      async ({ userId, text, stage }) => {
+        try {
+          const trimmed = text.trim();
+          if (!trimmed) throw new Error("Task text is required");
+          // Rejected rather than truncated: silently storing two thirds of a
+          // task is worse than saying it did not fit.
+          if (trimmed.length > TODO_TEXT_MAX) {
+            throw new Error(
+              `Task must be ${TODO_TEXT_MAX} characters or fewer; got ${trimmed.length}`
+            );
+          }
+
+          const todo = await createTodoForUser(userId, {
+            text: trimmed,
+            stage: stage ?? "todo",
+          });
+          return ok({
+            id: todo.id,
+            text: todo.text,
+            stage: todo.stage,
+            stageLabel: stageDef(todo.stage).label,
+          });
         } catch (e) {
           return fail(e);
         }
