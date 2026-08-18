@@ -72,6 +72,26 @@ export function TodoColumn({
     onDrop(def.key, null);
   };
 
+  /*
+    A closed board still takes drops.
+
+    Below `md` the body is `display:none`, so without these the only way to move
+    a chip into a collapsed stage would be to open it first — and opening it
+    mid-drag means letting go of the chip. The heading is the whole card while
+    closed, so dropping anywhere on it appends to that stage, exactly as
+    dropping on a column's empty space does.
+  */
+  const handleHeaderDragOver = (event: DragEvent<HTMLElement>) => {
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+    onDragOver(def.key, null);
+  };
+
+  const handleHeaderDrop = (event: DragEvent<HTMLElement>) => {
+    event.preventDefault();
+    onDrop(def.key, null);
+  };
+
   const heading = (
     <>
       <span className="flex min-w-0 items-center gap-2">
@@ -105,10 +125,17 @@ export function TodoColumn({
   /*
     A collapsed board is the whole card, so it keeps all four corners and the
     divider under the heading goes away with the body it was separating.
+
+    It also gets taller. Open, the heading is a label with a list under it;
+    closed, it is the entire drop target for a stage, and a 44px strip is a mean
+    thing to ask someone to hit while holding a chip.
   */
   const headerEdge = open
-    ? "border-b rounded-t-xl"
-    : "md:border-b rounded-xl md:rounded-b-none";
+    ? "border-b rounded-t-xl py-3"
+    : "md:border-b rounded-xl md:rounded-b-none py-5 md:py-3";
+
+  /* Only the closed heading paints its own drop state — open, the body does. */
+  const headerDropTarget = active && !open;
 
   return (
     <section
@@ -124,9 +151,17 @@ export function TodoColumn({
       <button
         type="button"
         onClick={() => setOpen((wasOpen) => !wasOpen)}
+        onDragOver={handleHeaderDragOver}
+        onDrop={handleHeaderDrop}
         aria-expanded={open}
         aria-controls={bodyId}
-        className={`border-divider hover:bg-sunken flex w-full cursor-pointer items-center justify-between gap-2 px-3.5 py-3 transition-colors duration-150 md:hidden ${headerEdge}`}
+        className={[
+          "border-divider flex w-full cursor-pointer items-center justify-between gap-2 px-3.5 transition-colors duration-150 md:hidden",
+          headerEdge,
+          headerDropTarget
+            ? "bg-sunken ring-foreground ring-1 ring-inset"
+            : "hover:bg-sunken",
+        ].join(" ")}
       >
         {heading}
       </button>
@@ -135,7 +170,7 @@ export function TodoColumn({
         the other out of the accessibility tree, so neither needs hiding by hand.
       */}
       <div
-        className={`border-divider hidden items-center justify-between gap-2 px-3.5 py-3 md:flex ${headerEdge}`}
+        className={`border-divider hidden items-center justify-between gap-2 px-3.5 md:flex ${headerEdge}`}
       >
         {heading}
       </div>
