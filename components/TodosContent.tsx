@@ -127,12 +127,13 @@ export function TodosContent({ todos }: TodosContentProps) {
       />
 
       {/*
-        One board, two layouts. Below md it is a horizontal snap carousel — three
-        columns will not fit on a phone at any readable chip width, and a
-        stacked accordion loses the left-to-right progression that is the whole
-        metaphor. At md it becomes an equal three-up grid.
+        One board, two layouts. Below md the three stages stack as collapsed
+        accordions — the page then scrolls one way instead of two, which is the
+        difference between a board you can skim on a phone and one you have to
+        swipe through to find out what is on it. At md it becomes an equal
+        three-up grid and every stage is open at once.
       */}
-      <div className="-mx-5 flex snap-x snap-mandatory items-start gap-3 overflow-x-auto px-5 pb-1.5 md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0">
+      <div className="flex flex-col gap-3 md:grid md:grid-cols-3 md:items-start md:gap-4">
         {TODO_STAGES.map((def, index) => (
           <TodoColumn
             key={def.key}
@@ -159,8 +160,10 @@ export function TodosContent({ todos }: TodosContentProps) {
       <p className="text-faint flex items-start gap-2 font-mono text-[10px] tracking-[0.08em]">
         <ArrowRight size={12} className="mt-px shrink-0" />
         <span>
-          <span className="hidden sm:inline">DRAG A CHIP BETWEEN COLUMNS</span>
-          <span className="sm:hidden">TAP A CHIP TO MOVE IT</span>
+          <span className="hidden md:inline">DRAG A CHIP BETWEEN COLUMNS</span>
+          <span className="md:hidden">
+            TAP A STAGE TO OPEN IT · TAP A CHIP TO MOVE IT
+          </span>
           {" · BULK ACTIONS MOVE EVERY ITEM"}
         </span>
       </p>
