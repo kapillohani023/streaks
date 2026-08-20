@@ -64,7 +64,7 @@ export function Navbar() {
 
   return (
     <div className="flex justify-center px-4 pt-2.5 pb-[max(1.125rem,env(safe-area-inset-bottom))]">
-      <div className="border-border flex w-full max-w-[420px] items-center gap-0.5 rounded-xl border bg-[var(--panel-blur)] p-1 shadow-[var(--shadow-dock)] backdrop-blur-xl">
+      <div className="border-border flex w-full max-w-[420px] items-center justify-center gap-0.5 rounded-xl border bg-[var(--panel-blur)] p-1 shadow-[var(--shadow-dock)] backdrop-blur-xl">
         {NAV_ITEMS.map(({ href, icon: Icon, name, short }) => {
           const isActive = path.startsWith(href);
           return (
