@@ -1,0 +1,15 @@
+# Copy to .github/workflows/deploy.yml in github.com/kapillohani023/streaks
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: kapillohani023/deploy/.github/workflows/app-deploy.yml@main
+    with:
+      service: streaks
+      extra_services: streaks-cron
+    secrets: inherit
