@@ -1,4 +1,3 @@
-# Copy to .github/workflows/deploy.yml in github.com/kapillohani023/streaks
 name: Deploy
 
 on:
@@ -8,6 +7,9 @@ on:
 
 jobs:
   deploy:
+    permissions:
+      contents: read
+      packages: write
     uses: kapillohani023/deploy/.github/workflows/app-deploy.yml@main
     with:
       service: streaks
