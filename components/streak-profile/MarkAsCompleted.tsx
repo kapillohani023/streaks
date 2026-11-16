@@ -1,11 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check } from "lucide-react";
 import { Streak } from "@/types/streak";
 import { completedOffsets, currentRun, isDoneToday } from "@/lib/stats";
-import { createStreakEntry } from "@/app/actions/streak-entry";
+import { toDateKey } from "@/lib/util";
+import {
+  markStreakCompletedOnDate,
+  markStreakCompletedToday,
+} from "@/app/actions/streak-entry";
 import { SsButton } from "@/components/ui/SsButton";
-import { SsTextarea } from "@/components/ui/SsInput";
+import { SsInput, SsTextarea } from "@/components/ui/SsInput";
 import { SsLoaderOverlay } from "@/components/ui/SsLoader";
 import { SsDialog } from "@/components/ui/SsDialog";
 
@@ -21,24 +25,34 @@ export function EntrySubmissionDialog({
   streak,
 }: EntrySubmissionDialogProps) {
   const [note, setNote] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setNote("");
+      setError(null);
+      setIsSubmitting(false);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    const formData = new FormData();
-    formData.set("streakId", streak.id);
-    formData.set("date", new Date().toISOString());
-    formData.set("completed", "true");
-    formData.set("note", note);
-
-    await createStreakEntry(formData);
-    setNote("");
-    setIsSubmitting(false);
-    onClose();
+    try {
+      await markStreakCompletedToday({
+        streakId: streak.id,
+        note: note.trim() || undefined,
+      });
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save entry");
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -52,7 +66,7 @@ export function EntrySubmissionDialog({
         disableClose={isSubmitting}
       >
         <form onSubmit={handleSubmit}>
-          <div className="mb-5">
+          <div className="mb-5 flex flex-col gap-3.5">
             <SsTextarea
               id="daily-note"
               value={note}
@@ -62,6 +76,7 @@ export function EntrySubmissionDialog({
               rows={5}
               autoFocus
               disabled={isSubmitting}
+              error={error ?? undefined}
             />
           </div>
 
@@ -78,6 +93,138 @@ export function EntrySubmissionDialog({
             </SsButton>
             <SsButton type="submit" mono block disabled={isSubmitting}>
               Complete day
+            </SsButton>
+          </div>
+        </form>
+      </SsDialog>
+    </>
+  );
+}
+
+interface PastEntryDialogProps {
+  isOpen: boolean;
+  streak: Streak;
+  onClose: () => void;
+}
+
+/** Default the picker to yesterday, clamped into the streak's valid range. */
+function defaultPastDate(streak: Streak, todayKey: string, minKey: string) {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  let key = toDateKey(yesterday);
+  if (key > todayKey) key = todayKey;
+  if (key < minKey) key = minKey;
+  return key;
+}
+
+/**
+ * Backfill a completed day after the streak already exists — date + optional
+ * note. Shares the same server path as the MCP tool so rules stay one place.
+ */
+export function PastEntryDialog({
+  isOpen,
+  onClose,
+  streak,
+}: PastEntryDialogProps) {
+  const minKey = useMemo(() => toDateKey(streak.startDate), [streak.startDate]);
+
+  const [todayKey, setTodayKey] = useState(() => toDateKey(new Date()));
+  const [date, setDate] = useState(() =>
+    defaultPastDate(streak, toDateKey(new Date()), minKey)
+  );
+  const [note, setNote] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const today = toDateKey(new Date());
+      setTodayKey(today);
+      setDate(defaultPastDate(streak, today, minKey));
+      setNote("");
+      setError(null);
+      setIsSubmitting(false);
+    }
+  }, [isOpen, streak, minKey]);
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!date) {
+      setError("Pick a date");
+      return;
+    }
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      await markStreakCompletedOnDate({
+        streakId: streak.id,
+        date,
+        note: note.trim() || undefined,
+      });
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save entry");
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <>
+      <SsLoaderOverlay open={isSubmitting} label="Saving entry..." />
+      <SsDialog
+        open={isOpen}
+        onClose={onClose}
+        eyebrow="PAST ENTRY"
+        title={streak.name}
+        disableClose={isSubmitting}
+      >
+        <form onSubmit={handleSubmit}>
+          <div className="mb-5 flex flex-col gap-3.5">
+            <SsInput
+              id="past-entry-date"
+              type="date"
+              mono
+              label="Date"
+              value={date}
+              min={minKey}
+              max={todayKey}
+              onChange={(e) => {
+                setDate(e.target.value);
+                setError(null);
+              }}
+              disabled={isSubmitting}
+              required
+              autoFocus
+              hint={`Between ${minKey} and ${todayKey}`}
+              error={error ?? undefined}
+            />
+            <SsTextarea
+              id="past-entry-note"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              label="Note / optional"
+              placeholder="What happened that day?"
+              rows={4}
+              disabled={isSubmitting}
+            />
+          </div>
+
+          <div className="flex gap-2.5">
+            <SsButton
+              type="button"
+              onClick={onClose}
+              variant="outline"
+              mono
+              block
+              disabled={isSubmitting}
+            >
+              Cancel
+            </SsButton>
+            <SsButton type="submit" mono block disabled={isSubmitting || !date}>
+              Add entry
             </SsButton>
           </div>
         </form>

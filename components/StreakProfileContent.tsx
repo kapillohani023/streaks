@@ -43,7 +43,7 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
     }
   };
 
-  const { menu, dialogs, markComplete } = useStreakActions({
+  const { menu, dialogs, markComplete, addPastEntry } = useStreakActions({
     streak,
     onDelete: handleDelete,
     placement: "header",
@@ -114,7 +114,11 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
         legend
       />
 
-      <StreakEntryHistory entries={streak.entries} onAddEntry={markComplete} />
+      <StreakEntryHistory
+        entries={streak.entries}
+        onAddEntry={markComplete}
+        onAddPastEntry={addPastEntry}
+      />
 
       {dialogs}
     </PageShell>

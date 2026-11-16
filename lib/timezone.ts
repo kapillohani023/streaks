@@ -118,9 +118,48 @@ export function localDayBounds(
   at: Date = new Date()
 ): { start: Date; end: Date } {
   const zone = safeZone(timeZone);
-  const [year, month, day] = localDateKey(zone, at).split("-").map(Number);
-  const start = wallClockToUtc(zone, year, month, day);
-  const end = wallClockToUtc(zone, year, month, day + 1);
+  return localDayBoundsForDateKey(zone, localDateKey(zone, at));
+}
+
+/**
+ * Parse a calendar "YYYY-MM-DD" into year/month/day, or null if it isn't a
+ * real Gregorian date (e.g. "2026-02-30", "2026-13-01", or free text).
+ */
+export function parseDateKey(
+  dateKey: string
+): { year: number; month: number; day: number } | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateKey.trim());
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  // Round-trip through Date.UTC so Feb 30 collapses to Mar 2 and fails the
+  // equality check below — a pure regex can't catch that.
+  const probe = new Date(Date.UTC(year, month - 1, day));
+  if (
+    probe.getUTCFullYear() !== year ||
+    probe.getUTCMonth() !== month - 1 ||
+    probe.getUTCDate() !== day
+  ) {
+    return null;
+  }
+  return { year, month, day };
+}
+
+/**
+ * [start, end) of a specific local calendar day ("YYYY-MM-DD") in `timeZone`.
+ * Throws when `dateKey` isn't a real date — callers that already validated
+ * can treat that as a bug rather than a user error.
+ */
+export function localDayBoundsForDateKey(
+  timeZone: string,
+  dateKey: string
+): { start: Date; end: Date } {
+  const parts = parseDateKey(dateKey);
+  if (!parts) throw new Error(`Invalid date "${dateKey}" — expected YYYY-MM-DD`);
+  const zone = safeZone(timeZone);
+  const start = wallClockToUtc(zone, parts.year, parts.month, parts.day);
+  const end = wallClockToUtc(zone, parts.year, parts.month, parts.day + 1);
   return { start, end };
 }
 

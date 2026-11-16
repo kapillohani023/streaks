@@ -5,6 +5,7 @@ import {
   getStreakEntriesForUser,
   createStreakForUser,
   markStreakCompletedTodayForUser,
+  markStreakCompletedOnDateForUser,
   isStreakCompletedTodayForUser,
   setStreakReminderForUser,
   hasPushSubscription,
@@ -138,7 +139,8 @@ const handler = createMcpHandler(
         "Safe to call more than once: if today is already marked completed, no duplicate " +
         "entry is created and the existing entry is returned instead — the response's " +
         "`alreadyCompleted` field tells you which happened. Use `is_streak_completed_today` " +
-        "first if you only need to check status without writing anything.",
+        "first if you only need to check status without writing anything. For a past day " +
+        "the user forgot to log, use `mark_streak_completed_on_date` instead.",
       {
         userId: z
           .string()
@@ -159,6 +161,59 @@ const handler = createMcpHandler(
             await markStreakCompletedTodayForUser(userId, { streakId, note });
           return ok({
             alreadyCompleted,
+            entry: {
+              id: entry.id,
+              streakId: entry.streakId,
+              date: entry.date.toISOString(),
+              completed: entry.completed,
+              note: entry.note ?? null,
+            },
+          });
+        } catch (e) {
+          return fail(e);
+        }
+      }
+    );
+
+    server.tool(
+      "mark_streak_completed_on_date",
+      "Mark a streak the user owns as done for a specific local calendar day " +
+        "(backfill / 'add past entry'). `date` is YYYY-MM-DD in the user's timezone " +
+        "— do not convert to UTC. Rejects future days and days before the streak " +
+        "started. Safe to call more than once for the same day: if that day is " +
+        "already marked completed, no duplicate entry is created and the response's " +
+        "`alreadyCompleted` field is true. Prefer `mark_streak_completed_today` when " +
+        "the day is today.",
+      {
+        userId: z
+          .string()
+          .describe(
+            "The acting user's id. Use the `userId` provided in the request input; never invent it or ask the user."
+          ),
+        streakId: z
+          .string()
+          .describe("The id of the streak to mark completed for the given day"),
+        date: z
+          .string()
+          .describe(
+            'Local calendar day as YYYY-MM-DD, e.g. "2026-11-10". Must not be in the future or before the streak startDate.'
+          ),
+        note: z
+          .string()
+          .optional()
+          .describe("Optional note to attach to the entry"),
+      },
+      async ({ userId, streakId, date, note }) => {
+        try {
+          const { alreadyCompleted, entry, date: dateKey } =
+            await markStreakCompletedOnDateForUser(userId, {
+              streakId,
+              date,
+              note,
+            });
+          return ok({
+            alreadyCompleted,
+            date: dateKey,
             entry: {
               id: entry.id,
               streakId: entry.streakId,

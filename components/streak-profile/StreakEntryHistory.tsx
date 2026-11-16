@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { Check, ChevronDown, History } from "lucide-react";
+import { CalendarPlus, Check, ChevronDown, History } from "lucide-react";
 import { StreakEntry } from "@/types/streak-entry";
 import { dayIndex, todayIndex } from "@/lib/stats";
 import { formatLogDate } from "@/lib/util";
@@ -12,6 +12,8 @@ interface StreakEntryHistoryProps {
   entries: StreakEntry[];
   /** Opens the note dialog from the empty state so a first entry is one tap away. */
   onAddEntry?: () => void;
+  /** Opens the backfill dialog for a day that wasn't logged when it happened. */
+  onAddPastEntry?: () => void;
 }
 
 /** How many rows render before the reader has to ask for more. */
@@ -67,6 +69,7 @@ const buildRows = (entries: StreakEntry[]): Row[] => {
 export function StreakEntryHistory({
   entries,
   onAddEntry,
+  onAddPastEntry,
 }: StreakEntryHistoryProps) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -94,17 +97,31 @@ export function StreakEntryHistory({
         <SsTypography variant="muted" className="mx-auto max-w-xs">
           Every day you mark complete shows up here, newest first.
         </SsTypography>
-        {onAddEntry && (
-          <SsButton
-            onClick={onAddEntry}
-            variant="outline"
-            mono
-            size="sm"
-            className="mt-4"
-            leftIcon={<Check size={13} />}
-          >
-            Mark today complete
-          </SsButton>
+        {(onAddEntry || onAddPastEntry) && (
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            {onAddEntry && (
+              <SsButton
+                onClick={onAddEntry}
+                variant="outline"
+                mono
+                size="sm"
+                leftIcon={<Check size={13} />}
+              >
+                Mark today complete
+              </SsButton>
+            )}
+            {onAddPastEntry && (
+              <SsButton
+                onClick={onAddPastEntry}
+                variant="ghost"
+                mono
+                size="sm"
+                leftIcon={<CalendarPlus size={13} />}
+              >
+                Add past entry
+              </SsButton>
+            )}
+          </div>
         )}
       </div>
     );
@@ -115,11 +132,25 @@ export function StreakEntryHistory({
 
   return (
     <div className="border-border bg-panel overflow-hidden rounded-xl border">
-      <div className="border-divider flex items-baseline justify-between gap-2 border-b px-5 py-3">
+      <div className="border-divider flex items-center justify-between gap-2 border-b px-5 py-3">
         <MonoLabel as="h2">LOG / NEWEST FIRST</MonoLabel>
-        <MonoLabel as="span" size="tile" className="tracking-[0.08em]">
-          {rows.length} {rows.length === 1 ? "ENTRY" : "ENTRIES"}
-        </MonoLabel>
+        <div className="flex items-center gap-2">
+          <MonoLabel as="span" size="tile" className="tracking-[0.08em]">
+            {rows.length} {rows.length === 1 ? "ENTRY" : "ENTRIES"}
+          </MonoLabel>
+          {onAddPastEntry && (
+            <SsButton
+              onClick={onAddPastEntry}
+              variant="ghost"
+              mono
+              size="sm"
+              leftIcon={<CalendarPlus size={12} />}
+              className="shrink-0"
+            >
+              Past
+            </SsButton>
+          )}
+        </div>
       </div>
 
       <ol className="m-0 list-none px-5 py-2.5">

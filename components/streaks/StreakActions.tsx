@@ -1,10 +1,13 @@
 "use client";
 import { useState, type ReactNode } from "react";
-import { Check, Pencil, Trash2 } from "lucide-react";
+import { CalendarPlus, Check, Pencil, Trash2 } from "lucide-react";
 import { Streak } from "@/types/streak";
 import { isCompletedToday } from "@/lib/util";
 import { SsMenu } from "@/components/ui/SsMenu";
-import { EntrySubmissionDialog } from "@/components/streak-profile/MarkAsCompleted";
+import {
+  EntrySubmissionDialog,
+  PastEntryDialog,
+} from "@/components/streak-profile/MarkAsCompleted";
 import { DeleteStreakDialog } from "@/components/streak-profile/DeleteStreakButton";
 import { EditStreakDialog } from "@/components/streaks/EditStreakDialog";
 
@@ -27,11 +30,13 @@ export interface StreakActions {
   dialogs: ReactNode;
   /** Opens the "mark complete" note dialog from outside the menu. */
   markComplete: () => void;
+  /** Opens the backfill dialog from outside the menu. */
+  addPastEntry: () => void;
 }
 
 /**
- * The action set a streak carries with it — mark complete, edit, delete —
- * together with the dialogs each one opens.
+ * The action set a streak carries with it — mark complete, add past entry,
+ * edit, delete — together with the dialogs each one opens.
  *
  * A hook rather than a component because the list and the profile put the
  * trigger in different places, and the profile also needs to fire the
@@ -45,6 +50,7 @@ export function useStreakActions({
   placement = "row",
 }: UseStreakActionsOptions): StreakActions {
   const [isEntryDialogOpen, setIsEntryDialogOpen] = useState(false);
+  const [isPastEntryDialogOpen, setIsPastEntryDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -61,6 +67,11 @@ export function useStreakActions({
           icon: <Check size={14} />,
           disabled: completedToday,
           onSelect: () => setIsEntryDialogOpen(true),
+        },
+        {
+          label: "Add past entry",
+          icon: <CalendarPlus size={14} />,
+          onSelect: () => setIsPastEntryDialogOpen(true),
         },
         {
           label: "Edit",
@@ -84,6 +95,11 @@ export function useStreakActions({
         onClose={() => setIsEntryDialogOpen(false)}
         streak={streak}
       />
+      <PastEntryDialog
+        isOpen={isPastEntryDialogOpen}
+        onClose={() => setIsPastEntryDialogOpen(false)}
+        streak={streak}
+      />
       <EditStreakDialog
         open={isEditDialogOpen}
         streak={streak}
@@ -99,5 +115,10 @@ export function useStreakActions({
     </>
   );
 
-  return { menu, dialogs, markComplete: () => setIsEntryDialogOpen(true) };
+  return {
+    menu,
+    dialogs,
+    markComplete: () => setIsEntryDialogOpen(true),
+    addPastEntry: () => setIsPastEntryDialogOpen(true),
+  };
 }

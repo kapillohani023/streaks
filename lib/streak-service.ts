@@ -5,7 +5,10 @@ import { StreakEntry } from "@/types/streak-entry";
 import {
   DEFAULT_TIMEZONE,
   isValidTimezone,
+  localDateKey,
   localDayBounds,
+  localDayBoundsForDateKey,
+  parseDateKey,
   parseReminderTime,
 } from "@/lib/timezone";
 
@@ -207,16 +210,46 @@ export async function isStreakCompletedTodayForUser(
 }
 
 /**
- * Mark a streak the user owns as completed for today. Idempotent: if
- * today is already marked completed, the existing entry is returned
- * instead of creating a duplicate.
+ * Mark a streak the user owns as completed for a specific local calendar day
+ * ("YYYY-MM-DD" in the owner's timezone). Idempotent for that day: a second
+ * call returns the existing entry instead of creating a duplicate.
+ *
+ * Rejects future days and days before the streak's start date — both would
+ * either invent history that hasn't happened or sit outside the streak's life.
  */
-export async function markStreakCompletedTodayForUser(
+export async function markStreakCompletedOnDateForUser(
   userId: string,
-  input: { streakId: string; note?: string }
-): Promise<{ alreadyCompleted: boolean; entry: StreakRow["entries"][number] }> {
-  await assertOwnedStreak(userId, input.streakId);
-  const { start, end } = todayBounds(await getUserTimezone(userId));
+  input: { streakId: string; date: string; note?: string }
+): Promise<{
+  alreadyCompleted: boolean;
+  entry: StreakRow["entries"][number];
+  date: string;
+}> {
+  const dateKey = input.date.trim();
+  if (!parseDateKey(dateKey)) {
+    throw new Error(`Invalid date "${input.date}" — expected YYYY-MM-DD`);
+  }
+
+  const streak = await prisma.streak.findFirst({
+    where: { id: input.streakId, userId },
+    select: { id: true, startDate: true },
+  });
+  if (!streak) throw new Error("Streak not found");
+
+  const timezone = await getUserTimezone(userId);
+  const todayKey = localDateKey(timezone);
+  if (dateKey > todayKey) {
+    throw new Error("Can't log a future day");
+  }
+
+  const startKey = localDateKey(timezone, streak.startDate);
+  if (dateKey < startKey) {
+    throw new Error(
+      `Can't log before the streak started (${startKey})`
+    );
+  }
+
+  const { start, end } = localDayBoundsForDateKey(timezone, dateKey);
 
   const existing = await prisma.streakEntry.findFirst({
     where: {
@@ -226,18 +259,42 @@ export async function markStreakCompletedTodayForUser(
     },
   });
   if (existing) {
-    return { alreadyCompleted: true, entry: existing };
+    return { alreadyCompleted: true, entry: existing, date: dateKey };
   }
+
+  // Today keeps "now" so a same-day check-in stamps the real clock; past days
+  // land at local noon so the calendar day survives UTC round-trips cleanly.
+  const entryDate =
+    dateKey === todayKey
+      ? new Date()
+      : new Date(start.getTime() + 12 * 60 * 60 * 1000);
 
   const entry = await prisma.streakEntry.create({
     data: {
       streakId: input.streakId,
-      date: new Date(),
+      date: entryDate,
       completed: true,
       note: input.note,
     },
   });
-  return { alreadyCompleted: false, entry };
+  return { alreadyCompleted: false, entry, date: dateKey };
+}
+
+/**
+ * Mark a streak the user owns as completed for today. Idempotent: if
+ * today is already marked completed, the existing entry is returned
+ * instead of creating a duplicate.
+ */
+export async function markStreakCompletedTodayForUser(
+  userId: string,
+  input: { streakId: string; note?: string }
+): Promise<{ alreadyCompleted: boolean; entry: StreakRow["entries"][number] }> {
+  const timezone = await getUserTimezone(userId);
+  const { alreadyCompleted, entry } = await markStreakCompletedOnDateForUser(
+    userId,
+    { streakId: input.streakId, date: localDateKey(timezone), note: input.note }
+  );
+  return { alreadyCompleted, entry };
 }
 
 /**
