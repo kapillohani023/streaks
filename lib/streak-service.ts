@@ -164,6 +164,110 @@ export async function addStreakEntryForUser(
 }
 
 /**
+ * Update a streak entry's note and/or local calendar date. Ownership is
+ * checked via the parent streak. Moving the date rejects futures, pre-start
+ * days, and days that already have a *different* completed entry.
+ */
+export async function updateStreakEntryForUser(
+  userId: string,
+  input: {
+    streakId: string;
+    entryId: string;
+    /** Local calendar "YYYY-MM-DD". Omit to leave the date alone. */
+    date?: string;
+    /** Pass `null` or `""` to clear the note; omit to leave it alone. */
+    note?: string | null;
+  }
+) {
+  const existing = await prisma.streakEntry.findFirst({
+    where: {
+      id: input.entryId,
+      streakId: input.streakId,
+      streak: { userId },
+    },
+    include: { streak: { select: { startDate: true } } },
+  });
+  if (!existing) throw new Error("Entry not found");
+
+  if (input.date === undefined && input.note === undefined) {
+    return existing;
+  }
+
+  const timezone = await getUserTimezone(userId);
+  const data: { date?: Date; note?: string | null } = {};
+
+  if (input.note !== undefined) {
+    const trimmed = input.note?.trim() || null;
+    data.note = trimmed;
+  }
+
+  if (input.date !== undefined) {
+    const dateKey = input.date.trim();
+    if (!parseDateKey(dateKey)) {
+      throw new Error(`Invalid date "${input.date}" — expected YYYY-MM-DD`);
+    }
+
+    const todayKey = localDateKey(timezone);
+    if (dateKey > todayKey) {
+      throw new Error("Can't move an entry to a future day");
+    }
+
+    const startKey = localDateKey(timezone, existing.streak.startDate);
+    if (dateKey < startKey) {
+      throw new Error(
+        `Can't move an entry before the streak started (${startKey})`
+      );
+    }
+
+    const { start, end } = localDayBoundsForDateKey(timezone, dateKey);
+    const conflict = await prisma.streakEntry.findFirst({
+      where: {
+        streakId: input.streakId,
+        completed: true,
+        id: { not: input.entryId },
+        date: { gte: start, lt: end },
+      },
+      select: { id: true },
+    });
+    if (conflict) {
+      throw new Error("That day already has an entry");
+    }
+
+    const currentKey = localDateKey(timezone, existing.date);
+    if (dateKey !== currentKey) {
+      data.date =
+        dateKey === todayKey
+          ? new Date()
+          : new Date(start.getTime() + 12 * 60 * 60 * 1000);
+    }
+  }
+
+  return prisma.streakEntry.update({
+    where: { id: input.entryId },
+    data,
+  });
+}
+
+/** Permanently remove one entry from a streak the user owns. */
+export async function deleteStreakEntryForUser(
+  userId: string,
+  input: { streakId: string; entryId: string }
+) {
+  const owned = await prisma.streakEntry.findFirst({
+    where: {
+      id: input.entryId,
+      streakId: input.streakId,
+      streak: { userId },
+    },
+    select: { id: true },
+  });
+  if (!owned) throw new Error("Entry not found");
+
+  await prisma.streakEntry.delete({ where: { id: input.entryId } });
+  return { id: input.entryId, deleted: true };
+}
+
+/**
  * [start of day, start of next day) for right now, in the given IANA zone.
  *
  * This used to use the *server's* local time, which on a UTC host meant an

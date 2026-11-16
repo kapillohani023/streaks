@@ -1,11 +1,12 @@
 "use server";
-import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/app/auth";
 import {
   addStreakEntryForUser,
+  deleteStreakEntryForUser,
   markStreakCompletedOnDateForUser,
   markStreakCompletedTodayForUser,
+  updateStreakEntryForUser,
 } from "@/lib/streak-service";
 
 export async function createStreakEntry(formData: FormData) {
@@ -70,24 +71,30 @@ export async function markStreakCompletedOnDate(input: {
   return result;
 }
 
+export async function updateStreakEntry(input: {
+  streakId: string;
+  entryId: string;
+  date?: string;
+  note?: string | null;
+}) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const entry = await updateStreakEntryForUser(session.user.id, input);
+
+  revalidatePath("/", "layout");
+  return entry;
+}
+
 export async function deleteStreakEntry(streakId: string, entryId: string) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-  // Ownership check: only delete an entry that belongs to a streak the user owns.
-  const owned = await prisma.streakEntry.findFirst({
-    where: {
-      id: entryId,
-      streakId,
-      streak: { userId: session.user.id },
-    },
-    select: { id: true },
-  });
-  if (!owned) throw new Error("Entry not found");
-
-  await prisma.streakEntry.delete({
-    where: { id: entryId },
+  const result = await deleteStreakEntryForUser(session.user.id, {
+    streakId,
+    entryId,
   });
 
   revalidatePath("/", "layout");
+  return result;
 }

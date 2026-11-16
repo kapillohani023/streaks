@@ -115,7 +115,7 @@ export function StreakProfileContent({ streak }: StreakProfileContentProps) {
       />
 
       <StreakEntryHistory
-        entries={streak.entries}
+        streak={streak}
         onAddEntry={markComplete}
         onAddPastEntry={addPastEntry}
       />
