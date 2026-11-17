@@ -118,7 +118,7 @@ export function SsMenu({
         <div
           role="menu"
           className={[
-            "ss-animate-scale-in border-border-strong bg-panel-2 absolute z-50 min-w-44 overflow-hidden rounded-lg border p-1 shadow-[var(--shadow-menu)]",
+            "ss-animate-scale-in border-border-strong bg-panel-2 absolute z-[100] min-w-44 overflow-hidden rounded-lg border p-1 shadow-[var(--shadow-menu)]",
             align === "right" ? "right-0" : "left-0",
             openUpward ? "bottom-full mb-1" : "top-full mt-1",
           ].join(" ")}

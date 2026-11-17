@@ -59,15 +59,26 @@ export function EditEntryDialog({
       setError("Pick a date");
       return;
     }
+    if (date > todayKey) {
+      setError("Can't move an entry to a future day");
+      return;
+    }
+    if (date < minKey) {
+      setError(`Can't move an entry before the streak started (${minKey})`);
+      return;
+    }
     setIsSubmitting(true);
     setError(null);
+
+    const dateToSave = date;
+    const noteToSave = note.trim() || null;
 
     try {
       await updateStreakEntry({
         streakId,
         entryId: entry.id,
-        date,
-        note: note.trim() || null,
+        date: dateToSave,
+        note: noteToSave,
       });
       onClose();
     } catch (err) {

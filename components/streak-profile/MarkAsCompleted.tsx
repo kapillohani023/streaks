@@ -107,12 +107,17 @@ interface PastEntryDialogProps {
   onClose: () => void;
 }
 
+/** Yesterday as YYYY-MM-DD — the newest day "Add past entry" may target. */
+function yesterdayKey(from = new Date()): string {
+  const d = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  d.setDate(d.getDate() - 1);
+  return toDateKey(d);
+}
+
 /** Default the picker to yesterday, clamped into the streak's valid range. */
-function defaultPastDate(streak: Streak, todayKey: string, minKey: string) {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  let key = toDateKey(yesterday);
-  if (key > todayKey) key = todayKey;
+function defaultPastDate(maxKey: string, minKey: string) {
+  let key = yesterdayKey();
+  if (key > maxKey) key = maxKey;
   if (key < minKey) key = minKey;
   return key;
 }
@@ -120,6 +125,7 @@ function defaultPastDate(streak: Streak, todayKey: string, minKey: string) {
 /**
  * Backfill a completed day after the streak already exists — date + optional
  * note. Shares the same server path as the MCP tool so rules stay one place.
+ * Today is intentionally out of range here; use Mark complete for that.
  */
 export function PastEntryDialog({
   isOpen,
@@ -128,26 +134,26 @@ export function PastEntryDialog({
 }: PastEntryDialogProps) {
   const minKey = useMemo(() => toDateKey(streak.startDate), [streak.startDate]);
 
-  const [todayKey, setTodayKey] = useState(() => toDateKey(new Date()));
-  const [date, setDate] = useState(() =>
-    defaultPastDate(streak, toDateKey(new Date()), minKey)
-  );
+  const [maxKey, setMaxKey] = useState(() => yesterdayKey());
+  const [date, setDate] = useState(() => defaultPastDate(yesterdayKey(), minKey));
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      const today = toDateKey(new Date());
-      setTodayKey(today);
-      setDate(defaultPastDate(streak, today, minKey));
+      const max = yesterdayKey();
+      setMaxKey(max);
+      setDate(defaultPastDate(max, minKey));
       setNote("");
       setError(null);
       setIsSubmitting(false);
     }
-  }, [isOpen, streak, minKey]);
+  }, [isOpen, minKey]);
 
   if (!isOpen) return null;
+
+  const noPastDays = maxKey < minKey;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,14 +161,26 @@ export function PastEntryDialog({
       setError("Pick a date");
       return;
     }
+    if (date > maxKey) {
+      setError("Pick a past day — use Mark complete for today");
+      return;
+    }
+    if (date < minKey) {
+      setError(`Can't log before the streak started (${minKey})`);
+      return;
+    }
     setIsSubmitting(true);
     setError(null);
+
+    // Capture before any revalidation re-renders reset the controlled input.
+    const dateToSave = date;
+    const noteToSave = note.trim() || undefined;
 
     try {
       await markStreakCompletedOnDate({
         streakId: streak.id,
-        date,
-        note: note.trim() || undefined,
+        date: dateToSave,
+        note: noteToSave,
       });
       onClose();
     } catch (err) {
@@ -190,15 +208,19 @@ export function PastEntryDialog({
               label="Date"
               value={date}
               min={minKey}
-              max={todayKey}
+              max={maxKey}
               onChange={(e) => {
                 setDate(e.target.value);
                 setError(null);
               }}
-              disabled={isSubmitting}
+              disabled={isSubmitting || noPastDays}
               required
               autoFocus
-              hint={`Between ${minKey} and ${todayKey}`}
+              hint={
+                noPastDays
+                  ? "No past days yet — streak started today"
+                  : `Between ${minKey} and ${maxKey}`
+              }
               error={error ?? undefined}
             />
             <SsTextarea
@@ -208,7 +230,7 @@ export function PastEntryDialog({
               label="Note / optional"
               placeholder="What happened that day?"
               rows={4}
-              disabled={isSubmitting}
+              disabled={isSubmitting || noPastDays}
             />
           </div>
 
@@ -223,7 +245,12 @@ export function PastEntryDialog({
             >
               Cancel
             </SsButton>
-            <SsButton type="submit" mono block disabled={isSubmitting || !date}>
+            <SsButton
+              type="submit"
+              mono
+              block
+              disabled={isSubmitting || !date || noPastDays}
+            >
               Add entry
             </SsButton>
           </div>

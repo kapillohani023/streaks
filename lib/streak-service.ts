@@ -235,10 +235,8 @@ export async function updateStreakEntryForUser(
 
     const currentKey = localDateKey(timezone, existing.date);
     if (dateKey !== currentKey) {
-      data.date =
-        dateKey === todayKey
-          ? new Date()
-          : new Date(start.getTime() + 12 * 60 * 60 * 1000);
+      // Local noon — same reason as markStreakCompletedOnDateForUser.
+      data.date = new Date(start.getTime() + 12 * 60 * 60 * 1000);
     }
   }
 
@@ -366,12 +364,10 @@ export async function markStreakCompletedOnDateForUser(
     return { alreadyCompleted: true, entry: existing, date: dateKey };
   }
 
-  // Today keeps "now" so a same-day check-in stamps the real clock; past days
-  // land at local noon so the calendar day survives UTC round-trips cleanly.
-  const entryDate =
-    dateKey === todayKey
-      ? new Date()
-      : new Date(start.getTime() + 12 * 60 * 60 * 1000);
+  // Always stamp local noon for the chosen calendar day — never `new Date()`.
+  // A live clock can sit near a timezone boundary and re-read as a different
+  // local day on the client (e.g. 20:00 UTC → next morning in IST).
+  const entryDate = new Date(start.getTime() + 12 * 60 * 60 * 1000);
 
   const entry = await prisma.streakEntry.create({
     data: {

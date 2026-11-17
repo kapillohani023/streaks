@@ -162,7 +162,8 @@ export function StreakEntryHistory({
 
   return (
     <>
-      <div className="border-border bg-panel overflow-hidden rounded-xl border">
+      {/* No overflow-hidden: it clips each row's action menu under the next row. */}
+      <div className="border-border bg-panel rounded-xl border">
         <div className="border-divider flex items-center justify-between gap-2 border-b px-5 py-3">
           <MonoLabel as="h2">LOG / NEWEST FIRST</MonoLabel>
           <div className="flex items-center gap-2">
@@ -207,7 +208,7 @@ export function StreakEntryHistory({
                   </div>
                 )}
 
-                <div className="group/entry relative pb-3.5 pl-6.5">
+                <div className="group/entry relative z-0 pb-3.5 pl-6.5 hover:z-50 focus-within:z-50">
                   {!isLast && (
                     <span
                       className="bg-border absolute top-[18px] bottom-0 left-1 w-px"
@@ -284,7 +285,7 @@ export function StreakEntryHistory({
                       )}
                     </div>
 
-                    <div className="relative z-10 shrink-0 opacity-100 transition-opacity duration-150 sm:opacity-0 sm:group-hover/entry:opacity-100 sm:group-focus-within/entry:opacity-100">
+                    <div className="relative shrink-0 opacity-100 transition-opacity duration-150 sm:opacity-0 sm:group-hover/entry:opacity-100 sm:group-focus-within/entry:opacity-100">
                       <SsMenu
                         label={`Actions for ${formatLogDate(entry.date)}`}
                         items={[
