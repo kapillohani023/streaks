@@ -1,87 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Streaks
 
-## Getting Started
+Personal habit tracker with daily check-ins, a journal, a todo board, Web Push reminders, and an AI chat that can act on your streaks and todos through MCP.
 
-First, run the development server:
+Stack: Next.js 16, React 19, Prisma, PostgreSQL, NextAuth (Google), bun, Tailwind CSS 4.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Run locally
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+You need bun, PostgreSQL, and a Google OAuth client.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Streak reminders (Web Push)
-
-Each streak can have a daily reminder. The preference lives on the streak
-(`reminder_enabled`, `reminder_time`), the time is local wall-clock in the
-owner's timezone (`users.timezone`, auto-detected from the browser), and
-delivery is Web Push to every device the user has registered.
-
-### Environment
+1. Install dependencies:
 
 ```bash
-# Generate a keypair once:  bun x web-push generate-vapid-keys
-VAPID_PUBLIC_KEY=...
-VAPID_PRIVATE_KEY=...
-NEXT_PUBLIC_VAPID_PUBLIC_KEY=...   # same value as VAPID_PUBLIC_KEY
-VAPID_SUBJECT=mailto:you@example.com
-
-# Shared secret for the reminder cron endpoint
-CRON_SECRET=...
+bun install
 ```
 
-`NEXT_PUBLIC_VAPID_PUBLIC_KEY` is inlined at build time, so it must be set in
-the build environment, not just at runtime.
+2. Copy the environment variables below into `.env` and fill in real values.
 
-### Scheduler
+3. Apply migrations:
 
-Nothing in the app runs on a timer. `GET /api/cron/reminders` has to be pinged
-externally — set up a job on [cron-job.org](https://cron-job.org):
+```bash
+bunx prisma migrate deploy
+```
 
-- **URL**: `https://<your-domain>/api/cron/reminders`
-- **Schedule**: every 5 minutes
-- **Header**: `Authorization: Bearer <CRON_SECRET>`
+4. Start the app:
 
-The route is excluded from the session proxy in `proxy.ts` — it has no session
-cookie and authenticates with `CRON_SECRET` instead. Without that exclusion the
-proxy redirects the scheduler to `/signin` and the job never runs.
+```bash
+bun run dev
+```
 
-Each run returns a JSON summary (`checked`, `sent`, `failed`, `pruned`,
-`skippedCompleted`, `undeliverable`), which cron-job.org stores in its request
-log — that log is the observability story for reminders.
+Open [http://localhost:3000](http://localhost:3000). Unauthenticated requests redirect to `/signin`.
 
-A reminder fires on the first tick at or after its local time, within a
-30-minute grace window (`GRACE_WINDOW_MINUTES` in `lib/reminders.ts`), at most
-once per user-local day, and only if the streak isn't already completed that
-day. The grace window is what makes a missed or delayed tick recoverable.
+## Environment
 
-### Notes
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `DATABASE_URL` | yes | PostgreSQL connection string |
+| `AUTH_SECRET` | yes | NextAuth secret |
+| `AUTH_URL` | yes | Public origin, for example `http://localhost:3000` |
+| `GOOGLE_CLIENT_ID` | yes | Google OAuth client id |
+| `GOOGLE_CLIENT_SECRET` | yes | Google OAuth client secret |
+| `VAPID_PUBLIC_KEY` | for reminders | From `bun x web-push generate-vapid-keys` |
+| `VAPID_PRIVATE_KEY` | for reminders | Same keypair |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | for reminders | Same value as `VAPID_PUBLIC_KEY`. Inlined at build time |
+| `VAPID_SUBJECT` | for reminders | `mailto:` contact for the push service |
+| `CRON_SECRET` | for reminders | Bearer token for `GET /api/cron/reminders` |
+| `T2A_API_URL` | for AI chat | Upstream agent endpoint |
+| `T2A_API_BEARER_TOKEN` | for AI chat | Bearer token for that endpoint |
+| `MCP_SERVER_SECRET` | for MCP | Shared secret for `POST /api/mcp` |
 
-- iOS only allows Web Push once the PWA is installed to the Home Screen.
-- Enabling a reminder saves the preference even when the device has no
-  notification permission — the UI says so rather than silently discarding it.
+Generate VAPID keys once:
 
-## Learn More
+```bash
+bun x web-push generate-vapid-keys
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Streaks.** Create habits, mark days complete with optional notes, edit or delete entries, and view heatmaps and milestones.
+- **Dashboard.** Daily check-in, focus streak, week bars, and yearly activity.
+- **Journal.** Dated entries with a calendar, search, and a writing streak.
+- **Todos.** Three-column board (`todo`, `doing`, `done`) with drag reorder.
+- **Reminders.** Per-streak daily Web Push at a local wall-clock time in the user's timezone.
+- **AI chat.** `/ai` talks to an upstream agent that calls streak and todo tools on `/api/mcp`.
+- **PWA.** Installable; iOS Web Push works only after you add the app to the Home Screen.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Streak reminders
 
-## Deploy on Vercel
+Each streak can store `reminder_enabled` and `reminder_time`. Time is local wall-clock in `users.timezone` (set from the browser). Delivery is Web Push to every registered device.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Nothing in the app runs on a timer. Ping the cron route from outside the process:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- URL: `https://<your-domain>/api/cron/reminders`
+- Schedule: every 5 minutes
+- Header: `Authorization: Bearer <CRON_SECRET>`
+
+`proxy.ts` excludes `/api/cron` and `/api/mcp` from the session gate. Those routes authenticate with shared secrets. Without the exclusion, the proxy redirects the scheduler to `/signin` and the job never runs.
+
+Each run returns JSON (`checked`, `sent`, `failed`, `pruned`, `skippedCompleted`, `undeliverable`). Use that response as the job log.
+
+A reminder fires on the first tick at or after its local time, within a 30-minute grace window (`GRACE_WINDOW_MINUTES` in `lib/reminders.ts`), at most once per user-local day, and only if the streak is not already complete that day.
+
+Notes:
+
+- Enabling a reminder saves the preference even when the device has no notification permission. The UI says so instead of discarding the write.
+- `NEXT_PUBLIC_VAPID_PUBLIC_KEY` must be present at build time, not only at runtime.
+
+## Docker
+
+The image runs migrations, then `next start`:
+
+```bash
+docker build --build-arg NEXT_PUBLIC_VAPID_PUBLIC_KEY=<key> -t streaks .
+docker run --env-file .env -p 3000:3000 streaks
+```
+
+Pushes to `main` deploy through `.github/workflows/deploy.yml` (service `streaks`, plus `streaks-cron`).
+
+## Scripts
+
+| Command | Purpose |
+| --- | --- |
+| `bun run dev` | Dev server |
+| `bun run build` | Production build |
+| `bun run start` | Production server |
+| `bun run lint` | ESLint |
+| `bun run format` | Prettier write |
+| `bunx prisma migrate deploy` | Apply migrations |
+| `bunx prisma generate` | Regenerate Prisma client |
